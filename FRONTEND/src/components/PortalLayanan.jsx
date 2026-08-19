@@ -99,6 +99,8 @@ export default function PortalLayanan() {
       navigate('/narasumber');
     } else if (tile.id === 'pengaduan') {
       navigate('/pengaduan');
+    } else if (tile.id === 'kunjungan') {
+      navigate('/kunjungan');
     } else {
       setSelectedService(tile);
       setSubmitted(null);
