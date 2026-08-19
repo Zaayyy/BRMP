@@ -185,31 +185,76 @@ export default function MagangPage() {
               Dapatkan pengalaman riset lapang dan praktikum laboratorium berstandar nasional di Balai Besar Standar Instrumen Pertanian DIY dengan bimbingan langsung para peneliti dan fungsional ahli.
             </p>
 
-            {/* BUTTON BUKA INFORMASI & SOP MAGANG */}
-            <button
-              type="button"
-              onClick={() => setModalInfoOpen(true)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                backgroundColor: '#ffffff',
-                color: '#312e81',
-                padding: '0.75rem 1.4rem',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '0.9rem',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
-              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <Info size={18} color="#4338ca" />
-              <span>Lihat Informasi & SOP Magang</span>
-            </button>
+          </div>
+        </div>
+
+        {/* ═══════ CTA BANNER: INFORMASI & SOP MAGANG ═══════ */}
+        <div
+          onClick={() => setModalInfoOpen(true)}
+          style={{
+            background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #c7d2fe 100%)',
+            borderRadius: '22px',
+            padding: '1.75rem 2rem',
+            marginBottom: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1.5rem',
+            flexWrap: 'wrap',
+            cursor: 'pointer',
+            border: '2px solid rgba(99,102,241,0.25)',
+            boxShadow: '0 8px 30px rgba(67,56,202,0.1)',
+            transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)';
+            e.currentTarget.style.boxShadow = '0 12px 40px rgba(67,56,202,0.2)';
+            e.currentTarget.style.borderColor = '#6366f1';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 8px 30px rgba(67,56,202,0.1)';
+            e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)';
+          }}
+        >
+          {/* Decorative circle */}
+          <div style={{
+            position: 'absolute', top: '-30px', right: '-30px', width: '140px', height: '140px',
+            borderRadius: '50%', backgroundColor: 'rgba(99,102,241,0.12)', pointerEvents: 'none',
+          }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', position: 'relative', zIndex: 2 }}>
+            <div style={{
+              width: '56px', height: '56px', borderRadius: '16px',
+              background: 'linear-gradient(135deg, #4338ca, #6366f1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 6px 16px rgba(67,56,202,0.35)',
+              flexShrink: 0,
+            }}>
+              <BookOpen size={26} color="#fff" />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1e1b4b', margin: '0 0 0.15rem 0' }}>
+                📋 Informasi & SOP Layanan Magang
+              </h3>
+              <p style={{ fontSize: '0.84rem', color: '#4338ca', margin: 0, fontWeight: 600 }}>
+                Klik untuk membaca persyaratan, prosedur, biaya, dan alur pelayanan resmi magang BRMP DIY
+              </p>
+            </div>
+          </div>
+
+          <div style={{
+            backgroundColor: '#4338ca', color: '#fff',
+            padding: '0.65rem 1.4rem', borderRadius: '10px',
+            fontWeight: 800, fontSize: '0.88rem',
+            display: 'flex', alignItems: 'center', gap: '0.45rem',
+            boxShadow: '0 4px 12px rgba(67,56,202,0.4)',
+            whiteSpace: 'nowrap', position: 'relative', zIndex: 2,
+          }}>
+            <FileText size={16} />
+            <span>Buka SOP</span>
           </div>
         </div>
 
@@ -617,14 +662,14 @@ export default function MagangPage() {
         </div>
       </div>
 
-      {/* MODAL POPUP INFORMASI & SOP MAGANG (SESUAI SCREENSHOT USER) */}
+      {/* MODAL POPUP INFORMASI & SOP MAGANG — PREMIUM REDESIGN */}
       {modalInfoOpen && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15,23,42,0.75)',
-            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(15,23,42,0.8)',
+            backdropFilter: 'blur(12px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -636,147 +681,247 @@ export default function MagangPage() {
           <div
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '20px',
-              maxWidth: '840px',
+              borderRadius: '24px',
+              maxWidth: '900px',
               width: '100%',
-              maxHeight: '90vh',
+              maxHeight: '92vh',
               overflowY: 'auto',
-              boxShadow: '0 25px 60px -15px rgba(0,0,0,0.4)',
+              boxShadow: '0 30px 80px -20px rgba(0,0,0,0.5)',
               position: 'relative',
-              animation: 'fadeInUp 0.35s cubic-bezier(0.22,1,0.36,1)',
-              display: 'flex',
-              flexDirection: 'column',
+              animation: 'fadeInUp 0.4s cubic-bezier(0.22,1,0.36,1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* ═══ GRADIENT HEADER ═══ */}
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '1.25rem 1.75rem',
-                borderBottom: '1px solid #e2e8f0',
+                background: 'linear-gradient(135deg, #312e81 0%, #4338ca 40%, #6366f1 100%)',
+                borderRadius: '24px 24px 0 0',
+                padding: '2rem 2rem 1.75rem 2rem',
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                Informasi Magang
-              </h3>
-              <button
-                onClick={() => setModalInfoOpen(false)}
-                style={{
-                  backgroundColor: '#f1f5f9',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: '#64748b',
-                }}
-              >
-                <X size={20} />
-              </button>
+              {/* Decorative circles */}
+              <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '200px', height: '200px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', bottom: '-30px', left: '20%', width: '120px', height: '120px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: '52px', height: '52px', borderRadius: '14px',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}>
+                    <BookOpen size={26} color="#fff" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff', margin: '0 0 0.15rem 0' }}>
+                      Informasi & SOP Magang
+                    </h3>
+                    <p style={{ fontSize: '0.84rem', color: '#c7d2fe', margin: 0, fontWeight: 500 }}>
+                      Balai Besar Modernisasi Pertanian (BRMP) DIY
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setModalInfoOpen(false)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.15)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    width: '40px', height: '40px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: '#fff',
+                    backdropFilter: 'blur(6px)',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'; }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
-            {/* Modal Body Content */}
-            <div style={{ padding: '1.75rem', fontSize: '0.88rem', color: '#1e293b', lineHeight: 1.65 }}>
-              <p style={{ margin: '0 0 1.25rem 0', color: '#334155' }}>
-                Balai Besar Modernisasi Pertanian (BRMP) DIY melayani Bimbingan Teknis / Pelatihan / Magang / PKL
-              </p>
+            {/* ═══ MODAL BODY ═══ */}
+            <div style={{ padding: '2rem' }}>
 
-              {/* PERSYARATAN PENGGUNA LAYANAN */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.02em' }}>
-                  PERSYARATAN PENGGUNA LAYANAN:
-                </h4>
-                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                  <li style={{ marginBottom: '0.35rem' }}>Menulis identitas sesuai kartu identitas yang dimiliki dan maksud kedatangan pada buku tamu.</li>
-                  <li style={{ marginBottom: '0.35rem' }}>Mengisi form permohonan layanan, dengan melampirkan : KTP/Kartu Anggota/KTM dan lainnya.</li>
-                </ol>
+              {/* SECTION: PERSYARATAN */}
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ShieldCheck size={16} color="#fff" />
+                  </div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    Persyaratan Pengguna Layanan
+                  </h4>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingLeft: '0.25rem' }}>
+                  {[
+                    'Menulis identitas sesuai kartu identitas yang dimiliki dan maksud kedatangan pada buku tamu.',
+                    'Mengisi form permohonan layanan, dengan melampirkan: KTP / Kartu Anggota / KTM dan lainnya.',
+                  ].map((text, i) => (
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'flex-start', gap: '0.7rem',
+                      backgroundColor: '#fffbeb', borderRadius: '12px', padding: '0.9rem 1rem',
+                      border: '1px solid #fde68a',
+                    }}>
+                      <div style={{
+                        width: '22px', height: '22px', borderRadius: '6px', flexShrink: 0,
+                        background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px',
+                      }}>
+                        <Check size={13} color="#fff" strokeWidth={3} />
+                      </div>
+                      <span style={{ fontSize: '0.85rem', color: '#78350f', lineHeight: 1.55, fontWeight: 500 }}>{text}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* PROSEDUR / ALUR PELAYANAN */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.02em' }}>
-                  PROSEDUR / ALUR PELAYANAN:
-                </h4>
-                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pengguna layanan mengajukan permohonan tertulis berupa surat permohonan bimbingan teknis/pelatihan/magang/praktek kerja lapangan yang dilengkapi dengan proposal bimbingan teknis/pelatihan/magang/praktek kerja lapangan dan melampirkan profil pengguna layanan yang akan diajukan untuk program bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Petugas layanan menerima, mencatat dan menyampaikan surat permohonan beserta proposal bimbingan teknis/pelatihan/magang/praktek kerja lapangan kepada pejabat berwenang;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pejabat berwenang menerbitkan surat penerimaan bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pejabat berwenang mendisposisi permohonan kepada Tim pelaksana untuk melakukan layanan bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pengguna layanan yang sudah dinyatakan diterima wajib mengikuti pertemuan teknis (<em>technical meeting</em>) dengan membawa surat keterangan sehat (khusus untuk magang/praktek kerja lapangan) serta mengisi formulir persetujuan/pernyataan melaksanakan bimbingan teknis/pelatihan/magang/praktek kerja lapangan sesuai aturan yang ada;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pengguna layanan melaksanakan kegiatan bimbingan teknis/pelatihan/magang/praktek kerja lapangan sesuai dengan proposal yang diajukan di bawah bimbingan Tim pelaksana yang ditunjuk;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Khusus pengguna layanan magang/praktek kerja lapangan diwajibkan membuat laporan hasil pelaksanaan magang/praktek kerja lapangan dan melaksanakan seminar hasil magang/praktek kerja lapangan di BRMP DIY dan menyerahkan output hasil magang/praktek kerja lapangan serta menerima sertifikat magang/praktek kerja lapangan yang ditandatangani oleh Pejabat Berwenang;
-                  </li>
-                  <li style={{ marginBottom: '0.45rem' }}>
-                    Pengguna layanan bimbingan teknis/pelatihan/magang/praktek kerja wajib mengisi Kuisioner Survei Kepuasan Masyarakat sebagai bahan evaluasi pelaksanaan kegiatan berikutnya.
-                  </li>
-                </ol>
+              {/* SECTION: PROSEDUR / ALUR PELAYANAN */}
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg, #4338ca, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Sparkles size={16} color="#fff" />
+                  </div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    Prosedur / Alur Pelayanan
+                  </h4>
+                </div>
+
+                <div style={{ position: 'relative', paddingLeft: '2rem' }}>
+                  {/* Connecting vertical line */}
+                  <div style={{
+                    position: 'absolute', left: '14px', top: '18px', bottom: '18px',
+                    width: '2px', backgroundColor: '#e0e7ff', borderRadius: '2px',
+                  }} />
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[
+                      'Pengguna layanan mengajukan permohonan tertulis berupa surat permohonan bimbingan teknis/pelatihan/magang/praktek kerja lapangan yang dilengkapi dengan proposal dan profil pengguna layanan.',
+                      'Petugas layanan menerima, mencatat dan menyampaikan surat permohonan beserta proposal kepada pejabat berwenang.',
+                      'Pejabat berwenang menerbitkan surat penerimaan bimbingan teknis/pelatihan/magang/praktek kerja lapangan.',
+                      'Pejabat berwenang mendisposisi permohonan kepada Tim pelaksana untuk melakukan layanan.',
+                      'Pengguna layanan yang diterima wajib mengikuti technical meeting dengan membawa surat keterangan sehat serta mengisi formulir persetujuan.',
+                      'Pengguna layanan melaksanakan kegiatan sesuai proposal di bawah bimbingan Tim pelaksana yang ditunjuk.',
+                      'Khusus magang/PKL: diwajibkan membuat laporan hasil, melaksanakan seminar hasil, menyerahkan output, dan menerima sertifikat yang ditandatangani Pejabat Berwenang.',
+                      'Pengguna layanan wajib mengisi Kuisioner Survei Kepuasan Masyarakat sebagai bahan evaluasi.',
+                    ].map((text, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', position: 'relative' }}>
+                        {/* Step number circle */}
+                        <div style={{
+                          position: 'absolute', left: '-2rem',
+                          width: '28px', height: '28px', borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #4338ca, #6366f1)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#fff', fontSize: '0.72rem', fontWeight: 800,
+                          boxShadow: '0 2px 8px rgba(67,56,202,0.3)',
+                          border: '3px solid #fff', zIndex: 2,
+                        }}>
+                          {i + 1}
+                        </div>
+                        <div style={{
+                          backgroundColor: '#f8fafc', borderRadius: '12px', padding: '0.85rem 1rem',
+                          border: '1px solid #e2e8f0', flex: 1,
+                          transition: 'all 0.2s ease',
+                        }}>
+                          <span style={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.6, fontWeight: 500 }}>{text}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* BIAYA / TARIF */}
-              <div style={{ marginBottom: '1.25rem' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
-                  BIAYA / TARIF:
-                </h4>
-                <p style={{ margin: 0, color: '#15803d', fontWeight: 700 }}>
-                  Pelayanan bimbingan teknis/magang/bimbingan/praktik kerja lapangan tidak dipungut biaya/gratis (Rp. 0)
-                </p>
-              </div>
+              {/* SECTION: INFO STRIPS (Biaya, Output, Waktu) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.85rem', marginBottom: '2rem' }}>
+                {/* Biaya */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
+                  borderRadius: '14px', padding: '1.15rem 1.25rem',
+                  border: '1px solid #a7f3d0',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', backgroundColor: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Check size={14} color="#fff" strokeWidth={3} />
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#065f46', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Biaya / Tarif</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#047857' }}>
+                    GRATIS (Rp. 0)
+                  </p>
+                  <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.76rem', color: '#059669' }}>
+                    Tidak dipungut biaya apapun
+                  </p>
+                </div>
 
-              {/* OUTPUT LAYANAN */}
-              <div style={{ marginBottom: '1.25rem' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
-                  OUTPUT LAYANAN:
-                </h4>
-                <p style={{ margin: 0 }}>Pelayanan Bimbingan teknis / magang / bimbingan / praktik kerja lapangan.</p>
-              </div>
+                {/* Output */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+                  borderRadius: '14px', padding: '1.15rem 1.25rem',
+                  border: '1px solid #c7d2fe',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', backgroundColor: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Award size={14} color="#fff" />
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#3730a3', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Output Layanan</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#312e81' }}>
+                    Sertifikat Magang / PKL
+                  </p>
+                  <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.76rem', color: '#4338ca' }}>
+                    Ditandatangani Pejabat Berwenang
+                  </p>
+                </div>
 
-              {/* WAKTU PENYELESAIAN LAYANAN */}
-              <div style={{ marginBottom: '1.75rem' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
-                  WAKTU PENYELESAIAN LAYANAN:
-                </h4>
-                <p style={{ margin: 0 }}>Jangka waktu layanan bimbingan teknis / pelatihan / magang / praktek kerja lapangan: sesuai kesepakatan.</p>
+                {/* Waktu */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+                  borderRadius: '14px', padding: '1.15rem 1.25rem',
+                  border: '1px solid #fdba74',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '7px', backgroundColor: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Clock size={14} color="#fff" />
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#9a3412', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Waktu Penyelesaian</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#c2410c' }}>
+                    Sesuai Kesepakatan
+                  </p>
+                  <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.76rem', color: '#ea580c' }}>
+                    Ditentukan bersama Tim Pelaksana
+                  </p>
+                </div>
               </div>
 
               {/* CLOSE BUTTON */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button
                   type="button"
                   onClick={() => setModalInfoOpen(false)}
                   style={{
-                    backgroundColor: '#ef4444',
+                    background: 'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)',
                     color: '#ffffff',
-                    padding: '0.55rem 1.6rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
+                    padding: '0.75rem 2.5rem',
+                    borderRadius: '12px',
+                    fontWeight: 800,
+                    fontSize: '0.92rem',
                     border: 'none',
                     cursor: 'pointer',
+                    boxShadow: '0 6px 20px rgba(67,56,202,0.35)',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem',
                     transition: 'all 0.2s ease',
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
-                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+                  onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(67,56,202,0.45)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(67,56,202,0.35)'; }}
                 >
-                  Close
+                  <CheckCircle size={18} />
+                  <span>Saya Mengerti, Tutup</span>
                 </button>
               </div>
             </div>
