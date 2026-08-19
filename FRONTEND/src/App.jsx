@@ -24,9 +24,9 @@ function HomePage({ onOpenGuideModal }) {
         }}
         onOpenGuideModal={onOpenGuideModal}
       />
+      <PortalLayanan />
       <LabTracking />
       <BenihSection />
-      <PortalLayanan />
     </>
   );
 }
