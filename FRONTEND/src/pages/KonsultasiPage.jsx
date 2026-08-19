@@ -1,15 +1,31 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Send, Upload, CheckCircle, FileText, Image as ImageIcon, X, ShieldCheck, MessageCircle, HelpCircle, Loader2 } from 'lucide-react';
+import {
+  ArrowLeft, Send, Upload, CheckCircle, FileText, Image as ImageIcon,
+  X, ShieldCheck, MessageCircle, HelpCircle, Loader2, Sprout,
+  Users, Clock, Award, Phone, Mail, MapPin, Sparkles, Check
+} from 'lucide-react';
 import { pengaduanService } from '../services/apiService';
 
+const TOPIK_KONSULTASI = [
+  { id: 'padi', label: '🌾 Budidaya & Mutu Benih Padi', icon: '🌾' },
+  { id: 'jagung', label: '🌽 Varietas Jagung Unggul', icon: '🌽' },
+  { id: 'kedelai', label: '🌱 Kedelai & Kacang-kacangan', icon: '🌱' },
+  { id: 'hortikultura', label: '🌶️ Cabai, Bawang & Sayuran', icon: '🌶️' },
+  { id: 'tanah', label: '🧪 Kesuburan Tanah & Pemupukan', icon: '🧪' },
+  { id: 'hama', label: '🐛 Pengendalian Hama & Penyakit (OPT)', icon: '🐛' },
+  { id: 'sertifikasi', label: '📜 Prosedur Sertifikasi Benih', icon: '📜' },
+];
+
 export default function KonsultasiPage() {
+  const [selectedTopik, setSelectedTopik] = useState(TOPIK_KONSULTASI[0].label);
   const [formData, setFormData] = useState({
-    nik: '',
     nama: '',
+    nik: '',
     alamat: '',
     email: '',
     noHp: '',
+    komoditas: '',
     pesan: '',
   });
   const [file, setFile] = useState(null);
@@ -40,10 +56,12 @@ export default function KonsultasiPage() {
 
     try {
       const fullDescription = [
-        `[Layanan: Konsultasi Teknis & Mutu Benih]`,
-        formData.pesan ? `\nTopik/Keluhan: ${formData.pesan}` : '',
-        formData.alamat ? `\nAlamat: ${formData.alamat}` : '',
+        `[Layanan: Konsultasi Teknis & Standarisasi Pertanian]`,
+        `\nTopik Utama: ${selectedTopik}`,
+        formData.komoditas ? `\nKomoditas/Varietas: ${formData.komoditas}` : '',
         formData.nik ? `\nNIK: ${formData.nik}` : '',
+        `\nUraian Pertanyaan/Keluhan: ${formData.pesan}`,
+        formData.alamat ? `\nLokasi Lahan/Alamat: ${formData.alamat}` : '',
       ].join('');
 
       const res = await pengaduanService.submitPublic({
@@ -57,7 +75,7 @@ export default function KonsultasiPage() {
       setSubmitted({
         code,
         nama: formData.nama,
-        nik: formData.nik,
+        topik: selectedTopik,
         email: formData.email,
         fileName: file ? file.name : null,
       });
@@ -67,7 +85,7 @@ export default function KonsultasiPage() {
       setSubmitted({
         code,
         nama: formData.nama,
-        nik: formData.nik,
+        topik: selectedTopik,
         email: formData.email,
         fileName: file ? file.name : null,
       });
@@ -77,9 +95,13 @@ export default function KonsultasiPage() {
   };
 
   return (
-    <div style={{ paddingTop: '90px', minHeight: '100vh', backgroundColor: '#f4f8f5', paddingBottom: '4rem' }}>
+    <div style={{ paddingTop: '76px', minHeight: '100vh', backgroundColor: '#f0fdf4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <style>{`
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+
       {/* Top Back Navigation */}
-      <div style={{ maxWidth: '800px', margin: '0 auto 1.5rem auto', padding: '0 1.5rem' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto 1.5rem', padding: '0 1.5rem' }}>
         <Link
           to="/"
           style={{
@@ -93,7 +115,7 @@ export default function KonsultasiPage() {
             fontSize: '0.86rem',
             fontWeight: 700,
             textDecoration: 'none',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             border: '1px solid #dcfce7',
             transition: 'all 0.2s ease',
           }}
@@ -105,464 +127,550 @@ export default function KonsultasiPage() {
         </Link>
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
-        {/* Main Card Container */}
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1.5rem 5rem' }}>
+        {/* HERO BANNER */}
+        <div
+          style={{
+            borderRadius: '28px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 50px rgba(13, 110, 56, 0.16)',
+            background: 'linear-gradient(135deg, #064e26 0%, #0d6e38 55%, #10b981 100%)',
+            color: '#ffffff',
+            padding: '3rem 2.5rem',
+            position: 'relative',
+            marginBottom: '2.5rem',
+            animation: 'fadeInUp 0.5s ease both',
+          }}
+        >
+          <div style={{
+            position: 'absolute', top: '-50px', right: '-30px', width: '320px', height: '320px',
+            borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%)',
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: '750px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  backgroundColor: 'rgba(255,255,255,0.22)',
+                  color: '#ffffff',
+                  padding: '0.35rem 0.9rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  backdropFilter: 'blur(8px)',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Sprout size={14} />
+                Layanan Konsultasi Pakar Pertanian
+              </span>
+              <span
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  color: '#d1fae5',
+                  padding: '0.35rem 0.8rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                }}
+              >
+                Langsung Ditangani Ahli BRMP DIY
+              </span>
+            </div>
+
+            <h1
+              style={{
+                fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
+                fontWeight: 900,
+                lineHeight: 1.2,
+                margin: '0 0 1rem 0',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Konsultasi Teknis & Standarisasi Agro Modern
+            </h1>
+
+            <p style={{ fontSize: '0.98rem', color: '#ecfdf5', lineHeight: 1.65, margin: 0 }}>
+              Dapatkan solusi langsung dari pakar pemuliaan benih, agronom, dan analis laboratorium BRMP DIY terkait budidaya, hama tanaman, pemupukan presisi, hingga sertifikasi benih.
+            </p>
+          </div>
+        </div>
+
+        {/* JAMINAN LAYANAN KONSULTASI STRIP */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+            marginBottom: '2.5rem',
+          }}
+        >
+          {[
+            { icon: Award, label: 'Biaya Konsultasi', val: 'GRATIS (Rp. 0)', desc: 'Layanan publik bebas biaya' },
+            { icon: Clock, label: 'Respon Cepat', val: '1x24 Jam Kerja', desc: 'Diteruskan ke tim pakar spesialis' },
+            { icon: Users, label: 'Tenaga Ahli', val: 'Pakar Berpengalaman', desc: 'Agronom & Peneliti Mutu Benih' },
+            { icon: ShieldCheck, label: 'Pelacakan Tiket', val: 'Resi Online Terpadu', desc: 'Pantau status jawaban petugas' },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '16px',
+                padding: '1.25rem',
+                border: '1px solid #dcfce7',
+                boxShadow: '0 2px 10px rgba(13,110,56,0.04)',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.85rem',
+              }}
+            >
+              <div
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  backgroundColor: '#dcfce7',
+                  color: '#0d6e38',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <item.icon size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a', marginTop: '0.1rem' }}>{item.val}</div>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* FORM CONTAINER */}
         <div
           style={{
             backgroundColor: '#ffffff',
             borderRadius: '28px',
-            padding: '3rem 2.5rem',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)',
-            border: '1px solid rgba(13,110,56,0.1)',
+            padding: '2.8rem 2.5rem',
+            border: '1.5px solid rgba(16,185,129,0.2)',
+            boxShadow: '0 15px 40px rgba(13, 110, 56, 0.07)',
           }}
         >
-          {/* Top Badge */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div
+          <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 2.5rem auto' }}>
+            <span
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
                 backgroundColor: '#dcfce7',
-                color: '#0d6e38',
-                padding: '0.4rem 1.2rem',
+                color: '#15803d',
+                padding: '0.35rem 0.9rem',
                 borderRadius: '9999px',
-                fontSize: '0.78rem',
+                fontSize: '0.75rem',
                 fontWeight: 800,
-                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                marginBottom: '1rem',
-                border: '1px solid rgba(13,110,56,0.2)',
-              }}
-            >
-              <HelpCircle size={15} />
-              <span>LAYANAN KONSULTASI AHLI</span>
-            </div>
-
-            <h1
-              style={{
-                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                fontWeight: 800,
-                color: '#0f172a',
                 marginBottom: '0.6rem',
-                letterSpacing: '-0.02em',
               }}
             >
-              Konsultasi Agromodern BRMP DIY
-            </h1>
-
-            <p style={{ fontSize: '0.92rem', color: '#64748b', maxWidth: '580px', margin: '0 auto', lineHeight: 1.6 }}>
-              Sampaikan pertanyaan atau permasalahan teknis pertanian, uji benih, dan tanah Anda secara langsung kepada tim pakar ahli BRMP DIY.
+              <MessageCircle size={14} />
+              Formulir Konsultasi Online
+            </span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.4rem 0' }}>
+              Ajukan Pertanyaan atau Masalah Pertanian
+            </h2>
+            <p style={{ fontSize: '0.88rem', color: '#64748b', margin: 0 }}>
+              Pilih bidang konsultasi dan isi formulir di bawah ini agar tim teknis kami dapat memberikan rekomendasi yang tepat.
             </p>
           </div>
 
-          {!submitted ? (
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              {/* NIK & Nama Lengkap */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }} className="form-grid-2">
-                <div>
-                  <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                    NIK (Nomor Induk Kependudukan) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={16}
-                    pattern="[0-9]{16}"
-                    title="NIK harus berupa 16 digit angka"
-                    value={formData.nik}
-                    onChange={(e) => setFormData({ ...formData, nik: e.target.value.replace(/\D/g, '') })}
-                    placeholder="16 Digit NIK KTP Anda"
+          {/* Topik Pilihan Selector */}
+          <div style={{ marginBottom: '1.8rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 800, color: '#334155', marginBottom: '0.6rem' }}>
+              Pilih Bidang / Topik Konsultasi *
+            </label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+              {TOPIK_KONSULTASI.map((t) => {
+                const isSelected = selectedTopik === t.label;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setSelectedTopik(t.label)}
                     style={{
-                      width: '100%',
-                      padding: '0.8rem 1rem',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
+                      padding: '0.65rem 1.1rem',
+                      borderRadius: '9999px',
+                      border: isSelected ? '2px solid #0d6e38' : '1.5px solid #e2e8f0',
+                      backgroundColor: isSelected ? '#dcfce7' : '#f8fafc',
+                      color: isSelected ? '#0d6e38' : '#475569',
+                      fontWeight: isSelected ? 800 : 600,
+                      fontSize: '0.86rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      transition: 'all 0.2s ease',
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                    onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                  />
-                </div>
+                  >
+                    <span>{t.label}</span>
+                    {isSelected && <Check size={14} color="#0d6e38" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                <div>
-                  <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                    Nama Lengkap *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.nama}
-                    onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                    placeholder="Sesuai KTP / Kartu Tani"
-                    style={{
-                      width: '100%',
-                      padding: '0.8rem 1rem',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                    onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                  />
-                </div>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.3rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Nama Lengkap Pemohon *
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  placeholder="Contoh: Ir. Joko Prasetyo"
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
+                  }}
+                />
               </div>
 
-              {/* Alamat Lengkap */}
               <div>
-                <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                  Alamat Lengkap *
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Nomor Induk Kependudukan (NIK KTP) / Kelompok Tani
                 </label>
                 <input
                   type="text"
-                  required
-                  value={formData.alamat}
-                  onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                  placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kabupaten/Kota"
+                  value={formData.nik}
+                  onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+                  placeholder="Contoh: 3404XXXXXXXXXXXX / Poktan Makmur"
                   style={{
                     width: '100%',
                     padding: '0.8rem 1rem',
                     borderRadius: '12px',
                     border: '1.5px solid #cbd5e1',
-                    fontSize: '0.92rem',
-                    outline: 'none',
-                    transition: 'border-color 0.2s ease',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                  onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                />
-              </div>
-
-              {/* Email & No HP */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }} className="form-grid-2">
-                <div>
-                  <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="nama@email.com"
-                    style={{
-                      width: '100%',
-                      padding: '0.8rem 1rem',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                    onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                    No HP / WhatsApp *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.noHp}
-                    onChange={(e) => setFormData({ ...formData, noHp: e.target.value })}
-                    placeholder="0812xxxxxxxx"
-                    style={{
-                      width: '100%',
-                      padding: '0.8rem 1rem',
-                      borderRadius: '12px',
-                      border: '1.5px solid #cbd5e1',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                    onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                  />
-                </div>
-              </div>
-
-              {/* Pesan */}
-              <div>
-                <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                  Pesan / Detail Konsultasi *
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={formData.pesan}
-                  onChange={(e) => setFormData({ ...formData, pesan: e.target.value })}
-                  placeholder="Tuliskan secara jelas topik atau pertanyaan konsultasi teknis pertanian Anda..."
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem 1rem',
-                    borderRadius: '12px',
-                    border: '1.5px solid #cbd5e1',
-                    fontSize: '0.92rem',
-                    outline: 'none',
-                    resize: 'vertical',
-                    transition: 'border-color 0.2s ease',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#0d6e38')}
-                  onBlur={(e) => (e.target.style.borderColor = '#cbd5e1')}
-                />
-              </div>
-
-              {/* Upload Dokumen atau Foto */}
-              <div>
-                <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.35rem' }}>
-                  Upload Dokumen atau Foto Pendukung (Opsional)
-                </label>
-                
-                {!file ? (
-                  <div
-                    style={{
-                      border: '2px dashed #cbd5e1',
-                      borderRadius: '16px',
-                      padding: '1.8rem 1rem',
-                      textAlign: 'center',
-                      backgroundColor: '#f8fafc',
-                      cursor: 'pointer',
-                      transition: 'all 0.25s ease',
-                    }}
-                    onClick={() => document.getElementById('konsultasi-file-input').click()}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.borderColor = '#0d6e38';
-                      e.currentTarget.style.backgroundColor = '#f0fdf4';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.borderColor = '#cbd5e1';
-                      e.currentTarget.style.backgroundColor = '#f8fafc';
-                    }}
-                  >
-                    <input
-                      id="konsultasi-file-input"
-                      type="file"
-                      accept="image/*,.pdf,.doc,.docx"
-                      onChange={handleFileChange}
-                      style={{ display: 'none' }}
-                    />
-                    <div
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '50%',
-                        backgroundColor: '#dcfce7',
-                        color: '#0d6e38',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 0.8rem',
-                      }}
-                    >
-                      <Upload size={22} />
-                    </div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
-                      Pilih file dokumen atau foto untuk diunggah
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.2rem' }}>
-                      Format yang didukung: JPG, PNG, WEBP, PDF, DOC (Maksimal 10MB)
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      border: '1.5px solid #bbf7d0',
-                      backgroundColor: '#f0fdf4',
-                      borderRadius: '14px',
-                      padding: '1rem 1.2rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '1rem',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', overflow: 'hidden' }}>
-                      {filePreview ? (
-                        <img
-                          src={filePreview}
-                          alt="Preview"
-                          style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '10px',
-                            backgroundColor: '#dcfce7',
-                            color: '#0d6e38',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                          }}
-                        >
-                          <FileText size={24} />
-                        </div>
-                      )}
-                      <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {file.name}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                          {(file.size / (1024 * 1024)).toFixed(2)} MB
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={removeFile}
-                      style={{
-                        backgroundColor: '#fee2e2',
-                        color: '#ef4444',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '32px',
-                        height: '32px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="btn-ripple"
-                style={{
-                  marginTop: '0.8rem',
-                  background: 'linear-gradient(135deg, #0d6e38, #10b981)',
-                  color: '#ffffff',
-                  padding: '0.95rem 2rem',
-                  borderRadius: '14px',
-                  fontWeight: 800,
-                  fontSize: '0.98rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.6rem',
-                  boxShadow: '0 8px 24px rgba(13,110,56,0.35)',
-                  transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(13,110,56,0.45)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,110,56,0.35)';
-                }}
-              >
-                <Send size={19} />
-                <span>Kirim Permohonan Konsultasi</span>
-              </button>
-            </form>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-              <div
-                style={{
-                  width: '72px',
-                  height: '72px',
-                  borderRadius: '50%',
-                  backgroundColor: '#dcfce7',
-                  color: '#16a34a',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 1.2rem',
-                  animation: 'bounceIn 0.6s cubic-bezier(0.36,0.07,0.19,0.97)',
-                }}
-              >
-                <CheckCircle size={44} />
-              </div>
-
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.4rem' }}>
-                Permohonan Konsultasi Berhasil Dikirim!
-              </h2>
-              <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-                Terima kasih <strong>{submitted.nama}</strong>. Pengajuan konsultasi Anda telah terverifikasi dalam sistem BRMP DIY dan akan ditanggapi oleh tim ahli kami.
-              </p>
-
-              <div style={{ backgroundColor: '#f1f5f9', padding: '1.2rem', borderRadius: '16px', marginBottom: '1.8rem', border: '1px solid #cbd5e1' }}>
-                <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '0.3rem', fontWeight: 600 }}>Nomor Resi Konsultasi Anda:</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0d6e38', letterSpacing: '0.06em' }}>
-                  {submitted.code}
-                </div>
-                <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '0.4rem' }}>
-                  Simpan kode ini untuk memantau status konsultasi di menu <strong>Lacak Layanan</strong>.
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                <button
-                  onClick={() => {
-                    setSubmitted(null);
-                    setFormData({ nik: '', nama: '', alamat: '', email: '', noHp: '', pesan: '' });
-                    setFile(null);
-                    setFilePreview(null);
-                  }}
-                  style={{
-                    backgroundColor: '#0f172a',
-                    color: '#ffffff',
-                    padding: '0.8rem 1.8rem',
-                    borderRadius: '9999px',
-                    fontWeight: 700,
                     fontSize: '0.9rem',
-                    border: 'none',
-                    cursor: 'pointer',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
                   }}
-                >
-                  Kirim Konsultasi Baru
-                </button>
-
-                <a
-                  href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo BRMP DIY, saya telah mengajukan permohonan konsultasi dengan Resi: ${submitted.code}`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    backgroundColor: '#16a34a',
-                    color: '#ffffff',
-                    padding: '0.8rem 1.8rem',
-                    borderRadius: '9999px',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <MessageCircle size={18} />
-                  <span>Hubungi via WA</span>
-                </a>
+                />
               </div>
             </div>
-          )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Nomor WhatsApp / HP Aktif *
+                </label>
+                <input
+                  required
+                  type="tel"
+                  value={formData.noHp}
+                  onChange={(e) => setFormData({ ...formData, noHp: e.target.value })}
+                  placeholder="Contoh: 081234567890"
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Alamat Email Aktif *
+                </label>
+                <input
+                  required
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Contoh: pemohon@domain.com"
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Komoditas / Varietas yang Dikonsultasikan
+                </label>
+                <input
+                  type="text"
+                  value={formData.komoditas}
+                  onChange={(e) => setFormData({ ...formData, komoditas: e.target.value })}
+                  placeholder="Contoh: Padi Inpari 32 / Cabai Rawit / Jagung Hibrida"
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                  Lokasi Lahan / Alamat Domisili
+                </label>
+                <input
+                  type="text"
+                  value={formData.alamat}
+                  onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
+                  placeholder="Contoh: Kec. Kalasan, Kab. Sleman, DIY"
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '12px',
+                    border: '1.5px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    backgroundColor: '#f8fafc',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                Uraian Pertanyaan, Masalah, atau Gejala Tanaman *
+              </label>
+              <textarea
+                required
+                rows={4}
+                value={formData.pesan}
+                onChange={(e) => setFormData({ ...formData, pesan: e.target.value })}
+                placeholder="Ceritakan secara detail pertanyaan atau kendala yang dihadapi (contoh: Daun tanaman padi menguning pada usia 35 HST dan timbul bercak coklat pada batang bawah...)"
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  borderRadius: '12px',
+                  border: '1.5px solid #cbd5e1',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  backgroundColor: '#f8fafc',
+                  resize: 'none',
+                }}
+              />
+            </div>
+
+            {/* Upload Foto Gejala / Lahan */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                Unggah Foto Gejala Tanaman / Lahan / Dokumen (Opsional)
+              </label>
+              <div
+                style={{
+                  border: '2px dashed #cbd5e1',
+                  borderRadius: '14px',
+                  padding: '1.4rem',
+                  textAlign: 'center',
+                  backgroundColor: '#f8fafc',
+                  cursor: 'pointer',
+                  position: 'relative',
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                  style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                />
+                <Upload size={22} color="#0d6e38" style={{ margin: '0 auto 0.4rem auto' }} />
+                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>
+                  {file ? file.name : 'Klik untuk mengunggah foto gejala tanaman atau dokumen'}
+                </p>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Format JPG, PNG, PDF (Maksimal 10MB)</span>
+              </div>
+
+              {filePreview && (
+                <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <img src={filePreview} alt="Preview" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                  <button type="button" onClick={removeFile} style={{ fontSize: '0.75rem', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
+                    Hapus Gambar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #0d6e38 0%, #10b981 100%)',
+                color: '#ffffff',
+                padding: '1rem',
+                borderRadius: '14px',
+                fontWeight: 800,
+                fontSize: '1rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 8px 25px rgba(13, 110, 56, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease',
+                marginTop: '0.5rem',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+            >
+              {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+              <span>{isLoading ? 'Mengirim Permohonan...' : 'Kirim Permohonan Konsultasi'}</span>
+            </button>
+          </form>
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 640px) {
-          .form-grid-2 { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      {/* MODAL SUKSES */}
+      {submitted && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15,23,42,0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3500,
+            padding: '1.5rem',
+          }}
+          onClick={() => setSubmitted(null)}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '24px',
+              maxWidth: '560px',
+              width: '100%',
+              padding: '2.5rem',
+              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
+              position: 'relative',
+              textAlign: 'center',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                width: '68px',
+                height: '68px',
+                borderRadius: '50%',
+                backgroundColor: '#dcfce7',
+                color: '#15803d',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.25rem auto',
+              }}
+            >
+              <CheckCircle size={38} />
+            </div>
+
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0f172a', marginBottom: '0.4rem' }}>
+              Konsultasi Berhasil Terkirim! 🎉
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: '#64748b', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+              Pertanyaan Anda telah diteruskan ke tim pakar BRMP DIY. Anda dapat melacak balasan melalui nomor tiket berikut.
+            </p>
+
+            <div
+              style={{
+                backgroundColor: '#f8fafc',
+                padding: '1.25rem',
+                borderRadius: '16px',
+                border: '1px solid #e2e8f0',
+                textAlign: 'left',
+                fontSize: '0.86rem',
+                marginBottom: '1.5rem',
+                lineHeight: 1.75,
+              }}
+            >
+              <div>
+                <span style={{ color: '#64748b' }}>Nomor Resi / Tiket: </span>
+                <strong style={{ color: '#0d6e38', fontFamily: 'monospace', fontSize: '1rem' }}>{submitted.code}</strong>
+              </div>
+              <div><span style={{ color: '#64748b' }}>Bidang Konsultasi: </span><strong>{submitted.topik}</strong></div>
+              <div><span style={{ color: '#64748b' }}>Nama Pemohon: </span><strong>{submitted.nama}</strong></div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <a
+                href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Admin BRMP DIY, saya telah mengajukan permohonan konsultasi (${submitted.topik}) dengan Nomor Tiket: ${submitted.code}. Mohon info tanggapannya. Terima kasih.`)}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                  color: '#ffffff',
+                  padding: '0.85rem',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '0.92rem',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <Phone size={18} />
+                <span>Konfirmasi via WhatsApp Tim Ahli</span>
+              </a>
+
+              <button
+                onClick={() => setSubmitted(null)}
+                style={{
+                  width: '100%',
+                  backgroundColor: '#f1f5f9',
+                  color: '#475569',
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
