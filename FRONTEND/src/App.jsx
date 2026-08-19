@@ -13,6 +13,7 @@ import KonsultasiPage from './pages/KonsultasiPage';
 import NarasumberPage from './pages/NarasumberPage';
 import PengaduanPage from './pages/PengaduanPage';
 import KunjunganPage from './pages/KunjunganPage';
+import InformasiPublikPage from './pages/InformasiPublikPage';
 import { BookOpen, X } from 'lucide-react';
 
 function HomePage({ onOpenGuideModal }) {
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="/narasumber" element={<NarasumberPage />} />
             <Route path="/pengaduan" element={<PengaduanPage />} />
             <Route path="/kunjungan" element={<KunjunganPage />} />
+            <Route path="/informasi-publik" element={<InformasiPublikPage />} />
           </Routes>
         </main>
         <Footer />

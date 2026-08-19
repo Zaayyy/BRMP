@@ -101,6 +101,8 @@ export default function PortalLayanan() {
       navigate('/pengaduan');
     } else if (tile.id === 'kunjungan') {
       navigate('/kunjungan');
+    } else if (tile.id === 'informasi-publik') {
+      navigate('/informasi-publik');
     } else {
       setSelectedService(tile);
       setSubmitted(null);
