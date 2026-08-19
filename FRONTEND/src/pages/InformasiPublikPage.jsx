@@ -9,39 +9,8 @@ import {
 } from 'lucide-react';
 import { pengaduanService } from '../services/apiService';
 
-const KATEGORI_PPID = [
-  {
-    id: 'berkala',
-    nama: 'Informasi Berkala',
-    emoji: '📊',
-    color: '#7c3aed',
-    bgColor: '#f5f3ff',
-    desc: 'Informasi yang wajib diperbarui dan diumumkan secara berkala sekurang-kurangnya setiap 6 bulan sekali.',
-    contoh: ['Laporan Akuntabilitas Kinerja (LAKIP)', 'Rencana Kerja & Anggaran Balai', 'Profil Balai Besar BRMP DIY', 'Statistik Produksi Benih Tahunan'],
-  },
-  {
-    id: 'serta-merta',
-    nama: 'Informasi Serta Merta',
-    emoji: '⚡',
-    color: '#d97706',
-    bgColor: '#fffbeb',
-    desc: 'Informasi yang dapat mengancam hajat hidup orang banyak dan ketertiban umum pertanian secara mendesak.',
-    contoh: ['Peringatan Dini Serangan Hama / Penyakit', 'Dampak Cuaca Ekstrem bagi Tanaman', 'Pengawasan Peredaran Benih Palsu', 'Penanganan Bencana Kekeringan Lahan'],
-  },
-  {
-    id: 'setiap-saat',
-    nama: 'Informasi Setiap Saat',
-    emoji: '📂',
-    color: '#0d6e38',
-    bgColor: '#ecfdf5',
-    desc: 'Informasi yang telah disediakan dan siap diakses publik kapanpun sesuai ketentuan perundang-undangan.',
-    contoh: ['Daftar Standar Mutu Benih Bersertifikat', 'Prosedur Uji Laboratorium Tanah', 'Hasil Riset Penerapan Teknologi', 'Regulasi & SOP Pelayanan Terpadu'],
-  },
-];
-
 export default function InformasiPublikPage() {
   const [pemohonType, setPemohonType] = useState('perorangan'); // 'perorangan' | 'lembaga'
-  const [selectedKategori, setSelectedKategori] = useState('Informasi Berkala');
   const [caraPeroleh, setCaraPeroleh] = useState('Salinan Elektronik (Email / PDF)');
   const [caraKirim, setCaraKirim] = useState('Email / WhatsApp Online');
 
@@ -73,8 +42,7 @@ export default function InformasiPublikPage() {
     try {
       const fullDescription = [
         `[Layanan: Permohonan Informasi Publik (PPID)]`,
-        `\nKategori Pemohon: ${pemohonType === 'perorangan' ? 'Perorangan / Pribadi' : 'Lembaga / Organisasi / Mahasiswa'}`,
-        `\nKategori Informasi: ${selectedKategori}`,
+        `\nKategori Pemohon: ${pemohonType === 'perorangan' ? 'Perorangan / Pribadi' : 'Badan Hukum / Instansi / Mahasiswa'}`,
         formData.nik ? `\nNIK / Identitas: ${formData.nik}` : '',
         formData.instansi ? `\nNama Instansi/Kampus: ${formData.instansi}` : '',
         formData.pekerjaan ? `\nProfesi/Pekerjaan: ${formData.pekerjaan}` : '',
@@ -97,7 +65,7 @@ export default function InformasiPublikPage() {
         code,
         nama: formData.nama,
         instansi: formData.instansi,
-        kategori: selectedKategori,
+        kategori: 'Informasi Publik PPID',
         rincian: formData.rincianInformasi,
         caraKirim,
         fileName: file ? file.name : null,
@@ -109,7 +77,7 @@ export default function InformasiPublikPage() {
         code,
         nama: formData.nama,
         instansi: formData.instansi,
-        kategori: selectedKategori,
+        kategori: 'Informasi Publik PPID',
         rincian: formData.rincianInformasi,
         caraKirim,
         fileName: file ? file.name : null,
@@ -225,81 +193,6 @@ export default function InformasiPublikPage() {
             <p style={{ fontSize: '0.98rem', color: '#e9d5ff', lineHeight: 1.65, margin: 0 }}>
               Pejabat Pengelola Informasi dan Dokumentasi (PPID) Balai Besar Standar Instrumen Pertanian DIY menjamin hak masyarakat untuk memperoleh informasi publik pertanian yang transparan, akurat, dan dapat dipertanggungjawabkan.
             </p>
-          </div>
-        </div>
-
-        {/* 3 KATEGORI INFORMASI PUBLIK CARDS */}
-        <div style={{ marginBottom: '2.5rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1e1b4b', margin: 0 }}>
-              Klasifikasi Informasi Publik BRMP DIY
-            </h2>
-            <p style={{ fontSize: '0.86rem', color: '#6b7280', margin: '0.3rem 0 0 0' }}>
-              Pahami kategori dokumen yang dapat Anda minta sesuai standar keterbukaan informasi nasional
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
-            {KATEGORI_PPID.map((kat) => {
-              const isSelected = selectedKategori === kat.nama;
-              return (
-                <div
-                  key={kat.id}
-                  onClick={() => setSelectedKategori(kat.nama)}
-                  style={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '20px',
-                    padding: '1.6rem',
-                    border: isSelected ? `2.5px solid ${kat.color}` : '1.5px solid #e5e7eb',
-                    boxShadow: isSelected ? `0 10px 25px ${kat.color}25` : '0 4px 15px rgba(0,0,0,0.03)',
-                    cursor: 'pointer',
-                    transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-                    transform: isSelected ? 'translateY(-3px)' : 'translateY(0)',
-                  }}
-                  onMouseOver={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.borderColor = kat.color;
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                    }
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.9rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      <span style={{ fontSize: '1.5rem' }}>{kat.emoji}</span>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                        {kat.nama}
-                      </h3>
-                    </div>
-                    {isSelected && (
-                      <span style={{ fontSize: '0.7rem', fontWeight: 800, backgroundColor: kat.color, color: '#ffffff', padding: '0.2rem 0.6rem', borderRadius: '9999px' }}>
-                        Dipilih ✓
-                      </span>
-                    )}
-                  </div>
-
-                  <p style={{ fontSize: '0.82rem', color: '#4b5563', lineHeight: 1.55, marginBottom: '1rem' }}>
-                    {kat.desc}
-                  </p>
-
-                  <div style={{ backgroundColor: kat.bgColor, padding: '0.9rem', borderRadius: '12px', border: `1px solid ${kat.color}20` }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: kat.color, textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                      Contoh Dokumen:
-                    </span>
-                    <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.78rem', color: '#374151', lineHeight: 1.6 }}>
-                      {kat.contoh.map((c, i) => (
-                        <li key={i}>{c}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
 
