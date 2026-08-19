@@ -176,7 +176,7 @@ export default function Navbar() {
         {/* CTA WhatsApp + Mobile toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <a
-            href="https://wa.me/6281234567890?text=Halo%20BRMP%20DIY,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20pertanian%20dan%20benih"
+            href="https://wa.me/6285878438548?text=Halo%20BRMP%20DIY,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20pertanian%20dan%20benih"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-ripple"
@@ -257,7 +257,7 @@ export default function Navbar() {
             );
           })}
           <a
-            href="https://wa.me/6281234567890?text=Halo%20BRMP%20DIY,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20pertanian%20dan%20benih"
+            href="https://wa.me/6285878438548?text=Halo%20BRMP%20DIY,%20saya%20ingin%20berkonsultasi%20mengenai%20layanan%20pertanian%20dan%20benih"
             target="_blank"
             rel="noopener noreferrer"
             style={{

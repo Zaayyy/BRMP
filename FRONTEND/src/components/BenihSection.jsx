@@ -329,7 +329,7 @@ export default function BenihSection() {
             </div>
 
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Admin%20BRMP%20DIY,%20saya%20ingin%20konsultasi%20terkait%20ketersediaan%20benih"
+              href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY,%20saya%20ingin%20konsultasi%20terkait%20ketersediaan%20benih"
               target="_blank"
               rel="noreferrer"
               style={{

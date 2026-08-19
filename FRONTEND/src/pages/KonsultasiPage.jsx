@@ -533,7 +533,7 @@ export default function KonsultasiPage() {
                 </button>
 
                 <a
-                  href={`https://wa.me/6281234567890?text=${encodeURIComponent(`Halo BRMP DIY, saya telah menguji permohonan konsultasi dengan Resi: ${submitted.code}`)}`}
+                  href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo BRMP DIY, saya telah mengajukan permohonan konsultasi dengan Resi: ${submitted.code}`)}`}
                   target="_blank"
                   rel="noreferrer"
                   style={{

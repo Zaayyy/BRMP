@@ -85,7 +85,7 @@ export default function BenihPage() {
 
   const handleWA = (nama = '') => {
     const text = encodeURIComponent(`Halo BRMP DIY, saya ingin menanyakan informasi stok dan pemesanan benih ${nama || 'unggul'}. Terima kasih.`);
-    window.open(`https://wa.me/6281234567890?text=${text}`, '_blank');
+    window.open(`https://wa.me/6285878438548?text=${text}`, '_blank');
   };
 
   return (
