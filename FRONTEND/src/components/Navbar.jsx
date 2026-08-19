@@ -44,7 +44,7 @@ export default function Navbar() {
       isActive: () => location.pathname === '/magang',
     },
     {
-      id: 'konsultasi', label: 'Konsultasi Ahli', type: 'route', to: '/konsultasi',
+      id: 'konsultasi', label: 'Layanan Konsultasi', type: 'route', to: '/konsultasi',
       isActive: () => location.pathname === '/konsultasi',
     },
   ];
