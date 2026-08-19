@@ -1,0 +1,25 @@
+### Windows
+# Windows thumbnail cache files
+Thumbs.db
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows shortcuts
+*.lnk
+
+### Node / Build
+node_modules/
+.vite/
+dist/
+
+# Environment
+.env
+.env.local
+
+# System
+.DS_Store
+npm-debug.log*

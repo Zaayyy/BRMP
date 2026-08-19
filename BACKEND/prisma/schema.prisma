@@ -1,0 +1,113 @@
+// Prisma Schema for BRMP DIY Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // Bisa diganti ke "postgresql" atau "sqlite" jika dibutuhkan
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// ENUMS
+// ----------------------------------------------------
+
+enum Role {
+  Admin
+  PetugasLab
+}
+
+enum StatusUji {
+  Diterima
+  Proses
+  Selesai
+}
+
+enum StatusPengaduan {
+  Menunggu
+  Diproses
+  Selesai
+  Ditolak
+}
+
+// ----------------------------------------------------
+// MODELS
+// ----------------------------------------------------
+
+/// 1. User: Menyimpan data pegawai/admin
+model User {
+  id            Int       @id @default(autoincrement())
+  nama          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(150)
+  password_hash String    @db.VarChar(255)
+  role          Role      @default(PetugasLab)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relasi
+  benihCreated          Benih[]       @relation("UserBenih")
+  labTrackingPetugas    LabTracking[] @relation("PetugasLabTracking")
+  pengaduanDitanggapi   Pengaduan[]   @relation("AdminPengaduan")
+
+  @@map("users")
+}
+
+/// 2. Benih: Katalog benih publik
+model Benih {
+  id           Int      @id @default(autoincrement())
+  nama_benih   String   @map("nama_benih") @db.VarChar(150)
+  deskripsi    String   @db.Text
+  stok         Int      @default(0)
+  gambar_url   String?  @map("gambar_url") @db.VarChar(500)
+  created_by_id Int?    @map("created_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relasi ke User pembuat/pengelola (opsional)
+  createdBy    User?    @relation("UserBenih", fields: [created_by_id], references: [id], onDelete: SetNull)
+
+  @@map("benih")
+}
+
+/// 3. LabTracking: Status uji laboratorium
+model LabTracking {
+  id                Int       @id @default(autoincrement())
+  kode_tracking     String    @unique @map("kode_tracking") @db.VarChar(50)
+  nama_pemohon      String    @map("nama_pemohon") @db.VarChar(150)
+  status_uji        StatusUji @default(Diterima) @map("status_uji")
+  hasil_dokumen_url String?   @map("hasil_dokumen_url") @db.VarChar(500)
+  keterangan        String?   @db.Text
+  petugas_id        Int?      @map("petugas_id")
+  tanggal_masuk     DateTime  @default(now()) @map("tanggal_masuk")
+  tanggal_selesai   DateTime? @map("tanggal_selesai")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relasi ke User (Petugas Lab yang menangani)
+  petugas           User?     @relation("PetugasLabTracking", fields: [petugas_id], references: [id], onDelete: SetNull)
+
+  @@map("lab_trackings")
+}
+
+/// 4. Pengaduan: Laporan dari masyarakat
+model Pengaduan {
+  id                 Int             @id @default(autoincrement())
+  kode_tracking      String          @unique @map("kode_tracking") @db.VarChar(50)
+  nama_pelapor       String          @map("nama_pelapor") @db.VarChar(150)
+  email_pelapor      String?         @map("email_pelapor") @db.VarChar(150)
+  no_telp_pelapor    String?         @map("no_telp_pelapor") @db.VarChar(30)
+  isi_pengaduan      String          @map("isi_pengaduan") @db.Text
+  tanggal            DateTime        @default(now())
+  status_tanggapan   StatusPengaduan @default(Menunggu) @map("status_tanggapan")
+  tanggapan_petugas  String?         @map("tanggapan_petugas") @db.Text
+  ditanggapi_oleh_id Int?            @map("ditanggapi_oleh_id")
+  tanggal_tanggapan  DateTime?       @map("tanggal_tanggapan")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+
+  // Relasi ke User (Admin yang menanggapi laporan)
+  ditanggapiOleh     User?           @relation("AdminPengaduan", fields: [ditanggapi_oleh_id], references: [id], onDelete: SetNull)
+
+  @@map("pengaduan")
+}
