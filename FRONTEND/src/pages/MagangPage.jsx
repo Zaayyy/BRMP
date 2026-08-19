@@ -4,21 +4,13 @@ import {
   ArrowLeft, Send, Upload, CheckCircle, FileText, X,
   Building2, GraduationCap, Calendar, User, Phone, Mail,
   BookOpen, Award, Loader2, Sparkles, Check, Clock, Users,
-  FlaskConical, Sprout, Database, ShieldCheck
+  FlaskConical, Sprout, Database, ShieldCheck, Info, HelpCircle
 } from 'lucide-react';
 import { pengaduanService } from '../services/apiService';
 
-const DIVISI_MAGANG = [
-  { id: 'lab-benih', label: '🌾 Laboratorium Uji Mutu Benih', icon: '🌾' },
-  { id: 'lab-tanah', label: '🧪 Laboratorium Kimia & Kesuburan Tanah', icon: '🧪' },
-  { id: 'kebun-percobaan', label: '🌱 Kebun Percobaan Agro Modern', icon: '🌱' },
-  { id: 'smart-farming', label: '🤖 Teknologi Pertanian Presisi / IoT', icon: '🤖' },
-  { id: 'ppid-standar', label: '📊 Standarisasi & Manajemen Data Pertanian', icon: '📊' },
-];
-
 export default function MagangPage() {
-  const [selectedDivisi, setSelectedDivisi] = useState(DIVISI_MAGANG[0].label);
   const [jenjang, setJenjang] = useState('S1 / D4 Perguruan Tinggi');
+  const [modalInfoOpen, setModalInfoOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     nama: '',
@@ -49,7 +41,6 @@ export default function MagangPage() {
     try {
       const fullDescription = [
         `[Layanan: Pendaftaran Magang, PKL & Riset Mahasiswa/SMK]`,
-        `\nDivisi Pilihan: ${selectedDivisi}`,
         `\nJenjang Pendidikan: ${jenjang}`,
         formData.instansi ? `\nAsal Kampus/Sekolah: ${formData.instansi}` : '',
         formData.jurusan ? `\nJurusan/Program Studi: ${formData.jurusan}` : '',
@@ -71,7 +62,6 @@ export default function MagangPage() {
         code,
         nama: formData.nama,
         instansi: formData.instansi,
-        divisi: selectedDivisi,
         periode: `${formData.tglMulai} s/d ${formData.tglSelesai}`,
         fileName: file ? file.name : null,
       });
@@ -82,7 +72,6 @@ export default function MagangPage() {
         code,
         nama: formData.nama,
         instansi: formData.instansi,
-        divisi: selectedDivisi,
         periode: `${formData.tglMulai} s/d ${formData.tglSelesai}`,
         fileName: file ? file.name : null,
       });
@@ -192,9 +181,35 @@ export default function MagangPage() {
               Pendaftaran Magang & Riset Terapan BRMP DIY
             </h1>
 
-            <p style={{ fontSize: '0.98rem', color: '#e0e7ff', lineHeight: 1.65, margin: 0 }}>
+            <p style={{ fontSize: '0.98rem', color: '#e0e7ff', lineHeight: 1.65, margin: '0 0 1.5rem 0' }}>
               Dapatkan pengalaman riset lapang dan praktikum laboratorium berstandar nasional di Balai Besar Standar Instrumen Pertanian DIY dengan bimbingan langsung para peneliti dan fungsional ahli.
             </p>
+
+            {/* BUTTON BUKA INFORMASI & SOP MAGANG */}
+            <button
+              type="button"
+              onClick={() => setModalInfoOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: '#ffffff',
+                color: '#312e81',
+                padding: '0.75rem 1.4rem',
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '0.9rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <Info size={18} color="#4338ca" />
+              <span>Lihat Informasi & SOP Magang</span>
+            </button>
           </div>
         </div>
 
@@ -211,7 +226,7 @@ export default function MagangPage() {
             { icon: Award, label: 'Sertifikat Resmi', val: 'Pengalaman Terakreditasi', desc: 'Diterbitkan langsung oleh Balai Besar' },
             { icon: Users, label: 'Pembimbing Ahli', val: 'Mentoring 1-on-1', desc: 'Dibimbing Peneliti & Fungsional Ahli' },
             { icon: FlaskConical, label: 'Fasilitas Terpadu', val: 'Lab & Smart Greenhouse', desc: 'Instrumen mutakhir & kebun riset' },
-            { icon: Clock, label: 'Proses Cepat', val: 'Surat Balasan 2-4 Hari', desc: 'Konfirmasi ketersediaan kuota resmi' },
+            { icon: Clock, label: 'Biaya Magang', val: 'GRATIS (Rp. 0)', desc: 'Sesuai ketentuan SOP Balai' },
           ].map((item, idx) => (
             <div
               key={idx}
@@ -283,44 +298,8 @@ export default function MagangPage() {
               Registrasi Magang / PKL / Riset
             </h2>
             <p style={{ fontSize: '0.88rem', color: '#64748b', margin: 0 }}>
-              Lengkapi data pemohon, institusi pendidikan, divisi yang diminati, serta periode pelaksanaan magang.
+              Lengkapi data pemohon, institusi pendidikan, jenjang studi, serta periode pelaksanaan magang.
             </p>
-          </div>
-
-          {/* Divisi Pilihan Selector */}
-          <div style={{ marginBottom: '1.8rem' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 800, color: '#334155', marginBottom: '0.6rem' }}>
-              Pilihan Divisi / Laboratorium Magang *
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-              {DIVISI_MAGANG.map((d) => {
-                const isSelected = selectedDivisi === d.label;
-                return (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => setSelectedDivisi(d.label)}
-                    style={{
-                      padding: '0.65rem 1.1rem',
-                      borderRadius: '9999px',
-                      border: isSelected ? '2px solid #4338ca' : '1.5px solid #e2e8f0',
-                      backgroundColor: isSelected ? '#e0e7ff' : '#f8fafc',
-                      color: isSelected ? '#4338ca' : '#475569',
-                      fontWeight: isSelected ? 800 : 600,
-                      fontSize: '0.86rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <span>{d.label}</span>
-                    {isSelected && <Check size={14} color="#4338ca" />}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.3rem' }}>
@@ -638,6 +617,173 @@ export default function MagangPage() {
         </div>
       </div>
 
+      {/* MODAL POPUP INFORMASI & SOP MAGANG (SESUAI SCREENSHOT USER) */}
+      {modalInfoOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15,23,42,0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3000,
+            padding: '1.25rem',
+          }}
+          onClick={() => setModalInfoOpen(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              maxWidth: '840px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 60px -15px rgba(0,0,0,0.4)',
+              position: 'relative',
+              animation: 'fadeInUp 0.35s cubic-bezier(0.22,1,0.36,1)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem 1.75rem',
+                borderBottom: '1px solid #e2e8f0',
+              }}
+            >
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                Informasi Magang
+              </h3>
+              <button
+                onClick={() => setModalInfoOpen(false)}
+                style={{
+                  backgroundColor: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body Content */}
+            <div style={{ padding: '1.75rem', fontSize: '0.88rem', color: '#1e293b', lineHeight: 1.65 }}>
+              <p style={{ margin: '0 0 1.25rem 0', color: '#334155' }}>
+                Balai Besar Modernisasi Pertanian (BRMP) DIY melayani Bimbingan Teknis / Pelatihan / Magang / PKL
+              </p>
+
+              {/* PERSYARATAN PENGGUNA LAYANAN */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.02em' }}>
+                  PERSYARATAN PENGGUNA LAYANAN:
+                </h4>
+                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                  <li style={{ marginBottom: '0.35rem' }}>Menulis identitas sesuai kartu identitas yang dimiliki dan maksud kedatangan pada buku tamu.</li>
+                  <li style={{ marginBottom: '0.35rem' }}>Mengisi form permohonan layanan, dengan melampirkan : KTP/Kartu Anggota/KTM dan lainnya.</li>
+                </ol>
+              </div>
+
+              {/* PROSEDUR / ALUR PELAYANAN */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.02em' }}>
+                  PROSEDUR / ALUR PELAYANAN:
+                </h4>
+                <ol style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pengguna layanan mengajukan permohonan tertulis berupa surat permohonan bimbingan teknis/pelatihan/magang/praktek kerja lapangan yang dilengkapi dengan proposal bimbingan teknis/pelatihan/magang/praktek kerja lapangan dan melampirkan profil pengguna layanan yang akan diajukan untuk program bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Petugas layanan menerima, mencatat dan menyampaikan surat permohonan beserta proposal bimbingan teknis/pelatihan/magang/praktek kerja lapangan kepada pejabat berwenang;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pejabat berwenang menerbitkan surat penerimaan bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pejabat berwenang mendisposisi permohonan kepada Tim pelaksana untuk melakukan layanan bimbingan teknis/pelatihan/magang/praktek kerja lapangan;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pengguna layanan yang sudah dinyatakan diterima wajib mengikuti pertemuan teknis (<em>technical meeting</em>) dengan membawa surat keterangan sehat (khusus untuk magang/praktek kerja lapangan) serta mengisi formulir persetujuan/pernyataan melaksanakan bimbingan teknis/pelatihan/magang/praktek kerja lapangan sesuai aturan yang ada;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pengguna layanan melaksanakan kegiatan bimbingan teknis/pelatihan/magang/praktek kerja lapangan sesuai dengan proposal yang diajukan di bawah bimbingan Tim pelaksana yang ditunjuk;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Khusus pengguna layanan magang/praktek kerja lapangan diwajibkan membuat laporan hasil pelaksanaan magang/praktek kerja lapangan dan melaksanakan seminar hasil magang/praktek kerja lapangan di BRMP DIY dan menyerahkan output hasil magang/praktek kerja lapangan serta menerima sertifikat magang/praktek kerja lapangan yang ditandatangani oleh Pejabat Berwenang;
+                  </li>
+                  <li style={{ marginBottom: '0.45rem' }}>
+                    Pengguna layanan bimbingan teknis/pelatihan/magang/praktek kerja wajib mengisi Kuisioner Survei Kepuasan Masyarakat sebagai bahan evaluasi pelaksanaan kegiatan berikutnya.
+                  </li>
+                </ol>
+              </div>
+
+              {/* BIAYA / TARIF */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
+                  BIAYA / TARIF:
+                </h4>
+                <p style={{ margin: 0, color: '#15803d', fontWeight: 700 }}>
+                  Pelayanan bimbingan teknis/magang/bimbingan/praktik kerja lapangan tidak dipungut biaya/gratis (Rp. 0)
+                </p>
+              </div>
+
+              {/* OUTPUT LAYANAN */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
+                  OUTPUT LAYANAN:
+                </h4>
+                <p style={{ margin: 0 }}>Pelayanan Bimbingan teknis / magang / bimbingan / praktik kerja lapangan.</p>
+              </div>
+
+              {/* WAKTU PENYELESAIAN LAYANAN */}
+              <div style={{ marginBottom: '1.75rem' }}>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.02em' }}>
+                  WAKTU PENYELESAIAN LAYANAN:
+                </h4>
+                <p style={{ margin: 0 }}>Jangka waktu layanan bimbingan teknis / pelatihan / magang / praktek kerja lapangan: sesuai kesepakatan.</p>
+              </div>
+
+              {/* CLOSE BUTTON */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setModalInfoOpen(false)}
+                  style={{
+                    backgroundColor: '#ef4444',
+                    color: '#ffffff',
+                    padding: '0.55rem 1.6rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ef4444')}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL SUKSES */}
       {submitted && (
         <div
@@ -706,14 +852,13 @@ export default function MagangPage() {
                 <span style={{ color: '#64748b' }}>Nomor Resi / Tiket: </span>
                 <strong style={{ color: '#4338ca', fontFamily: 'monospace', fontSize: '1rem' }}>{submitted.code}</strong>
               </div>
-              <div><span style={{ color: '#64748b' }}>Divisi Pilihan: </span><strong>{submitted.divisi}</strong></div>
               <div><span style={{ color: '#64748b' }}>Nama Pemohon: </span><strong>{submitted.nama} ({submitted.instansi})</strong></div>
               <div><span style={{ color: '#64748b' }}>Periode: </span><strong>{submitted.periode}</strong></div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <a
-                href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Pengelola Magang BRMP DIY, saya telah mendaftar Program Magang (${submitted.divisi}) dengan Nomor Tiket: ${submitted.code}. Mohon konfirmasi ketersediaan kuotanya. Terima kasih.`)}`}
+                href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Pengelola Magang BRMP DIY, saya telah mendaftar Program Magang/PKL dengan Nomor Tiket: ${submitted.code}. Mohon konfirmasi ketersediaan kuotanya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{
