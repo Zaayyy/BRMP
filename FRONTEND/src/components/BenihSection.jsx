@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MessageCircle, X, ChevronRight, RefreshCw, Loader2, Sprout } from 'lucide-react';
+import { MessageCircle, X, ChevronRight, RefreshCw, Loader2, Sprout, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { benihService } from '../services/apiService';
 
@@ -20,7 +20,6 @@ export default function BenihSection() {
   const [benihList, setBenihList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Ambil data benih secara real-time dari backend (GET /api/public/benih)
   const fetchLiveBenih = async () => {
     setIsLoading(true);
     try {
@@ -60,13 +59,13 @@ export default function BenihSection() {
       id="informasi-benih"
       ref={sectionRef}
       style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: '#fafbfc',
         padding: '6rem 1.5rem',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1240px', margin: '0 auto' }}>
         {/* Header */}
         <div
           style={{
@@ -86,57 +85,61 @@ export default function BenihSection() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                gap: '0.45rem',
                 backgroundColor: '#dcfce7',
                 color: '#15803d',
-                padding: '0.4rem 1rem',
+                padding: '0.45rem 1.15rem',
                 borderRadius: '9999px',
-                fontSize: '0.76rem',
-                fontWeight: 700,
-                letterSpacing: '0.08em',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                marginBottom: '1rem',
+                marginBottom: '1.2rem',
+                boxShadow: '0 2px 8px rgba(16,185,129,0.15)',
               }}
             >
-              <span>🌾 Stok Inventaris Live</span>
+              <Sprout size={15} />
+              <span>Inventaris Benih Real-Time</span>
             </div>
             <h2
               style={{
-                fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
-                fontWeight: 800,
+                fontSize: 'clamp(1.9rem, 3.6vw, 2.6rem)',
+                fontWeight: 900,
                 color: '#0f172a',
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.025em',
                 lineHeight: 1.2,
               }}
             >
               Ketersediaan Benih Bersertifikasi
             </h2>
-            <p style={{ fontSize: '1rem', color: '#64748b', marginTop: '0.5rem', maxWidth: '500px' }}>
-              Data benih pertanian resmi bersertifikat mutu dari Balai Besar Standar Instrumen Pertanian DIY.
+            <p style={{ fontSize: '0.98rem', color: '#64748b', marginTop: '0.65rem', maxWidth: '540px', lineHeight: 1.6 }}>
+              Katalog resmi varietas benih unggul berstandar nasional yang diproduksi dan diawasi oleh BRMP D.I. Yogyakarta.
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <button
               onClick={fetchLiveBenih}
               disabled={isLoading}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                padding: '0.65rem 1.1rem',
+                gap: '0.45rem',
+                padding: '0.75rem 1.25rem',
                 borderRadius: '9999px',
                 border: '1.5px solid #d1fae5',
                 backgroundColor: '#f0fdf4',
-                color: '#0d6e38',
-                fontWeight: 700,
-                fontSize: '0.85rem',
+                color: '#065f46',
+                fontWeight: 800,
+                fontSize: '0.86rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
             >
-              <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
-              <span>{isLoading ? 'Memuat...' : 'Segarkan'}</span>
+              <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
+              <span>{isLoading ? 'Memuat...' : 'Segarkan Data'}</span>
             </button>
 
             <Link
@@ -144,28 +147,28 @@ export default function BenihSection() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.5rem',
-                color: '#0d6e38',
-                fontWeight: 700,
-                fontSize: '0.95rem',
+                gap: '0.45rem',
+                color: '#ffffff',
+                fontWeight: 800,
+                fontSize: '0.88rem',
                 textDecoration: 'none',
-                padding: '0.65rem 1.2rem',
+                padding: '0.75rem 1.4rem',
                 borderRadius: '9999px',
-                border: '1.5px solid #d1fae5',
-                backgroundColor: '#ffffff',
-                transition: 'all 0.2s ease',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
+                boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
+                transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#0d6e38';
-                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(16,185,129,0.4)';
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#ffffff';
-                e.currentTarget.style.color = '#0d6e38';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(16,185,129,0.3)';
               }}
             >
               <span>Katalog Lengkap</span>
-              <ChevronRight size={17} />
+              <ChevronRight size={16} />
             </Link>
           </div>
         </div>
@@ -175,13 +178,13 @@ export default function BenihSection() {
           <div style={{
             textAlign: 'center',
             padding: '5rem 2rem',
-            backgroundColor: '#f8fafc',
-            borderRadius: '24px',
-            border: '1px dashed #cbd5e1',
+            backgroundColor: '#ffffff',
+            borderRadius: '26px',
+            border: '1.5px dashed #cbd5e1',
           }}>
             <Sprout size={48} color="#10b981" style={{ margin: '0 auto 1rem auto' }} />
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e293b' }}>Belum Ada Data Benih Terdaftar</h3>
-            <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.4rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>Belum Ada Data Benih Terdaftar</h3>
+            <p style={{ fontSize: '0.92rem', color: '#64748b', marginTop: '0.4rem' }}>
               Daftar benih baru yang ditambahkan di portal admin akan langsung tampil di sini.
             </p>
           </div>
@@ -189,7 +192,7 @@ export default function BenihSection() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
               gap: '1.5rem',
               opacity: sectionVisible ? 1 : 0,
               transform: sectionVisible ? 'translateY(0)' : 'translateY(40px)',
@@ -202,68 +205,71 @@ export default function BenihSection() {
                 onClick={() => setSelected(item)}
                 style={{
                   backgroundColor: '#ffffff',
-                  borderRadius: '20px',
+                  borderRadius: '22px',
                   padding: '1.5rem',
                   border: '1.5px solid #f1f5f9',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
                   cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+                  transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
                   position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
+                  overflow: 'hidden',
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-6px)';
-                  e.currentTarget.style.boxShadow = '0 16px 32px rgba(13,110,56,0.12)';
-                  e.currentTarget.style.borderColor = '#86efac';
+                  e.currentTarget.style.transform = 'translateY(-8px)';
+                  e.currentTarget.style.boxShadow = '0 18px 36px rgba(16,185,129,0.12)';
+                  e.currentTarget.style.borderColor = '#a7f3d0';
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.03)';
                   e.currentTarget.style.borderColor = '#f1f5f9';
                 }}
               >
+                {/* Image Box */}
                 <div style={{
-                  height: '130px',
+                  height: '140px',
                   backgroundColor: '#f8fafc',
-                  borderRadius: '14px',
+                  borderRadius: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '1rem',
+                  marginBottom: '1.1rem',
                   overflow: 'hidden',
+                  border: '1px solid #f1f5f9',
                 }}>
                   <img
                     src={item.image}
                     alt={item.nama}
-                    style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain' }}
+                    style={{ maxHeight: '115px', maxWidth: '90%', objectFit: 'contain' }}
                     onError={(e) => { e.currentTarget.src = '/images/seed_padi.png'; }}
                   />
                 </div>
 
                 <span style={{
                   alignSelf: 'flex-start',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
                   backgroundColor: item.statusStok === 'Tersedia' ? '#dcfce7' : item.statusStok === 'Terbatas' ? '#fef3c7' : '#fee2e2',
                   color: item.statusStok === 'Tersedia' ? '#15803d' : item.statusStok === 'Terbatas' ? '#b45309' : '#b91c1c',
-                  padding: '0.2rem 0.6rem',
+                  padding: '0.25rem 0.7rem',
                   borderRadius: '9999px',
-                  marginBottom: '0.6rem',
+                  marginBottom: '0.7rem',
                 }}>
                   {item.statusStok}
                 </span>
 
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.2rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0f172a', marginBottom: '0.25rem', lineHeight: 1.3 }}>
                   {item.nama}
                 </h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem', flex: 1 }}>
-                  Stok: <strong>{item.stok}</strong>
+                <p style={{ fontSize: '0.84rem', color: '#64748b', marginBottom: '1.2rem', flex: 1 }}>
+                  Stok: <strong style={{ color: '#059669' }}>{item.stok}</strong>
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '0.8rem' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0d6e38' }}>Lihat Detail</span>
-                  <ChevronRight size={15} color="#0d6e38" />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '0.9rem' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#059669' }}>Lihat Detail Varietas</span>
+                  <ChevronRight size={16} color="#059669" />
                 </div>
               </div>
             ))}
@@ -276,21 +282,22 @@ export default function BenihSection() {
         <div
           style={{
             position: 'fixed', inset: 0,
-            backgroundColor: 'rgba(15,23,42,0.7)',
-            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(15,23,42,0.75)',
+            backdropFilter: 'blur(10px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 2000, padding: '1.5rem',
+            zIndex: 3000, padding: '1.5rem',
           }}
           onClick={() => setSelected(null)}
         >
           <div
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '24px',
+              borderRadius: '26px',
               maxWidth: '560px', width: '100%',
-              padding: '2rem',
-              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
+              padding: '2.2rem',
+              boxShadow: '0 30px 70px -15px rgba(0,0,0,0.35)',
               position: 'relative',
+              animation: 'scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -299,48 +306,49 @@ export default function BenihSection() {
               style={{
                 position: 'absolute', top: '1.2rem', right: '1.2rem',
                 backgroundColor: '#f1f5f9', border: 'none', borderRadius: '50%',
-                width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#64748b', cursor: 'pointer',
+                width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#64748b', cursor: 'pointer', transition: 'all 0.2s ease',
               }}
             >
-              <X size={18} />
+              <X size={20} />
             </button>
 
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1.1rem', alignItems: 'center', marginBottom: '1.6rem' }}>
               <div style={{
-                width: '70px', height: '70px', borderRadius: '16px',
+                width: '76px', height: '76px', borderRadius: '18px',
                 backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden', border: '1px solid #e2e8f0',
+                overflow: 'hidden', border: '1.5px solid #e2e8f0', flexShrink: 0,
               }}>
-                <img src={selected.image} alt={selected.nama} style={{ maxHeight: '60px', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/images/seed_padi.png'; }} />
+                <img src={selected.image} alt={selected.nama} style={{ maxHeight: '64px', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/images/seed_padi.png'; }} />
               </div>
               <div>
-                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#15803d', backgroundColor: '#dcfce7', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#15803d', backgroundColor: '#dcfce7', padding: '0.25rem 0.65rem', borderRadius: '6px' }}>
                   {selected.kelas}
                 </span>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginTop: '0.3rem' }}>{selected.nama}</h3>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#0f172a', marginTop: '0.35rem' }}>{selected.nama}</h3>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '14px', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: 1.6, border: '1px solid #e2e8f0' }}>
-              <div><span style={{ color: '#64748b' }}>Stok Tersedia: </span><strong style={{ color: '#0d6e38' }}>{selected.stok}</strong></div>
-              <div><span style={{ color: '#64748b' }}>Status: </span><strong>{selected.statusStok}</strong></div>
-              <div><span style={{ color: '#64748b' }}>Deskripsi: </span>{selected.deskripsi}</div>
+            <div style={{ backgroundColor: '#f8fafc', padding: '1.1rem', borderRadius: '16px', fontSize: '0.86rem', marginBottom: '1.4rem', lineHeight: 1.65, border: '1px solid #e2e8f0' }}>
+              <div><span style={{ color: '#64748b' }}>Stok Tersedia: </span><strong style={{ color: '#059669', fontSize: '0.95rem' }}>{selected.stok}</strong></div>
+              <div><span style={{ color: '#64748b' }}>Status Inventaris: </span><strong>{selected.statusStok}</strong></div>
+              <div style={{ marginTop: '0.3rem' }}><span style={{ color: '#64748b' }}>Deskripsi Mutu: </span>{selected.deskripsi}</div>
             </div>
 
             <a
-              href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY,%20saya%20ingin%20konsultasi%20terkait%20ketersediaan%20benih"
+              href={`https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY,%20saya%20tertarik%20dengan%20ketersediaan%20benih%20${encodeURIComponent(selected.nama)}`}
               target="_blank"
               rel="noreferrer"
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                background: 'linear-gradient(135deg, #0d6e38, #10b981)',
-                color: '#ffffff', padding: '0.85rem', borderRadius: '12px',
-                fontWeight: 700, fontSize: '0.92rem', textDecoration: 'none',
+                background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                color: '#ffffff', padding: '0.95rem', borderRadius: '14px',
+                fontWeight: 800, fontSize: '0.94rem', textDecoration: 'none',
+                boxShadow: '0 6px 18px rgba(37,211,102,0.3)',
               }}
             >
               <MessageCircle size={18} />
-              <span>Hubungi Petugas Layanan Benih</span>
+              <span>Hubungi Petugas Penjualan via WhatsApp</span>
             </a>
           </div>
         </div>

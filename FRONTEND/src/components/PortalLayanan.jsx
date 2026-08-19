@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Users, MessageSquareWarning, Building2, Volume2, UserCheck, MapPin,
-  Search, CheckCircle, X, Send, FileCheck, Upload, FileText,
+  Search, CheckCircle, X, Send, FileCheck, Upload, FileText, Sparkles, ArrowRight,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { pengaduanService, labService } from '../services/apiService';
+import { pengaduanService } from '../services/apiService';
 
 function useScrollReveal(threshold = 0.1) {
   const ref = useRef(null);
@@ -19,51 +19,51 @@ function useScrollReveal(threshold = 0.1) {
 
 const serviceTiles = [
   {
-    id: 'konsultasi', title: 'Konsultasi', icon: Users,
-    gradient: 'linear-gradient(135deg, #0d6e38 0%, #10b981 100%)',
-    glowColor: 'rgba(16,185,129,0.45)',
+    id: 'konsultasi', title: 'Konsultasi Teknis', icon: Users,
+    gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+    glowColor: 'rgba(16,185,129,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Konsultasi teknis budidaya & standar agro modern dengan pakar BRMP DIY.',
+    desc: 'Konsultasi budidaya & standar agro modern bersama fungsional ahli.',
     emoji: '🌱',
   },
   {
-    id: 'pengaduan', title: 'Pengaduan', icon: MessageSquareWarning,
-    gradient: 'linear-gradient(135deg, #d97706 0%, #fbbf24 100%)',
-    glowColor: 'rgba(251,191,36,0.45)',
+    id: 'pengaduan', title: 'Pengaduan Publik', icon: MessageSquareWarning,
+    gradient: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+    glowColor: 'rgba(245,158,11,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Saluran pengaduan resmi mutu benih, pupuk & pelayanan publik DIY.',
+    desc: 'Saluran resmi pengaduan mutu benih, pupuk & layanan pertanian.',
     emoji: '📣',
   },
   {
-    id: 'magang', title: 'Magang / PKL', icon: Building2,
-    gradient: 'linear-gradient(135deg, #4f46e5 0%, #818cf8 100%)',
-    glowColor: 'rgba(129,140,248,0.45)',
+    id: 'magang', title: 'Magang / PKL / Riset', icon: Building2,
+    gradient: 'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)',
+    glowColor: 'rgba(99,102,241,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Pendaftaran magang & PKL mahasiswa di Lab & Kebun Percobaan BRMP DIY.',
+    desc: 'Pendaftaran magang & riset terapan di Lab & Kebun Percobaan.',
     emoji: '🎓',
   },
   {
-    id: 'narasumber', title: 'Narasumber', icon: Volume2,
+    id: 'narasumber', title: 'Permohonan Narasumber', icon: Volume2,
     gradient: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)',
-    glowColor: 'rgba(56,189,248,0.45)',
+    glowColor: 'rgba(56,189,248,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Permohonan narasumber ahli untuk workshop, bimtek & seminar pertanian.',
+    desc: 'Permohonan pemateri & narasumber ahli untuk bimtek/workshop.',
     emoji: '🎙️',
   },
   {
-    id: 'informasi-publik', title: 'Informasi Publik', icon: UserCheck,
-    gradient: 'linear-gradient(135deg, #7c3aed 0%, #c084fc 100%)',
-    glowColor: 'rgba(192,132,252,0.45)',
+    id: 'informasi-publik', title: 'Informasi Publik (PPID)', icon: UserCheck,
+    gradient: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+    glowColor: 'rgba(168,85,247,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Permohonan data publik, dokumen teknis & laporan resmi PPID BRMP DIY.',
+    desc: 'Permohonan data publik & dokumen teknis resmi PPID BRMP DIY.',
     emoji: '📋',
   },
   {
-    id: 'kunjungan', title: 'Kunjungan', icon: MapPin,
-    gradient: 'linear-gradient(135deg, #dc2626 0%, #fb7185 100%)',
-    glowColor: 'rgba(251,113,133,0.45)',
+    id: 'kunjungan', title: 'Kunjungan Edukasi', icon: MapPin,
+    gradient: 'linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)',
+    glowColor: 'rgba(244,63,94,0.35)',
     iconBg: 'rgba(255,255,255,0.22)',
-    desc: 'Pengajuan kunjungan edukasi ke fasilitas lab & lahan modern BRMP DIY.',
+    desc: 'Pengajuan kunjungan studi lapang ke fasilitas agro modern BRMP.',
     emoji: '🏛️',
   },
 ];
@@ -74,16 +74,7 @@ export default function PortalLayanan() {
   const [trackInput, setTrackInput] = useState('');
   const [trackResult, setTrackResult] = useState(null);
   const [formData, setFormData] = useState({
-    nik: '',
-    nama: '',
-    instansi: '',
-    alamat: '',
-    email: '',
-    telepon: '',
-    kegiatan: '',
-    tema: '',
-    tanggal: '',
-    pesan: '',
+    nik: '', nama: '', instansi: '', alamat: '', email: '', telepon: '', kegiatan: '', tema: '', tanggal: '', pesan: '',
   });
   const [file, setFile] = useState(null);
   const [submitted, setSubmitted] = useState(null);
@@ -119,7 +110,6 @@ export default function PortalLayanan() {
     if (!code) return;
 
     try {
-      // Cari di API Pengaduan & Layanan Publik
       const res = await pengaduanService.trackByCodePublic(code);
       if (res && res.success && res.data) {
         const data = res.data;
@@ -206,33 +196,37 @@ export default function PortalLayanan() {
       id="portal-layanan"
       ref={sectionRef}
       style={{
-        background: 'linear-gradient(180deg, #f0fdf4 0%, #dcfce7 40%, #f8fafc 100%)',
+        background: 'linear-gradient(180deg, #f8fafc 0%, #ecfdf5 45%, #f8fafc 100%)',
         padding: '6rem 1.5rem',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
+      {/* Dot Pattern Overlay */}
+      <div
+        style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'radial-gradient(rgba(16,185,129,0.08) 1.5px, transparent 1.5px)',
+          backgroundSize: '24px 24px',
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Animated background orbs */}
       <div style={{
-        position: 'absolute', top: '5%', left: '-80px',
-        width: '420px', height: '420px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)',
+        position: 'absolute', top: '10%', left: '-80px',
+        width: '400px', height: '400px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)',
         pointerEvents: 'none', animation: 'floatOrb 8s ease-in-out infinite',
       }} />
       <div style={{
-        position: 'absolute', bottom: '10%', right: '-60px',
+        position: 'absolute', bottom: '15%', right: '-60px',
         width: '320px', height: '320px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(13,110,56,0.1) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(5,150,105,0.08) 0%, transparent 70%)',
         pointerEvents: 'none', animation: 'floatOrb 11s ease-in-out infinite reverse',
       }} />
-      <div style={{
-        position: 'absolute', top: '40%', right: '15%',
-        width: '200px', height: '200px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(251,191,36,0.08) 0%, transparent 70%)',
-        pointerEvents: 'none', animation: 'floatOrb 6s ease-in-out infinite 2s',
-      }} />
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', position: 'relative' }}>
+      <div style={{ maxWidth: '1160px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
         {/* Header */}
         <div style={{
           textAlign: 'center', maxWidth: '750px', margin: '0 auto 3.5rem auto',
@@ -241,63 +235,58 @@ export default function PortalLayanan() {
           transition: 'all 0.7s cubic-bezier(0.22,1,0.36,1)',
         }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: 'linear-gradient(135deg, #0d6e38, #10b981)',
+            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+            background: 'linear-gradient(135deg, #059669, #10b981)',
             color: '#ffffff',
-            padding: '0.45rem 1.2rem', borderRadius: '9999px',
-            fontSize: '0.76rem', fontWeight: 700, letterSpacing: '0.08em',
+            padding: '0.45rem 1.25rem', borderRadius: '9999px',
+            fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.06em',
             textTransform: 'uppercase', marginBottom: '1.2rem',
-            boxShadow: '0 4px 14px rgba(13,110,56,0.3)',
+            boxShadow: '0 4px 14px rgba(16,185,129,0.25)',
           }}>
-            🏛️ Layanan Publik Digital BRMP DIY
+            <Sparkles size={14} />
+            <span>Layanan Publik Digital BRMP DIY</span>
           </div>
+
           <h2 style={{
-            fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
-            fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em',
+            fontSize: 'clamp(2rem, 3.8vw, 2.7rem)',
+            fontWeight: 900, color: '#0f172a', letterSpacing: '-0.025em',
             lineHeight: 1.2,
           }}>
             Portal Sistem Informasi
             <span style={{
               display: 'block',
-              background: 'linear-gradient(135deg, #0d6e38, #10b981)',
+              background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #047857 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>Manajemen Agro Modern</span>
+            }}>
+              Manajemen Agro Modern
+            </span>
           </h2>
-          <p style={{ fontSize: '0.95rem', color: '#64748b', marginTop: '0.75rem', lineHeight: 1.6 }}>
-            Pilih layanan yang Anda butuhkan untuk mengajukan permohonan secara digital
+          <p style={{ fontSize: '0.98rem', color: '#64748b', marginTop: '0.85rem', lineHeight: 1.65 }}>
+            Akses seluruh permohonan layanan, sertifikasi, konsultasi, dan pengaduan masyarakat dalam satu pintu terintegrasi.
           </p>
         </div>
 
         {/* Portal Container - 6 Gradient Tiles */}
         <div
           style={{
-            background: 'linear-gradient(135deg, rgba(13,110,56,0.06) 0%, rgba(16,185,129,0.04) 50%, rgba(255,255,255,0.8) 100%)',
-            borderRadius: '32px',
+            background: 'rgba(255, 255, 255, 0.75)',
+            borderRadius: '28px',
             padding: '2.5rem',
-            marginBottom: '2.5rem',
-            boxShadow: '0 20px 60px rgba(13,110,56,0.08), 0 1px 0 rgba(255,255,255,0.8) inset',
+            marginBottom: '2.8rem',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.04), 0 1px 0 rgba(255,255,255,0.9) inset',
             border: '1px solid rgba(16,185,129,0.15)',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(16px)',
             opacity: sectionVisible ? 1 : 0,
             transform: sectionVisible ? 'translateY(0)' : 'translateY(35px)',
             transition: 'all 0.7s 0.15s cubic-bezier(0.22,1,0.36,1)',
             position: 'relative',
-            overflow: 'hidden',
           }}
         >
-          {/* Container inner glow */}
-          <div style={{
-            position: 'absolute', inset: 0, borderRadius: '32px',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 60%)',
-            pointerEvents: 'none',
-          }} />
-
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '1.2rem',
-              position: 'relative',
+              gap: '1.25rem',
             }}
             className="portal-grid"
           >
@@ -312,120 +301,92 @@ export default function PortalLayanan() {
                   onMouseOut={() => setHoveredTile(null)}
                   style={{
                     borderRadius: '22px',
-                    padding: '1.8rem 1.2rem 1.5rem',
+                    padding: '2rem 1.4rem 1.6rem',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'space-between',
                     textAlign: 'center',
                     cursor: 'pointer',
                     position: 'relative',
                     overflow: 'hidden',
                     background: isHover
                       ? tile.gradient
-                      : 'rgba(255,255,255,0.85)',
+                      : '#ffffff',
                     border: isHover
                       ? '1.5px solid rgba(255,255,255,0.4)'
-                      : '1.5px solid rgba(255,255,255,0.6)',
+                      : '1.5px solid #f1f5f9',
                     boxShadow: isHover
-                      ? `0 20px 50px ${tile.glowColor}, 0 0 0 1px rgba(255,255,255,0.2) inset`
-                      : '0 4px 16px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.9) inset',
+                      ? `0 20px 45px ${tile.glowColor}, 0 0 0 1px rgba(255,255,255,0.2) inset`
+                      : '0 4px 16px rgba(0,0,0,0.03)',
                     transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                    transform: isHover ? 'translateY(-10px) scale(1.05)' : 'translateY(0) scale(1)',
-                    animation: sectionVisible ? `fadeInUp 0.55s ${i * 0.09 + 0.25}s both` : 'none',
-                    backdropFilter: 'blur(8px)',
-                    minHeight: '160px',
+                    transform: isHover ? 'translateY(-8px) scale(1.03)' : 'translateY(0) scale(1)',
+                    minHeight: '200px',
                   }}
                 >
-                  {/* Shimmer overlay on hover */}
-                  {isHover && (
-                    <div style={{
-                      position: 'absolute', inset: 0, borderRadius: '22px',
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%)',
-                      pointerEvents: 'none',
-                    }} />
-                  )}
-
-                  {/* Floating particles on hover */}
-                  {isHover && (
-                    <>
-                      <div style={{
-                        position: 'absolute', top: '12px', right: '14px',
-                        width: '6px', height: '6px', borderRadius: '50%',
-                        backgroundColor: 'rgba(255,255,255,0.6)',
-                        animation: 'particleFloat 1.5s ease-in-out infinite',
-                      }} />
-                      <div style={{
-                        position: 'absolute', bottom: '18px', left: '16px',
-                        width: '4px', height: '4px', borderRadius: '50%',
-                        backgroundColor: 'rgba(255,255,255,0.4)',
-                        animation: 'particleFloat 2s ease-in-out infinite 0.5s',
-                      }} />
-                    </>
-                  )}
-
-                  {/* Icon container */}
-                  <div style={{
-                    width: '64px', height: '64px', borderRadius: '20px',
-                    background: isHover ? tile.iconBg : tile.gradient,
-                    color: isHover ? '#ffffff' : '#ffffff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '1rem',
-                    boxShadow: isHover
-                      ? '0 4px 16px rgba(255,255,255,0.3)'
-                      : `0 8px 24px ${tile.glowColor}`,
-                    transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                    transform: isHover ? 'scale(1.15) rotate(-3deg)' : 'scale(1) rotate(0)',
-                    backdropFilter: isHover ? 'blur(4px)' : 'none',
-                    border: isHover ? '1px solid rgba(255,255,255,0.35)' : 'none',
-                  }}>
-                    <IconComp size={30} strokeWidth={2} />
-                  </div>
-
                   {/* Emoji badge */}
                   <div style={{
-                    position: 'absolute', top: '12px', left: '14px',
-                    fontSize: '0.85rem', opacity: isHover ? 0.9 : 0.4,
+                    position: 'absolute', top: '14px', left: '16px',
+                    fontSize: '0.9rem', opacity: isHover ? 0.95 : 0.5,
                     transition: 'opacity 0.3s ease',
                     lineHeight: 1,
                   }}>
                     {tile.emoji}
                   </div>
 
-                  <h3 style={{
-                    fontSize: '0.95rem', fontWeight: 800,
-                    color: isHover ? '#ffffff' : '#1e293b',
-                    lineHeight: 1.3, transition: 'color 0.25s ease',
-                    marginBottom: '0.4rem',
-                  }}>
-                    {tile.title}
-                  </h3>
-
-                  <p style={{
-                    fontSize: '0.72rem',
-                    color: isHover ? 'rgba(255,255,255,0.85)' : '#94a3b8',
-                    lineHeight: 1.4,
-                    transition: 'color 0.25s ease',
-                    maxWidth: '140px',
-                    margin: '0 auto',
-                  }}>
-                    {tile.desc}
-                  </p>
-
-                  {/* Arrow indicator on hover */}
+                  {/* Icon container */}
                   <div style={{
-                    marginTop: '0.8rem',
-                    opacity: isHover ? 1 : 0,
-                    transform: isHover ? 'translateY(0)' : 'translateY(4px)',
-                    transition: 'all 0.3s ease',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    color: 'rgba(255,255,255,0.9)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
+                    width: '60px', height: '60px', borderRadius: '18px',
+                    background: isHover ? 'rgba(255,255,255,0.2)' : tile.gradient,
+                    color: '#ffffff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '1rem',
+                    boxShadow: isHover
+                      ? '0 4px 16px rgba(255,255,255,0.3)'
+                      : `0 8px 20px ${tile.glowColor}`,
+                    transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+                    transform: isHover ? 'scale(1.1) rotate(-3deg)' : 'scale(1) rotate(0)',
+                    border: isHover ? '1px solid rgba(255,255,255,0.4)' : 'none',
                   }}>
-                    Buka Layanan →
+                    <IconComp size={28} strokeWidth={2} />
+                  </div>
+
+                  <div>
+                    <h3 style={{
+                      fontSize: '1rem', fontWeight: 800,
+                      color: isHover ? '#ffffff' : '#0f172a',
+                      lineHeight: 1.3, transition: 'color 0.25s ease',
+                      marginBottom: '0.45rem',
+                    }}>
+                      {tile.title}
+                    </h3>
+
+                    <p style={{
+                      fontSize: '0.78rem',
+                      color: isHover ? 'rgba(255,255,255,0.9)' : '#64748b',
+                      lineHeight: 1.5,
+                      transition: 'color 0.25s ease',
+                      maxWidth: '220px',
+                      margin: '0 auto',
+                    }}>
+                      {tile.desc}
+                    </p>
+                  </div>
+
+                  {/* Action Link Footer */}
+                  <div style={{
+                    marginTop: '1.2rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    color: isHover ? '#ffffff' : '#059669',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.25s ease',
+                    transform: isHover ? 'translateX(2px)' : 'translateX(0)',
+                  }}>
+                    <span>Buka Layanan</span>
+                    <ArrowRight size={13} />
                   </div>
                 </div>
               );
@@ -433,301 +394,72 @@ export default function PortalLayanan() {
           </div>
         </div>
 
-        {/* Sub-text */}
-        <p style={{
-          textAlign: 'center', fontSize: '0.88rem', color: '#475569', marginBottom: '1.2rem',
-          fontWeight: 500,
-          opacity: sectionVisible ? 1 : 0, transition: 'opacity 0.7s 0.5s ease',
-        }}>
-          Sudah pernah mengajukan permohonan layanan? Cek kode layanan di bawah ini.
-        </p>
+        {/* Search / Track Section */}
+        <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto' }}>
+          <p style={{
+            fontSize: '0.9rem', color: '#475569', marginBottom: '1.2rem',
+            fontWeight: 600,
+            opacity: sectionVisible ? 1 : 0, transition: 'opacity 0.7s 0.5s ease',
+          }}>
+            Sudah pernah mengajukan permohonan layanan? Cek status nomor resi di bawah ini:
+          </p>
 
-        {/* Track Layanan Search */}
-        <form
-          onSubmit={handleTrack}
-          style={{
-            maxWidth: '720px', margin: '0 auto',
-            backgroundColor: '#ffffff', borderRadius: '9999px',
-            padding: '0.4rem 0.4rem 0.4rem 1.4rem',
-            display: 'flex', alignItems: 'center', gap: '0.8rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-            border: '2px solid #e2e8f0',
-            opacity: sectionVisible ? 1 : 0,
-            transition: 'opacity 0.7s 0.55s ease, border-color 0.25s ease',
-          }}
-        >
-          <Search size={20} color="#94a3b8" style={{ flexShrink: 0 }} />
-          <input
-            type="text"
-            value={trackInput}
-            onChange={(e) => setTrackInput(e.target.value)}
-            placeholder="Masukkan Nomor Resi / Kode Permohonan Layanan..."
-            style={{ flex: 1, border: 'none', outline: 'none', fontSize: '0.92rem', color: '#1e293b', backgroundColor: 'transparent' }}
-          />
-          <button
-            type="submit"
+          <form
+            onSubmit={handleTrack}
             style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              color: '#ffffff', padding: '0.75rem 1.6rem',
-              borderRadius: '9999px', fontWeight: 700, fontSize: '0.88rem',
-              boxShadow: '0 4px 14px rgba(16,185,129,0.3)', whiteSpace: 'nowrap',
-              transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+              backgroundColor: '#ffffff', borderRadius: '9999px',
+              padding: '0.45rem 0.45rem 0.45rem 1.4rem',
+              display: 'flex', alignItems: 'center', gap: '0.8rem',
+              boxShadow: '0 8px 25px rgba(0,0,0,0.06)',
+              border: '2px solid #e2e8f0',
+              opacity: sectionVisible ? 1 : 0,
+              transition: 'all 0.3s ease',
             }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onFocus={(e) => (e.currentTarget.style.borderColor = '#10b981')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
           >
-            Lacak Layanan
-          </button>
-        </form>
+            <Search size={20} color="#94a3b8" style={{ flexShrink: 0 }} />
+            <input
+              type="text"
+              value={trackInput}
+              onChange={(e) => setTrackInput(e.target.value)}
+              placeholder="Masukkan Nomor Resi / Kode Permohonan Layanan..."
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: '0.92rem', color: '#1e293b', backgroundColor: 'transparent' }}
+            />
+            <button
+              type="submit"
+              style={{
+                background: 'linear-gradient(135deg, #059669, #10b981)',
+                color: '#ffffff', padding: '0.8rem 1.75rem',
+                borderRadius: '9999px', fontWeight: 800, fontSize: '0.88rem',
+                boxShadow: '0 4px 14px rgba(16,185,129,0.3)', whiteSpace: 'nowrap',
+                transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              Lacak Layanan
+            </button>
+          </form>
+        </div>
       </div>
 
-      {/* Service Form Modal */}
-      {selectedService && (
-        <div style={{
-          position: 'fixed', inset: 0,
-          backgroundColor: 'rgba(15,23,42,0.7)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2000, padding: '1.5rem',
-        }} onClick={() => setSelectedService(null)}>
-          <div
-            style={{
-              backgroundColor: '#ffffff', borderRadius: '24px',
-              maxWidth: '560px', width: '100%',
-              maxHeight: '90vh', overflowY: 'auto',
-              padding: '2rem', position: 'relative',
-              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
-              animation: 'scaleIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Top color bar */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, height: '5px',
-              borderRadius: '24px 24px 0 0', backgroundColor: selectedService.color,
-            }} />
-
-            <button onClick={() => setSelectedService(null)} style={{
-              position: 'absolute', top: '1.2rem', right: '1.2rem',
-              backgroundColor: '#f1f5f9', border: 'none', borderRadius: '50%',
-              width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: '#64748b', transition: 'all 0.2s ease',
-            }}>
-              <X size={18} />
-            </button>
-
-            {!submitted ? (
-              <>
-                <div style={{ marginBottom: '1.5rem', marginTop: '0.5rem' }}>
-                  <div style={{
-                    width: '48px', height: '48px', borderRadius: '14px',
-                    backgroundColor: selectedService.bgColor,
-                    color: selectedService.color,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '0.8rem',
-                  }}>
-                    <selectedService.icon size={26} strokeWidth={1.8} />
-                  </div>
-                  <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a' }}>
-                    Layanan {selectedService.title}
-                  </h3>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.2rem' }}>
-                    {selectedService.desc}
-                  </p>
-                </div>
-
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                      Nama Lengkap *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.nama}
-                      onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                      placeholder="Nama Sesuai KTP"
-                      style={{
-                        width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                        border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                      NIK (Nomor Induk Kependudukan) *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={16}
-                      value={formData.nik}
-                      onChange={(e) => setFormData({ ...formData, nik: e.target.value.replace(/\D/g, '') })}
-                      placeholder="16 Digit NIK KTP"
-                      style={{
-                        width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                        border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                      Alamat Lengkap *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.alamat}
-                      onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                      placeholder="Alamat domisili lengkap"
-                      style={{
-                        width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                        border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                    <div>
-                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="nama@email.com"
-                        style={{
-                          width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                          border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                        No HP / WhatsApp *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={formData.telepon}
-                        onChange={(e) => setFormData({ ...formData, telepon: e.target.value })}
-                        placeholder="0812xxxx"
-                        style={{
-                          width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                          border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                      Detail Permohonan / Uraian *
-                    </label>
-                    <textarea
-                      rows={3} required
-                      value={formData.pesan}
-                      onChange={(e) => setFormData({ ...formData, pesan: e.target.value })}
-                      placeholder="Jelaskan permohonan atau pengaduan Anda..."
-                      style={{
-                        width: '100%', padding: '0.7rem 0.9rem', borderRadius: '10px',
-                        border: '1.5px solid #e2e8f0', fontSize: '0.9rem', resize: 'vertical', outline: 'none',
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.3rem' }}>
-                      Upload Dokumen / Foto Bukti Pendukung (Opsional)
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf,.doc,.docx"
-                      onChange={(e) => setFile(e.target.files[0])}
-                      style={{
-                        width: '100%', padding: '0.5rem', borderRadius: '10px',
-                        border: '1.5px solid #e2e8f0', fontSize: '0.85rem',
-                      }}
-                    />
-                    {file && (
-                      <div style={{ fontSize: '0.78rem', color: '#16a34a', fontWeight: 600, marginTop: '0.2rem' }}>
-                        ✓ File terpilih: {file.name}
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    style={{
-                      marginTop: '0.4rem',
-                      background: `linear-gradient(135deg, ${selectedService.color}, ${selectedService.color}cc)`,
-                      color: '#ffffff', padding: '0.85rem', borderRadius: '12px',
-                      fontWeight: 700, fontSize: '0.93rem',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                      boxShadow: `0 6px 18px ${selectedService.color}40`,
-                      transition: 'all 0.25s ease', cursor: 'pointer',
-                    }}
-                  >
-                    <Send size={18} />
-                    <span>Kirim Permohonan</span>
-                  </button>
-                </form>
-              </>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-                <div style={{
-                  width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#16a34a',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.2rem',
-                  animation: 'bounceIn 0.6s cubic-bezier(0.36,0.07,0.19,0.97)',
-                }}>
-                  <CheckCircle size={38} />
-                </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.4rem' }}>
-                  Permohonan Berhasil Dikirim!
-                </h3>
-                <p style={{ fontSize: '0.88rem', color: '#64748b', marginBottom: '1.2rem' }}>
-                  Terima kasih, <strong>{submitted.nama}</strong>. Permohonan layanan <strong>{submitted.service}</strong> Anda telah tercatat.
-                </p>
-                <div style={{ backgroundColor: '#f1f5f9', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.3rem' }}>Simpan Nomor Resi:</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0d6e38', letterSpacing: '0.05em' }}>{submitted.code}</div>
-                </div>
-                <button
-                  onClick={() => { setSelectedService(null); setSubmitted(null); setFile(null); }}
-                  style={{
-                    backgroundColor: '#0f172a', color: '#ffffff',
-                    padding: '0.75rem 1.5rem', borderRadius: '9999px',
-                    fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer',
-                  }}
-                >
-                  Tutup
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Tracking Result Modal */}
+      {/* Track Result Modal */}
       {trackResult && (
         <div style={{
           position: 'fixed', inset: 0,
-          backgroundColor: 'rgba(15,23,42,0.7)',
-          backdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(15,23,42,0.75)',
+          backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2000, padding: '1.5rem',
+          zIndex: 3000, padding: '1.5rem',
         }} onClick={() => setTrackResult(null)}>
           <div
             style={{
               backgroundColor: '#ffffff', borderRadius: '24px',
-              maxWidth: '500px', width: '100%',
+              maxWidth: '520px', width: '100%',
               padding: '2rem', position: 'relative',
-              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
-              animation: 'scaleIn 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+              boxShadow: '0 30px 70px -15px rgba(0,0,0,0.35)',
+              animation: 'scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -749,14 +481,14 @@ export default function PortalLayanan() {
                 <FileCheck size={24} />
               </div>
               <div>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', backgroundColor: '#e0f2fe', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0284c7', backgroundColor: '#e0f2fe', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
                   {trackResult.kode}
                 </span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', marginTop: '0.25rem' }}>{trackResult.layanan}</h3>
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: 1.6, border: '1px solid #e2e8f0' }}>
+            <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '14px', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: 1.6, border: '1px solid #e2e8f0' }}>
               <div><span style={{ color: '#64748b' }}>Pemohon: </span><strong>{trackResult.pemohon}</strong></div>
               <div><span style={{ color: '#64748b' }}>Tanggal Pengajuan: </span><strong>{trackResult.tanggal}</strong></div>
               <div style={{ marginTop: '0.4rem' }}>
@@ -765,7 +497,7 @@ export default function PortalLayanan() {
                   display: 'inline-block',
                   backgroundColor: trackResult.statusRaw === 'Selesai' ? '#dcfce7' : trackResult.statusRaw === 'Diproses' ? '#e0f2fe' : trackResult.statusRaw === 'Ditolak' ? '#fee2e2' : '#fef3c7',
                   color: trackResult.statusRaw === 'Selesai' ? '#15803d' : trackResult.statusRaw === 'Diproses' ? '#0369a1' : trackResult.statusRaw === 'Ditolak' ? '#b91c1c' : '#b45309',
-                  padding: '0.15rem 0.55rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 800,
+                  padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 800,
                   marginLeft: '0.3rem',
                 }}>
                   {trackResult.status}
@@ -776,7 +508,7 @@ export default function PortalLayanan() {
             {/* Official Response Highlight */}
             <div style={{
               backgroundColor: '#fffbeb', border: '1.5px solid #fde68a',
-              borderRadius: '12px', padding: '0.9rem 1rem', marginBottom: '1.4rem',
+              borderRadius: '14px', padding: '1rem', marginBottom: '1.4rem',
               fontSize: '0.86rem', color: '#78350f', lineHeight: 1.6,
             }}>
               <div style={{ fontWeight: 800, color: '#92400e', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -788,9 +520,10 @@ export default function PortalLayanan() {
             <button
               onClick={() => setTrackResult(null)}
               style={{
-                width: '100%', background: 'linear-gradient(135deg, #0d6e38, #10b981)',
-                color: '#ffffff', padding: '0.8rem', borderRadius: '10px',
-                fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', border: 'none',
+                width: '100%', background: 'linear-gradient(135deg, #059669, #10b981)',
+                color: '#ffffff', padding: '0.85rem', borderRadius: '12px',
+                fontWeight: 800, fontSize: '0.92rem', cursor: 'pointer', border: 'none',
+                boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
               }}
             >
               Tutup
@@ -800,19 +533,9 @@ export default function PortalLayanan() {
       )}
 
       <style>{`
-        @media (max-width: 700px) {
-          .portal-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (max-width: 480px) {
-          .portal-grid { grid-template-columns: 1fr !important; }
-        }
         @keyframes floatOrb {
           0%, 100% { transform: translateY(0px) scale(1); }
           50% { transform: translateY(-24px) scale(1.05); }
-        }
-        @keyframes particleFloat {
-          0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
-          50% { transform: translateY(-8px) scale(1.3); opacity: 1; }
         }
       `}</style>
     </section>

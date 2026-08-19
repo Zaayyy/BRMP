@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle } from 'lucide-react';
+import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle, Sparkles } from 'lucide-react';
 import { labService } from '../services/apiService';
 
-// Intersection Observer hook for scroll reveal
 function useScrollReveal(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -69,77 +68,86 @@ export default function LabTracking() {
         overflow: 'hidden',
       }}
     >
-      {/* Decorative circles */}
+      {/* Decorative background blurs */}
       <div style={{
         position: 'absolute', top: '-60px', right: '-60px',
-        width: '280px', height: '280px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)',
+        width: '320px', height: '320px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div style={{
         position: 'absolute', bottom: '-40px', left: '-40px',
-        width: '200px', height: '200px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(13,110,56,0.08) 0%, transparent 70%)',
+        width: '240px', height: '240px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(5,150,105,0.08) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
       <div
         style={{
-          maxWidth: '1000px',
+          maxWidth: '1040px',
           margin: '0 auto',
           opacity: sectionVisible ? 1 : 0,
           transform: sectionVisible ? 'translateY(0)' : 'translateY(40px)',
           transition: 'all 0.8s cubic-bezier(0.22,1,0.36,1)',
+          position: 'relative',
+          zIndex: 2,
         }}
       >
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
             backgroundColor: '#dcfce7', color: '#15803d',
-            padding: '0.4rem 1rem', borderRadius: '9999px',
-            fontSize: '0.76rem', fontWeight: 700, letterSpacing: '0.08em',
-            textTransform: 'uppercase', marginBottom: '1rem',
+            padding: '0.45rem 1.15rem', borderRadius: '9999px',
+            fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.06em',
+            textTransform: 'uppercase', marginBottom: '1.2rem',
+            boxShadow: '0 2px 8px rgba(16,185,129,0.15)',
           }}>
             <FlaskConical size={14} />
-            <span>Layanan Laboratorium</span>
+            <span>Laboratorium Terakreditasi</span>
           </div>
+
           <h2 style={{
-            fontSize: 'clamp(1.75rem, 3.5vw, 2.4rem)',
-            fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '0.8rem',
+            fontSize: 'clamp(1.9rem, 3.6vw, 2.6rem)',
+            fontWeight: 900, color: '#0f172a', letterSpacing: '-0.025em', marginBottom: '0.85rem',
           }}>
-            Tracking Layanan Laboratorium BRMP DIY
+            Tracking Uji Laboratorium BRMP DIY
           </h2>
-          <p style={{ fontSize: '1rem', color: '#64748b', lineHeight: 1.55, maxWidth: '600px', margin: '0 auto' }}>
-            Pantau hasil uji laboratorium, sertifikasi benih, dan analisis mutu secara transparan dan real-time langsung dari database.
+
+          <p style={{ fontSize: '0.98rem', color: '#64748b', lineHeight: 1.65, maxWidth: '640px', margin: '0 auto' }}>
+            Pantau proses pengujian mutu benih, analisis tanah, dan instrumen pertanian secara transparan langsung dari database laboratorium.
           </p>
         </div>
 
         {/* Search Card */}
         <div style={{
-          background: 'linear-gradient(135deg, #e8f5ed, #d1fae5)',
-          borderRadius: '24px',
+          background: 'linear-gradient(135deg, #f0fdf4 0%, #e8f5ed 50%, #d1fae5 100%)',
+          borderRadius: '26px',
           padding: '2.5rem',
-          border: '1px solid rgba(16,185,129,0.2)',
-          boxShadow: '0 8px 32px rgba(13,110,56,0.07)',
+          border: '1.5px solid rgba(16,185,129,0.25)',
+          boxShadow: '0 12px 35px rgba(13,110,56,0.06)',
+          position: 'relative',
         }}>
           <form onSubmit={handleSearch} style={{
             backgroundColor: '#ffffff',
             borderRadius: '9999px',
-            padding: '0.4rem 0.4rem 0.4rem 1.4rem',
+            padding: '0.45rem 0.45rem 0.45rem 1.4rem',
             display: 'flex',
             alignItems: 'center',
             gap: '0.8rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-            border: '2px solid rgba(16,185,129,0.2)',
-            transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
-          }}>
+            boxShadow: '0 8px 25px rgba(0,0,0,0.06)',
+            border: '2px solid rgba(16,185,129,0.3)',
+            transition: 'all 0.25s ease',
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = '#10b981')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(16,185,129,0.3)')}
+          >
             <Search size={20} color="#94a3b8" style={{ flexShrink: 0 }} />
             <input
               type="text"
               value={query}
               onChange={(e) => { setQuery(e.target.value); setNotFoundMsg(null); }}
-              placeholder="Masukkan Kode Tracking Pengujian Lab (contoh: LAB-20260819-001)..."
+              placeholder="Masukkan Kode Tracking Pengujian Lab (contoh: LAB-2026-001)..."
               style={{
                 flex: 1, border: 'none', outline: 'none',
                 fontSize: '0.95rem', color: '#1e293b', backgroundColor: 'transparent',
@@ -149,15 +157,17 @@ export default function LabTracking() {
               type="submit"
               disabled={isLoading}
               style={{
-                background: 'linear-gradient(135deg, #10b981, #0d6e38)',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
                 color: '#ffffff',
-                padding: '0.75rem 1.75rem',
+                padding: '0.8rem 1.8rem',
                 borderRadius: '9999px',
-                fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap',
-                boxShadow: '0 4px 14px rgba(13,110,56,0.3)',
+                fontWeight: 800, fontSize: '0.9rem', whiteSpace: 'nowrap',
+                boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
                 transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
                 border: 'none', cursor: 'pointer',
               }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
               {isLoading ? 'Mencari...' : 'Cari Hasil Lab'}
             </button>
@@ -167,17 +177,18 @@ export default function LabTracking() {
           {notFoundMsg && (
             <div style={{
               marginTop: '1.2rem',
-              backgroundColor: '#fee2e2',
-              border: '1px solid #fca5a5',
-              borderRadius: '12px',
-              padding: '0.8rem 1.2rem',
-              fontSize: '0.86rem',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: '14px',
+              padding: '0.9rem 1.2rem',
+              fontSize: '0.88rem',
               color: '#991b1b',
               display: 'flex',
               alignItems: 'center',
               gap: '0.6rem',
+              fontWeight: 500,
             }}>
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
               <span>{notFoundMsg}</span>
             </div>
           )}
@@ -189,22 +200,22 @@ export default function LabTracking() {
         <div
           style={{
             position: 'fixed', inset: 0,
-            backgroundColor: 'rgba(15,23,42,0.7)',
-            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(15,23,42,0.75)',
+            backdropFilter: 'blur(10px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 2000, padding: '1.5rem',
+            zIndex: 3000, padding: '1.5rem',
           }}
           onClick={() => setActiveResult(null)}
         >
           <div
             style={{
               backgroundColor: '#ffffff',
-              borderRadius: '24px',
-              maxWidth: '640px', width: '100%',
-              maxHeight: '88vh', overflowY: 'auto',
-              padding: '2rem',
-              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
-              animation: 'fadeInUp 0.4s cubic-bezier(0.22,1,0.36,1)',
+              borderRadius: '26px',
+              maxWidth: '660px', width: '100%',
+              maxHeight: '90vh', overflowY: 'auto',
+              padding: '2.2rem',
+              boxShadow: '0 30px 70px -15px rgba(0,0,0,0.35)',
+              animation: 'scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1)',
               position: 'relative',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -212,29 +223,30 @@ export default function LabTracking() {
             <button onClick={() => setActiveResult(null)} style={{
               position: 'absolute', top: '1.2rem', right: '1.2rem',
               backgroundColor: '#f1f5f9', border: 'none', borderRadius: '50%',
-              width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#64748b', cursor: 'pointer', transition: 'all 0.2s ease',
             }}>
-              <X size={18} />
+              <X size={20} />
             </button>
 
             {/* Modal Header */}
-            <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
               <div style={{
-                width: '52px', height: '52px', borderRadius: '14px',
-                background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)',
-                color: '#0d6e38', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                width: '54px', height: '54px', borderRadius: '16px',
+                background: 'linear-gradient(135deg, #059669, #10b981)',
+                color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                boxShadow: '0 6px 16px rgba(16,185,129,0.3)',
               }}>
-                <FlaskConical size={26} />
+                <FlaskConical size={28} />
               </div>
               <div>
                 <span style={{
-                  fontSize: '0.72rem', fontWeight: 700, color: '#0d6e38',
-                  backgroundColor: '#dcfce7', padding: '0.2rem 0.6rem', borderRadius: '6px',
+                  fontSize: '0.75rem', fontWeight: 800, color: '#059669',
+                  backgroundColor: '#dcfce7', padding: '0.25rem 0.7rem', borderRadius: '6px',
                 }}>
                   {activeResult.code}
                 </span>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginTop: '0.3rem', lineHeight: 1.3 }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', marginTop: '0.35rem', lineHeight: 1.3 }}>
                   {activeResult.title}
                 </h3>
               </div>
@@ -242,31 +254,33 @@ export default function LabTracking() {
 
             {/* Info Row */}
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem',
-              backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '12px',
-              fontSize: '0.85rem', marginBottom: '1.5rem', border: '1px solid #e2e8f0',
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem',
+              backgroundColor: '#f8fafc', padding: '1.1rem', borderRadius: '16px',
+              fontSize: '0.86rem', marginBottom: '1.6rem', border: '1px solid #e2e8f0',
             }}>
               <div>
-                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem' }}>Pemohon:</span>
-                <strong style={{ color: '#1e293b' }}>{activeResult.pemohon}</strong>
+                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Nama Pemohon:</span>
+                <strong style={{ color: '#0f172a', fontSize: '0.92rem' }}>{activeResult.pemohon}</strong>
               </div>
               <div>
-                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem' }}>Tanggal Masuk:</span>
-                <strong style={{ color: '#1e293b' }}>{activeResult.tanggalMasuk}</strong>
+                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Tanggal Penerimaan Sampel:</span>
+                <strong style={{ color: '#0f172a', fontSize: '0.92rem' }}>{activeResult.tanggalMasuk}</strong>
               </div>
             </div>
 
             {/* Progress Timeline */}
-            <h4 style={{ fontSize: '0.88rem', fontWeight: 700, color: '#334155', marginBottom: '1rem' }}>Progress Pengujian Laboratorium:</h4>
-            <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', marginBottom: '1.8rem' }}>
+            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1e293b', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+              Tahapan Pengujian Laboratorium:
+            </h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', marginBottom: '2rem' }}>
               <div style={{
-                position: 'absolute', top: '16px', left: '8%', right: '8%', height: '3px',
+                position: 'absolute', top: '17px', left: '8%', right: '8%', height: '3px',
                 backgroundColor: '#e2e8f0', zIndex: 0, borderRadius: '2px',
               }}>
                 <div style={{
                   height: '100%', borderRadius: '2px',
                   width: `${((activeResult.step - 1) / 4) * 100}%`,
-                  background: 'linear-gradient(90deg, #0d6e38, #10b981)',
+                  background: 'linear-gradient(90deg, #059669, #10b981)',
                   transition: 'width 1s ease',
                 }} />
               </div>
@@ -275,18 +289,19 @@ export default function LabTracking() {
                 return (
                   <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, flex: 1 }}>
                     <div style={{
-                      width: '34px', height: '34px', borderRadius: '50%',
-                      backgroundColor: done ? '#0d6e38' : '#e2e8f0',
+                      width: '36px', height: '36px', borderRadius: '50%',
+                      backgroundColor: done ? '#059669' : '#ffffff',
                       color: done ? '#ffffff' : '#94a3b8',
+                      border: done ? 'none' : '2px solid #e2e8f0',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontWeight: 700, fontSize: '0.82rem',
-                      boxShadow: done ? '0 4px 10px rgba(13,110,56,0.3)' : 'none',
+                      fontWeight: 800, fontSize: '0.85rem',
+                      boxShadow: done ? '0 4px 12px rgba(5,150,105,0.35)' : 'none',
                       transition: 'all 0.3s ease',
-                      marginBottom: '0.4rem',
+                      marginBottom: '0.45rem',
                     }}>
-                      {done ? <CheckCircle size={18} /> : i + 1}
+                      {done ? <CheckCircle size={20} /> : i + 1}
                     </div>
-                    <span style={{ fontSize: '0.7rem', fontWeight: done ? 700 : 500, color: done ? '#0d6e38' : '#94a3b8', textAlign: 'center', lineHeight: 1.3 }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: done ? 800 : 500, color: done ? '#065f46' : '#94a3b8', textAlign: 'center', lineHeight: 1.3 }}>
                       {step}
                     </span>
                   </div>
@@ -302,19 +317,20 @@ export default function LabTracking() {
                 rel="noreferrer"
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                  background: 'linear-gradient(135deg, #0d6e38, #10b981)',
-                  color: '#ffffff', padding: '0.85rem', borderRadius: '12px',
-                  fontWeight: 700, fontSize: '0.93rem', textDecoration: 'none', marginBottom: '0.8rem',
+                  background: 'linear-gradient(135deg, #059669, #10b981)',
+                  color: '#ffffff', padding: '0.95rem', borderRadius: '14px',
+                  fontWeight: 800, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '0.9rem',
+                  boxShadow: '0 6px 18px rgba(16,185,129,0.3)',
                 }}
               >
                 <Download size={18} />
-                <span>Unduh Dokumen Hasil Uji Resmi (PDF)</span>
+                <span>Unduh Dokumen Laporan Hasil Uji (PDF)</span>
               </a>
             ) : (
               <div style={{
-                backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0',
-                borderRadius: '12px', padding: '0.8rem', textAlign: 'center',
-                fontSize: '0.84rem', color: '#15803d', fontWeight: 600, marginBottom: '0.8rem',
+                backgroundColor: '#ecfdf5', border: '1.5px solid #a7f3d0',
+                borderRadius: '14px', padding: '0.9rem', textAlign: 'center',
+                fontSize: '0.86rem', color: '#065f46', fontWeight: 600, marginBottom: '1rem',
               }}>
                 ℹ️ Sampel sedang dalam tahapan pengujian aktif laboratorium BRMP DIY.
               </div>
@@ -324,8 +340,8 @@ export default function LabTracking() {
               onClick={() => setActiveResult(null)}
               style={{
                 width: '100%', backgroundColor: '#f1f5f9', color: '#475569',
-                padding: '0.75rem', borderRadius: '12px', fontWeight: 700,
-                fontSize: '0.88rem', border: 'none', cursor: 'pointer',
+                padding: '0.8rem', borderRadius: '12px', fontWeight: 800,
+                fontSize: '0.9rem', border: 'none', cursor: 'pointer',
               }}
             >
               Tutup
