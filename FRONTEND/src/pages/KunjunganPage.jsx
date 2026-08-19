@@ -36,7 +36,7 @@ const LOKASI_LIST = [
     nama: 'Laboratorium Tanah',
     kategori: 'Laboratorium & Analisis Mutu',
     badge: 'Fasilitas Pengujian',
-    descRingkas: 'Balai Penerapan Modernisasi Pertanian (BRMP) DIY melayani kunjungan edukasi, studi banding, dan pengenalan instrumen pengujian laboratorium tanah dan tanaman.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani kunjungan edukasi, studi banding, dan pengenalan instrumen pengujian laboratorium tanah dan tanaman.',
     icon: FlaskConical,
     color: '#0284c7',
     persyaratan: [
@@ -62,7 +62,7 @@ const LOKASI_LIST = [
     nama: 'Kebun Percobaan',
     kategori: 'Lahan Agro Eduwisata Modern',
     badge: 'Outdoor Field',
-    descRingkas: 'Balai Penerapan Modernisasi Pertanian (BRMP) DIY melayani kunjungan agro eduwisata, studi lapang varietas benih unggul, dan percontohan smart farming.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani kunjungan agro eduwisata, studi lapang varietas benih unggul, dan percontohan smart farming.',
     icon: Sprout,
     color: '#10b981',
     persyaratan: [
@@ -88,7 +88,7 @@ const LOKASI_LIST = [
     nama: 'Wisma BRMP DIY',
     kategori: 'Akomodasi & Diklat Pertanian',
     badge: 'Fasilitas Wisma',
-    descRingkas: 'Balai Penerapan Modernisasi Pertanian (BRMP) DIY melayani permohonan akomodasi wisma untuk peserta pelatihan, magang, bimbingan teknis, dan studi banding pertanian.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani permohonan akomodasi wisma untuk peserta pelatihan, magang, bimbingan teknis, dan studi banding pertanian.',
     icon: Home,
     color: '#f59e0b',
     persyaratan: [
@@ -114,7 +114,7 @@ const LOKASI_LIST = [
     nama: 'Balai Besar BRMP DIY',
     kategori: 'Pusat Standarisasi & Audiensi',
     badge: 'Kantor Pusat',
-    descRingkas: 'Balai Penerapan Modernisasi Pertanian (BRMP) DIY melayani kunjungan kelembagaan, audiensi kedinasan, studi banding PPID, dan konsultasi kebijakan standarisasi pertanian.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani kunjungan kelembagaan, audiensi kedinasan, studi banding PPID, dan konsultasi kebijakan standarisasi pertanian.',
     icon: Building2,
     color: '#8b5cf6',
     persyaratan: [
@@ -374,7 +374,7 @@ export default function KunjunganPage() {
                   marginBottom: '0.75rem',
                 }}
               >
-                <span>🌱 Balai Penerapan Modernisasi Pertanian DIY</span>
+                <span>🌱 Balai Besar Modernisasi Pertanian DIY</span>
               </div>
               <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', fontWeight: 800, margin: '0 0 0.5rem 0', lineHeight: 1.25 }}>
                 Pusat Edukasi, Standarisasi Mutu & Pertanian Modern DIY

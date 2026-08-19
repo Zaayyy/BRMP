@@ -122,7 +122,7 @@ export default function Footer() {
               <MapPin size={22} color="#ffffff" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
               <div>
                 <strong style={{ display: 'block', fontSize: '1rem', fontWeight: 800, marginBottom: '0.2rem' }}>
-                  BALAI PENERAPAN MODERNISASI PERTANIAN YOGYAKARTA
+                  BALAI BESAR MODERNISASI PERTANIAN YOGYAKARTA
                 </strong>
                 <span style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
                   Jl. Stadion Maguwoharjo No 22, Wedomartani, Ngemplak, Sleman, Daerah Istimewa Yogyakarta (Kode Pos 55584)

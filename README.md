@@ -1,6 +1,6 @@
 # 🌾 BRMP DIY - Sistem Informasi & Pelayanan Terpadu Balai Standarisasi Pertanian
 
-Monorepo resmi aplikasi **BRMP DIY (Balai Penerapan Standar Instrumen Pertanian / Balai Pengawasan & Sertifikasi Benih DIY)** yang mencakup Website Publik, Portal Petugas/Admin, dan Backend REST API.
+Monorepo resmi aplikasi **BRMP DIY (Balai Besar Standar Instrumen Pertanian / Balai Pengawasan & Sertifikasi Benih DIY)** yang mencakup Website Publik, Portal Petugas/Admin, dan Backend REST API.
 
 ---
 

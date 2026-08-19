@@ -112,7 +112,7 @@ export default function BenihSection() {
               Ketersediaan Benih Bersertifikasi
             </h2>
             <p style={{ fontSize: '1rem', color: '#64748b', marginTop: '0.5rem', maxWidth: '500px' }}>
-              Data benih pertanian resmi bersertifikat mutu dari Balai Penerapan Standar Instrumen Pertanian DIY.
+              Data benih pertanian resmi bersertifikat mutu dari Balai Besar Standar Instrumen Pertanian DIY.
             </p>
           </div>
 

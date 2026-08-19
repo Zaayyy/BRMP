@@ -235,7 +235,7 @@ export default function MagangSection() {
                 </h3>
 
                 <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.65, marginBottom: '1.5rem' }}>
-                  Balai Penerapan Standar Instrumen Pertanian (BRMP DIY) membuka kesempatan magang, Praktik Kerja Lapangan (PKL), dan penelitian bagi mahasiswa dan siswa SMK di lingkungan laboratorium modern dan kebun percobaan agromodern Yogyakarta.
+                  Balai Besar Standar Instrumen Pertanian (BRMP DIY) membuka kesempatan magang, Praktik Kerja Lapangan (PKL), dan penelitian bagi mahasiswa dan siswa SMK di lingkungan laboratorium modern dan kebun percobaan agromodern Yogyakarta.
                 </p>
 
                 {/* Grid 4 Cards */}
