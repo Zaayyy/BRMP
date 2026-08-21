@@ -4,8 +4,7 @@
  */
 
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  'https://twobebrmp.onrender.com';
+  import.meta.env.VITE_API_BASE_URL || '';
 
 /**
  * Core wrapper untuk fetch API request dengan Interceptor Manual

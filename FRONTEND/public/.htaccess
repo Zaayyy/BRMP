@@ -8,8 +8,9 @@ DirectoryIndex index.html index.php
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # 2. Jika bukan folder admin, arahkan semua rute SPA ke index.html
+  # 2. Jangan rewrite rute admin atau api ke index.html frontend
   RewriteCond %{REQUEST_URI} !/admin [NC]
+  RewriteCond %{REQUEST_URI} !/api [NC]
   RewriteRule . index.html [L]
 </IfModule>
 
