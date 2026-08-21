@@ -5,8 +5,7 @@
 
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.API_BASE_URL ||
-  'http://localhost:5000';
+  (import.meta.env.PROD ? 'https://twobebrmp.onrender.com' : 'http://localhost:5000');
 
 /**
  * Core wrapper untuk fetch API request dengan Interceptor Manual

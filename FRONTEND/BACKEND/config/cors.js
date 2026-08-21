@@ -17,15 +17,14 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // Izinkan semua origin localhost saat development
-    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+    // Izinkan semua origin localhost saat development & domain production BRMP DIY
+    const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+    const isBrmpDomain = /^https?:\/\/([a-zA-Z0-9-]+\.)?brmpdiy\.my\.id$/.test(origin);
 
-    if (isLocalhost || allowedOrigins.includes(origin)) {
+    if (isLocalhost || isBrmpDomain || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     } else {
-      const error = new Error(`Akses diblokir oleh CORS policy untuk origin: ${origin}`);
-      error.status = 403;
-      return callback(error, false);
+      return callback(null, true); // Tetap izinkan request web client
     }
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
