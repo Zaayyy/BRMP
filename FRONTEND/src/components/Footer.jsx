@@ -3,7 +3,7 @@ import { MapPin, Mail, Phone, Clock, ExternalLink, ArrowRight, ShieldCheck, Hear
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=BRMP+DIY+Jl.+Stadion+Maguwoharjo+No+22+Wedomartani+Sleman';
+  const googleMapsUrl = 'https://maps.app.goo.gl/NYzD7j7UaR1spVgv5';
 
   const quickLinks = [
     { label: 'Beranda & Pengenalan', to: '/' },
@@ -147,11 +147,11 @@ export default function Footer() {
               </a>
 
               <iframe
-                title="Lokasi BRMP DIY"
-                src="https://maps.google.com/maps?q=Stadion%20Maguwoharjo%20Sleman%20Yogyakarta&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                title="Lokasi Kantor BRMP D.I. Yogyakarta"
+                src="https://maps.google.com/maps?q=-7.7510648,110.4259274&hl=id&z=17&ie=UTF8&iwloc=&output=embed"
                 width="100%"
                 height="100%"
-                style={{ border: 0, opacity: 0.9 }}
+                style={{ border: 0, opacity: 0.95 }}
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
