@@ -20,7 +20,7 @@ function PlantSVG({ x, variant = 0, scale = 1, delay = 0 }) {
     <svg
       viewBox="0 0 80 160"
       width={60 * scale}
-      height={120 * scale}z
+      height={120 * scale}
       style={{
         position: 'absolute',
         bottom: 0,
