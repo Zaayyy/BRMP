@@ -2,6 +2,12 @@
   RewriteEngine On
   RewriteBase /
 
+  # Redirect /testing/admin -> /admin/
+  RewriteRule ^testing/admin/?(.*)$ /admin/$1 [R=301,L,NC]
+
+  # Redirect /testing/... -> /...
+  RewriteRule ^testing/?(.*)$ /$1 [R=301,L,NC]
+
   # 1. Jika file atau folder fisik memang ada, langsung buka apa adanya
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
@@ -11,3 +17,4 @@
   RewriteCond %{REQUEST_URI} !/admin [NC]
   RewriteRule . /index.html [L]
 </IfModule>
+

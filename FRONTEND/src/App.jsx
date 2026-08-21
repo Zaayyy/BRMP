@@ -36,11 +36,8 @@ function HomePage({ onOpenGuideModal }) {
 export default function App() {
   const [guideModalOpen, setGuideModalOpen] = useState(false);
 
-  // Deteksi otomatis subpath hosting (misal: /testing) vs root lokal (/)
-  const basename = window.location.pathname.startsWith('/testing') ? '/testing' : '/';
-
   return (
-    <BrowserRouter basename={basename}>
+    <BrowserRouter>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff' }}>
         <Navbar />
         <main style={{ flex: 1 }}>
