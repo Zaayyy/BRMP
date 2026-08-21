@@ -220,7 +220,7 @@ try {
     // ROUTE: /public/benih
     // ==========================================
     if ($segments[0] === 'public' && ($segments[1] ?? '') === 'benih' && $method === 'GET') {
-        $stmt = $pdo->query("SELECT id, nama_benih as namaBenih, deskripsi, stok, gambar_url as gambarUrl, created_at as createdAt FROM benih ORDER BY id DESC");
+        $stmt = $pdo->query("SELECT id, nama_benih, nama_benih as namaBenih, deskripsi, stok, gambar_url, gambar_url as gambarUrl, created_at, created_at as createdAt FROM benih ORDER BY id DESC");
         $data = $stmt->fetchAll();
         echo json_encode(['success' => true, 'data' => $data]);
         exit();
@@ -231,7 +231,7 @@ try {
     // ==========================================
     if ($segments[0] === 'public' && ($segments[1] ?? '') === 'tracking' && isset($segments[2]) && $method === 'GET') {
         $kode = $segments[2];
-        $stmt = $pdo->prepare("SELECT t.id, t.kode_tracking as kodeTracking, t.nama_pemohon as namaPemohon, t.status_uji as statusUji, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id WHERE t.kode_tracking = :kode LIMIT 1");
+        $stmt = $pdo->prepare("SELECT t.id, t.kode_tracking, t.kode_tracking as kodeTracking, t.nama_pemohon, t.nama_pemohon as namaPemohon, t.status_uji, t.status_uji as statusUji, t.hasil_dokumen_url, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas, u.nama as nama_petugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id WHERE t.kode_tracking = :kode LIMIT 1");
         $stmt->execute([':kode' => $kode]);
         $tracking = $stmt->fetch();
 
@@ -267,7 +267,8 @@ try {
             'message' => 'Laporan pengaduan berhasil dikirim.',
             'data' => [
                 'id' => (int)$pdo->lastInsertId(),
-                'kodeTracking' => $kode
+                'kodeTracking' => $kode,
+                'kode_tracking' => $kode
             ]
         ]);
         exit();
@@ -292,7 +293,7 @@ try {
             }
 
             if ($method === 'GET') {
-                $stmt = $pdo->query("SELECT id, nama, email, role, created_at as createdAt, updated_at as updatedAt FROM users ORDER BY id ASC");
+                $stmt = $pdo->query("SELECT id, nama, email, role, created_at, created_at as createdAt, updated_at, updated_at as updatedAt FROM users ORDER BY id ASC");
                 echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 exit();
             }
@@ -355,7 +356,7 @@ try {
         // ------------------------------------------
         if ($sub === 'benih') {
             if ($method === 'GET') {
-                $stmt = $pdo->query("SELECT id, nama_benih as namaBenih, deskripsi, stok, gambar_url as gambarUrl, created_at as createdAt FROM benih ORDER BY id DESC");
+                $stmt = $pdo->query("SELECT id, nama_benih, nama_benih as namaBenih, deskripsi, stok, gambar_url, gambar_url as gambarUrl, created_at, created_at as createdAt, updated_at, updated_at as updatedAt FROM benih ORDER BY id DESC");
                 echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 exit();
             }
@@ -401,7 +402,7 @@ try {
         // ------------------------------------------
         if ($sub === 'tracking') {
             if ($method === 'GET') {
-                $stmt = $pdo->query("SELECT t.id, t.kode_tracking as kodeTracking, t.nama_pemohon as namaPemohon, t.status_uji as statusUji, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id ORDER BY t.id DESC");
+                $stmt = $pdo->query("SELECT t.id, t.kode_tracking, t.kode_tracking as kodeTracking, t.nama_pemohon, t.nama_pemohon as namaPemohon, t.status_uji, t.status_uji as statusUji, t.hasil_dokumen_url, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas, u.nama as nama_petugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id ORDER BY t.id DESC");
                 echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 exit();
             }
@@ -451,7 +452,7 @@ try {
         // ------------------------------------------
         if ($sub === 'pengaduan') {
             if ($method === 'GET') {
-                $stmt = $pdo->query("SELECT p.id, p.kode_tracking as kodeTracking, p.jenis_layanan as jenisLayanan, p.nama_pelapor as namaPelapor, p.email_pelapor as emailPelapor, p.no_telp_pelapor as noTelpPelapor, p.isi_pengaduan as isiPengaduan, p.status_tanggapan as statusTanggapan, p.tanggapan_petugas as tanggapanPetugas, p.tanggal, p.tanggal_tanggapan as tanggalTanggapan, u.nama as ditanggapiOleh FROM pengaduan p LEFT JOIN users u ON p.ditanggapi_oleh_id = u.id ORDER BY p.id DESC");
+                $stmt = $pdo->query("SELECT p.id, p.kode_tracking, p.kode_tracking as kodeTracking, p.jenis_layanan, p.jenis_layanan as jenisLayanan, p.nama_pelapor, p.nama_pelapor as namaPelapor, p.email_pelapor, p.email_pelapor as emailPelapor, p.no_telp_pelapor, p.no_telp_pelapor as noTelpPelapor, p.isi_pengaduan, p.isi_pengaduan as isiPengaduan, p.status_tanggapan, p.status_tanggapan as statusTanggapan, p.tanggapan_petugas, p.tanggapan_petugas as tanggapanPetugas, p.tanggal, p.tanggal_tanggapan, p.tanggal_tanggapan as tanggalTanggapan, u.nama as ditanggapiOleh, u.nama as ditanggapi_oleh FROM pengaduan p LEFT JOIN users u ON p.ditanggapi_oleh_id = u.id ORDER BY p.id DESC");
                 echo json_encode(['success' => true, 'data' => $stmt->fetchAll()]);
                 exit();
             }
