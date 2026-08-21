@@ -1,5 +1,7 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteBase /
+
   # 1. Jika file atau folder fisik memang ada, langsung buka apa adanya
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
@@ -7,5 +9,5 @@
 
   # 2. Jika bukan folder admin, arahkan semua rute SPA ke index.html
   RewriteCond %{REQUEST_URI} !/admin [NC]
-  RewriteRule . index.html [L]
+  RewriteRule . /index.html [L]
 </IfModule>
