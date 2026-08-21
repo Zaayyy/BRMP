@@ -1,3 +1,11 @@
+const DEFAULT_DATABASE_URL = "mysql://brmy4429_usertest:UMy%5E%40cbv_7%5Ec%248%26t@202.10.43.84:3306/brmy4429_brmp_db";
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = DEFAULT_DATABASE_URL;
+}
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = "brmp_secret_key_super_secure_2026_prod";
+}
+
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
