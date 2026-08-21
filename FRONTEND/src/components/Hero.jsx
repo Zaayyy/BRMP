@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronRight, BookOpen, Sparkles } from 'lucide-react';
+import { ChevronRight, Search, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { benihService } from '../services/apiService';
 
@@ -458,8 +458,8 @@ export default function Hero({ onOpenBenihModal, onOpenGuideModal }) {
               <ChevronRight size={17} />
             </Link>
 
-            <button
-              onClick={onOpenGuideModal}
+            <Link
+              to="/track"
               className="glass btn-ripple"
               style={{
                 display: 'inline-flex',
@@ -471,6 +471,7 @@ export default function Hero({ onOpenBenihModal, onOpenGuideModal }) {
                 fontSize: '0.95rem',
                 fontWeight: 600,
                 transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+                textDecoration: 'none',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px) scale(1.04)';
@@ -481,9 +482,9 @@ export default function Hero({ onOpenBenihModal, onOpenGuideModal }) {
                 e.currentTarget.style.backgroundColor = '';
               }}
             >
-              <BookOpen size={18} />
-              <span>Pelajari Panduan</span>
-            </button>
+              <Search size={18} />
+              <span>Lacak Layanan</span>
+            </Link>
           </div>
 
           {/* Quick Stats */}

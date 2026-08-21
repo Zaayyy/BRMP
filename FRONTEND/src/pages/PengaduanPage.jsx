@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, FileText, Image as ImageIcon,
   X, MessageSquareWarning, MapPin, Calendar, User, Phone, Mail,
@@ -16,6 +16,7 @@ const KATEGORI_PENGADUAN = [
 ];
 
 export default function PengaduanPage() {
+  const navigate = useNavigate();
   const [selectedKategori, setSelectedKategori] = useState(KATEGORI_PENGADUAN[0].label);
   const [formData, setFormData] = useState({
     nama: '',
@@ -69,6 +70,7 @@ export default function PengaduanPage() {
         email_pelapor: formData.email,
         no_telp_pelapor: formData.noHp,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Pengaduan Masyarakat',
       });
 
       const code = res?.data?.kode_tracking || `PGD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -634,6 +636,10 @@ export default function PengaduanPage() {
                 href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Petugas Pengawasan BRMP DIY, saya telah menyampaikan Laporan Pengaduan (${submitted.kategori}) dengan Nomor Tiket: ${submitted.code}. Mohon konfirmasi tindak lanjutnya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #25D366, #128C7E)',
@@ -654,7 +660,10 @@ export default function PengaduanPage() {
               </a>
 
               <button
-                onClick={() => setSubmitted(null)}
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   backgroundColor: '#f1f5f9',
@@ -667,7 +676,7 @@ export default function PengaduanPage() {
                   cursor: 'pointer',
                 }}
               >
-                Tutup
+                Tutup & Kembali ke Beranda
               </button>
             </div>
           </div>

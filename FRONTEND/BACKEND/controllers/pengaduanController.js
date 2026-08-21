@@ -14,17 +14,39 @@ const sanitizeInput = (str) => {
     .trim();
 };
 
+/**
+ * Deteksi jenis layanan / formulir asal berdasarkan parameter atau isi pengaduan & kode tracking
+ * @param {string} jenisLayanan 
+ * @param {string} isiPengaduan 
+ * @param {string} kodeTracking 
+ * @returns {string}
+ */
+const detectJenisLayanan = (jenisLayanan, isiPengaduan = '', kodeTracking = '') => {
+  if (jenisLayanan && typeof jenisLayanan === 'string' && jenisLayanan.trim()) {
+    return sanitizeInput(jenisLayanan);
+  }
+  const text = (isiPengaduan || '').toLowerCase();
+  const code = (kodeTracking || '').toUpperCase();
+  if (text.includes('narasumber') || code.startsWith('NAR')) return 'Permohonan Narasumber';
+  if (text.includes('magang') || text.includes('pkl') || text.includes('bimbingan teknis') || code.startsWith('MAGANG')) return 'Permohonan Magang';
+  if (text.includes('kunjungan') || text.includes('wisma') || text.includes('eduwisata') || code.startsWith('KUN')) return 'Permohonan Kunjungan';
+  if (text.includes('konsultasi') || code.startsWith('KON')) return 'Permohonan Konsultasi';
+  if (text.includes('informasi publik') || text.includes('ppid') || code.startsWith('PPID')) return 'Informasi Publik (PPID)';
+  if (text.includes('pengaduan') || code.startsWith('PGD')) return 'Pengaduan Masyarakat';
+  return 'Pengaduan Masyarakat';
+};
+
 // ==========================================
 // PUBLIC CONTROLLERS (Akses Publik)
 // ==========================================
 
 /**
  * POST /api/public/pengaduan
- * Mengirim formulir pengaduan masyarakat dengan kode tracking otomatis
+ * Mengirim formulir pengaduan / permohonan layanan masyarakat dengan kode tracking otomatis
  */
 const createPengaduanPublic = async (req, res, next) => {
   try {
-    const { nama_pelapor, email_pelapor, no_telp_pelapor, isi_pengaduan } = req.body;
+    const { nama_pelapor, email_pelapor, no_telp_pelapor, isi_pengaduan, jenis_layanan, asal_form } = req.body;
 
     // 1. Validasi field wajib
     if (!nama_pelapor || !isi_pengaduan) {
@@ -75,10 +97,14 @@ const createPengaduanPublic = async (req, res, next) => {
       }
     }
 
-    // 4. Simpan ke database
+    // 4. Deteksi dan sanitasi Jenis Layanan / Asal Formulir
+    const cleanJenisLayanan = detectJenisLayanan(jenis_layanan || asal_form, cleanIsi, kodeTracking);
+
+    // 5. Simpan ke database
     const newPengaduan = await prisma.pengaduan.create({
       data: {
         kode_tracking: kodeTracking,
+        jenis_layanan: cleanJenisLayanan,
         nama_pelapor: cleanNama,
         email_pelapor: cleanEmail,
         no_telp_pelapor: cleanNoTelp,
@@ -90,10 +116,11 @@ const createPengaduanPublic = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Laporan pengaduan Anda berhasil dikirim. Simpan kode tracking berikut untuk memeriksa status pengaduan Anda.',
+      message: 'Laporan permohonan/pengaduan Anda berhasil dikirim. Simpan kode tracking berikut untuk memeriksa status permohonan Anda.',
       data: {
         id: newPengaduan.id,
         kode_tracking: newPengaduan.kode_tracking,
+        jenis_layanan: newPengaduan.jenis_layanan,
         nama_pelapor: newPengaduan.nama_pelapor,
         tanggal: newPengaduan.tanggal,
         status_tanggapan: newPengaduan.status_tanggapan,
@@ -137,6 +164,7 @@ const getPengaduanByTrackingCodePublic = async (req, res, next) => {
       where: { kode_tracking: cleanKode },
       select: {
         kode_tracking: true,
+        jenis_layanan: true,
         tanggal: true,
         status_tanggapan: true,
         tanggapan_petugas: true,
@@ -152,12 +180,13 @@ const getPengaduanByTrackingCodePublic = async (req, res, next) => {
       });
     }
 
-    // 4. Kembalikan HANYA data status & tanggapan (tanpa nama atau kontak pelapor demi privasi)
+    // 4. Kembalikan data status & tanggapan (tanpa nama atau kontak pelapor demi privasi)
     return res.status(200).json({
       success: true,
       message: 'Status pengaduan berhasil ditemukan.',
       data: {
         kode_tracking: pengaduan.kode_tracking,
+        jenis_layanan: pengaduan.jenis_layanan || 'Pengaduan Masyarakat',
         tanggal_masuk: pengaduan.tanggal,
         status_tanggapan: pengaduan.status_tanggapan,
         tanggapan_petugas: pengaduan.tanggapan_petugas || 'Belum ada tanggapan dari petugas/admin.',
@@ -176,28 +205,32 @@ const getPengaduanByTrackingCodePublic = async (req, res, next) => {
 /**
  * GET /api/internal/pengaduan
  * Melihat daftar seluruh pengaduan yang masuk (Admin)
- * Query params: status, search, page, limit
+ * Query params: status, jenis_layanan, search, page, limit
  */
 const getAllPengaduanInternal = async (req, res, next) => {
   try {
-    const { status, search, page = 1, limit = 20 } = req.query;
+    const { status, jenis_layanan, search, page = 1, limit = 20 } = req.query;
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 20;
     const skip = (pageNum - 1) * limitNum;
 
     const where = {};
-    if (status) {
+    if (status && status !== 'Semua') {
       where.status_tanggapan = status;
+    }
+    if (jenis_layanan && jenis_layanan !== 'Semua') {
+      where.jenis_layanan = jenis_layanan;
     }
     if (search) {
       where.OR = [
         { kode_tracking: { contains: search } },
         { nama_pelapor: { contains: search } },
         { isi_pengaduan: { contains: search } },
+        { jenis_layanan: { contains: search } },
       ];
     }
 
-    const [total, list] = await Promise.all([
+    const [total, rawList] = await Promise.all([
       prisma.pengaduan.count({ where }),
       prisma.pengaduan.findMany({
         where,
@@ -215,6 +248,12 @@ const getAllPengaduanInternal = async (req, res, next) => {
         },
       }),
     ]);
+
+    // Format list dan pastikan jenis_layanan selalu terisi (fallback cerdas untuk data lama)
+    const list = rawList.map((item) => ({
+      ...item,
+      jenis_layanan: item.jenis_layanan || detectJenisLayanan('', item.isi_pengaduan, item.kode_tracking),
+    }));
 
     return res.status(200).json({
       success: true,
@@ -271,7 +310,10 @@ const getPengaduanByIdInternal = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Detail pengaduan berhasil diambil.',
-      data: pengaduan,
+      data: {
+        ...pengaduan,
+        jenis_layanan: pengaduan.jenis_layanan || detectJenisLayanan('', pengaduan.isi_pengaduan, pengaduan.kode_tracking),
+      },
     });
   } catch (error) {
     next(error);

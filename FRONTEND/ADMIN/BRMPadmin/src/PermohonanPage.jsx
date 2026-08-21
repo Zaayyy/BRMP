@@ -13,7 +13,15 @@ import {
     Phone,
     Calendar,
     MessageSquareWarning,
-    ExternalLink
+    ExternalLink,
+    Filter,
+    Tag,
+    FileText,
+    GraduationCap,
+    Building2,
+    Mic,
+    MessageCircle,
+    Info
 } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { internalPengaduanService } from "./services/apiService";
@@ -25,6 +33,81 @@ const statusStyles = {
     Ditolak: "bg-rose-100 text-rose-800 border border-rose-200",
 };
 
+/**
+ * Helper untuk identifikasi dan styling asal form permohonan / pengaduan
+ */
+export function getJenisLayananInfo(item) {
+    const raw = (item?.jenis_layanan || "").trim();
+    const text = (item?.isi_pengaduan || "").toLowerCase();
+    const code = (item?.kode_tracking || "").toUpperCase();
+
+    if (raw.includes("Narasumber") || text.includes("narasumber") || code.startsWith("NAR")) {
+        return {
+            key: "Permohonan Narasumber",
+            label: "Permohonan Narasumber & Ahli",
+            shortLabel: "Narasumber",
+            badgeClass: "bg-purple-100 text-purple-800 border-purple-200",
+            icon: Mic,
+            iconColor: "text-purple-600",
+            dotColor: "bg-purple-500",
+        };
+    }
+    if (raw.includes("Magang") || text.includes("magang") || text.includes("pkl") || code.startsWith("MAGANG")) {
+        return {
+            key: "Permohonan Magang",
+            label: "Permohonan Magang / PKL",
+            shortLabel: "Magang / PKL",
+            badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+            icon: GraduationCap,
+            iconColor: "text-blue-600",
+            dotColor: "bg-blue-500",
+        };
+    }
+    if (raw.includes("Kunjungan") || text.includes("kunjungan") || text.includes("wisma") || text.includes("eduwisata") || code.startsWith("KUN")) {
+        return {
+            key: "Permohonan Kunjungan",
+            label: "Permohonan Kunjungan & Wisma",
+            shortLabel: "Kunjungan",
+            badgeClass: "bg-teal-100 text-teal-800 border-teal-200",
+            icon: Building2,
+            iconColor: "text-teal-600",
+            dotColor: "bg-teal-500",
+        };
+    }
+    if (raw.includes("Konsultasi") || text.includes("konsultasi") || code.startsWith("KON")) {
+        return {
+            key: "Permohonan Konsultasi",
+            label: "Permohonan Konsultasi Teknis",
+            shortLabel: "Konsultasi",
+            badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+            icon: MessageCircle,
+            iconColor: "text-amber-600",
+            dotColor: "bg-amber-500",
+        };
+    }
+    if (raw.includes("PPID") || raw.includes("Informasi Publik") || text.includes("ppid") || text.includes("informasi publik") || code.startsWith("PPID")) {
+        return {
+            key: "Informasi Publik (PPID)",
+            label: "Informasi Publik (PPID)",
+            shortLabel: "PPID / Informasi",
+            badgeClass: "bg-indigo-100 text-indigo-800 border-indigo-200",
+            icon: FileText,
+            iconColor: "text-indigo-600",
+            dotColor: "bg-indigo-500",
+        };
+    }
+    // Default: Pengaduan Masyarakat
+    return {
+        key: "Pengaduan Masyarakat",
+        label: raw || "Pengaduan Masyarakat",
+        shortLabel: "Pengaduan",
+        badgeClass: "bg-rose-100 text-rose-800 border-rose-200",
+        icon: AlertCircle,
+        iconColor: "text-rose-600",
+        dotColor: "bg-rose-500",
+    };
+}
+
 export default function PermohonanPage({ onNavigate }) {
     const [aduanList, setAduanList] = useState([]);
     const [selectedId, setSelectedId] = useState(null);
@@ -32,6 +115,7 @@ export default function PermohonanPage({ onNavigate }) {
     const [isSaving, setIsSaving] = useState(false);
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("Semua");
+    const [filterForm, setFilterForm] = useState("Semua");
     const [notification, setNotification] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
 
@@ -73,6 +157,11 @@ export default function PermohonanPage({ onNavigate }) {
         return aduanList.find((item) => item.id === selectedId) || aduanList[0] || null;
     }, [aduanList, selectedId]);
 
+    // Info asal form untuk item yang sedang dipilih
+    const selectedFormInfo = useMemo(() => {
+        return selectedItem ? getJenisLayananInfo(selectedItem) : null;
+    }, [selectedItem]);
+
     // Update form when selected item changes
     useEffect(() => {
         if (selectedItem) {
@@ -83,19 +172,24 @@ export default function PermohonanPage({ onNavigate }) {
         }
     }, [selectedItem]);
 
-    // Filter pencarian dan status
+    // Filter pencarian, status, dan asal form
     const filteredAduan = useMemo(() => {
         return aduanList.filter((item) => {
+            const formInfo = getJenisLayananInfo(item);
             const matchSearch =
                 (item.nama_pelapor || "").toLowerCase().includes(search.toLowerCase()) ||
                 (item.kode_tracking || "").toLowerCase().includes(search.toLowerCase()) ||
                 (item.email_pelapor || "").toLowerCase().includes(search.toLowerCase()) ||
-                (item.isi_pengaduan || "").toLowerCase().includes(search.toLowerCase());
+                (item.isi_pengaduan || "").toLowerCase().includes(search.toLowerCase()) ||
+                (formInfo.label || "").toLowerCase().includes(search.toLowerCase()) ||
+                (formInfo.shortLabel || "").toLowerCase().includes(search.toLowerCase());
 
             const matchStatus = filterStatus === "Semua" || item.status_tanggapan === filterStatus;
-            return matchSearch && matchStatus;
+            const matchForm = filterForm === "Semua" || formInfo.key === filterForm;
+
+            return matchSearch && matchStatus && matchForm;
         });
-    }, [aduanList, search, filterStatus]);
+    }, [aduanList, search, filterStatus, filterForm]);
 
     // Hitung statistik
     const summaryStats = useMemo(() => {
@@ -104,7 +198,7 @@ export default function PermohonanPage({ onNavigate }) {
         const diproses = aduanList.filter((a) => a.status_tanggapan === "Diproses").length;
         const selesai = aduanList.filter((a) => a.status_tanggapan === "Selesai").length;
         return [
-            { label: "Total Laporan Masuk", value: total, detail: "Keseluruhan pengaduan publik" },
+            { label: "Total Permohonan / Aduan", value: total, detail: "Keseluruhan form masuk" },
             { label: "Menunggu Tindak Lanjut", value: menunggu, detail: "Butuh verifikasi awal petugas" },
             { label: "Sedang Diproses", value: diproses, detail: "Dalam penanganan tim teknis" },
             { label: "Selesai Ditanggapi", value: selesai, detail: "Sudah diberikan respon resmi" },
@@ -212,15 +306,30 @@ export default function PermohonanPage({ onNavigate }) {
             </section>
 
             {/* Main Layout: Tabel Laporan (Kiri) & Detail + Form Tanggapan (Kanan) */}
-            <section className="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
+            <section className="grid gap-6 xl:grid-cols-[1.35fr_1fr]">
                 {/* 1. TABEL DAFTAR LAPORAN MASUK */}
                 <article className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm flex flex-col">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
                         <div>
-                            <h2 className="text-lg font-black text-slate-900">Laporan Pengaduan Masuk</h2>
-                            <p className="text-xs text-slate-500">Pilih baris pada tabel untuk membaca isi laporan lengkap</p>
+                            <h2 className="text-lg font-black text-slate-900">Daftar Permohonan & Laporan Masuk</h2>
+                            <p className="text-xs text-slate-500">Pilih baris pada tabel untuk membaca rincian data permohonan</p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* Filter Asal Form / Layanan */}
+                            <select
+                                value={filterForm}
+                                onChange={(e) => setFilterForm(e.target.value)}
+                                className="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 outline-none"
+                            >
+                                <option value="Semua">Semua Formulir (6 Form)</option>
+                                <option value="Pengaduan Masyarakat">📢 Pengaduan Masyarakat</option>
+                                <option value="Permohonan Narasumber">🎙️ Permohonan Narasumber</option>
+                                <option value="Permohonan Magang">🎓 Permohonan Magang / PKL</option>
+                                <option value="Permohonan Kunjungan">🏛️ Permohonan Kunjungan</option>
+                                <option value="Permohonan Konsultasi">💬 Permohonan Konsultasi</option>
+                                <option value="Informasi Publik (PPID)">📋 Informasi Publik PPID</option>
+                            </select>
+
                             {/* Filter Status */}
                             <select
                                 value={filterStatus}
@@ -243,7 +352,7 @@ export default function PermohonanPage({ onNavigate }) {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Cari kode tiket, nama pelapor, email, atau kata kunci..."
+                            placeholder="Cari kode tiket, jenis form/layanan, nama pelapor, email, atau kata kunci..."
                             className="w-full bg-transparent text-xs font-medium text-slate-800 outline-none"
                         />
                     </div>
@@ -254,7 +363,8 @@ export default function PermohonanPage({ onNavigate }) {
                             <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
                                 <tr>
                                     <th className="px-3.5 py-3 text-left">Kode Tiket</th>
-                                    <th className="px-3.5 py-3 text-left">Pelapor</th>
+                                    <th className="px-3.5 py-3 text-left">Asal Formulir</th>
+                                    <th className="px-3.5 py-3 text-left">Pelapor / Pemohon</th>
                                     <th className="px-3.5 py-3 text-left">Tgl Masuk</th>
                                     <th className="px-3.5 py-3 text-left">Status</th>
                                 </tr>
@@ -262,13 +372,16 @@ export default function PermohonanPage({ onNavigate }) {
                             <tbody className="divide-y divide-slate-50 bg-white">
                                 {filteredAduan.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="text-center py-8 text-slate-400">
-                                            Tidak ada laporan pengaduan yang cocok.
+                                        <td colSpan={5} className="text-center py-8 text-slate-400">
+                                            Tidak ada data permohonan atau pengaduan yang cocok.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredAduan.map((row) => {
                                         const isSelected = (selectedItem && selectedItem.id === row.id);
+                                        const formInfo = getJenisLayananInfo(row);
+                                        const FormIcon = formInfo.icon;
+
                                         return (
                                             <tr
                                                 key={row.id}
@@ -277,17 +390,23 @@ export default function PermohonanPage({ onNavigate }) {
                                                     isSelected ? "bg-emerald-50/80 font-semibold" : "hover:bg-slate-50"
                                                 }`}
                                             >
-                                                <td className="px-3.5 py-3.5 font-mono text-emerald-800 font-bold">
+                                                <td className="px-3.5 py-3.5 font-mono text-emerald-800 font-bold whitespace-nowrap">
                                                     {row.kode_tracking}
+                                                </td>
+                                                <td className="px-3.5 py-3.5 whitespace-nowrap">
+                                                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${formInfo.badgeClass}`}>
+                                                        <FormIcon size={12} className={formInfo.iconColor} />
+                                                        <span>{formInfo.shortLabel}</span>
+                                                    </span>
                                                 </td>
                                                 <td className="px-3.5 py-3.5">
                                                     <div className="font-bold text-slate-900">{row.nama_pelapor}</div>
                                                     <div className="text-[11px] text-slate-400">{row.email_pelapor || row.no_telp_pelapor || "-"}</div>
                                                 </td>
-                                                <td className="px-3.5 py-3.5 text-slate-500">
+                                                <td className="px-3.5 py-3.5 text-slate-500 whitespace-nowrap">
                                                     {row.tanggal ? new Date(row.tanggal).toLocaleDateString("id-ID") : "-"}
                                                 </td>
-                                                <td className="px-3.5 py-3.5">
+                                                <td className="px-3.5 py-3.5 whitespace-nowrap">
                                                     <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${statusStyles[row.status_tanggapan] || "bg-slate-100 text-slate-700"}`}>
                                                         {row.status_tanggapan}
                                                     </span>
@@ -303,7 +422,7 @@ export default function PermohonanPage({ onNavigate }) {
 
                 {/* 2. DETAIL LAPORAN & FORM TANGGAPAN PETUGAS */}
                 <article className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
-                    {selectedItem ? (
+                    {selectedItem && selectedFormInfo ? (
                         <div className="space-y-5">
                             {/* Header Detail */}
                             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
@@ -312,7 +431,7 @@ export default function PermohonanPage({ onNavigate }) {
                                         {selectedItem.kode_tracking}
                                     </span>
                                     <h3 className="mt-2 text-lg font-black text-slate-900">
-                                        Detail Laporan #{selectedItem.id}
+                                        Detail Permohonan #{selectedItem.id}
                                     </h3>
                                     <p className="text-xs text-slate-400">
                                         Diterima pada: {selectedItem.tanggal ? new Date(selectedItem.tanggal).toLocaleString("id-ID") : "-"}
@@ -323,10 +442,33 @@ export default function PermohonanPage({ onNavigate }) {
                                 </span>
                             </div>
 
+                            {/* Identifikasi Asal Formulir Box */}
+                            <div className="rounded-2xl bg-gradient-to-r from-slate-50 to-emerald-50/40 p-3.5 border border-slate-200/80 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm border border-slate-200">
+                                        {(() => {
+                                            const SelectedIcon = selectedFormInfo.icon;
+                                            return <SelectedIcon size={20} className={selectedFormInfo.iconColor} />;
+                                        })()}
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                            Identifikasi Asal Formulir
+                                        </span>
+                                        <p className="text-sm font-black text-slate-800">
+                                            {selectedFormInfo.label}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className={`rounded-full px-3 py-1 text-xs font-bold border ${selectedFormInfo.badgeClass}`}>
+                                    {selectedFormInfo.shortLabel}
+                                </span>
+                            </div>
+
                             {/* Data Pelapor Box */}
                             <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                 <div>
-                                    <div className="text-slate-400 font-semibold mb-0.5">Nama Pelapor:</div>
+                                    <div className="text-slate-400 font-semibold mb-0.5">Nama Pelapor / Pemohon:</div>
                                     <div className="font-bold text-slate-800 text-sm">{selectedItem.nama_pelapor}</div>
                                 </div>
                                 <div>
@@ -354,10 +496,10 @@ export default function PermohonanPage({ onNavigate }) {
                             {/* Isi Uraian Pengaduan */}
                             <div>
                                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                                    Uraian / Isi Laporan dari Masyarakat:
+                                    Uraian / Isi Formulir dari Pemohon:
                                 </label>
                                 <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 leading-relaxed whitespace-pre-line font-medium">
-                                    {selectedItem.isi_pengaduan || "Tidak ada isi laporan."}
+                                    {selectedItem.isi_pengaduan || "Tidak ada isi formulir."}
                                 </div>
                             </div>
 

@@ -14,15 +14,16 @@ import {
     AlertCircle,
     Zap,
 } from "lucide-react";
-import { authService } from "../services/apiService";
+import { authService, ROLE_DETAILS } from "../services/apiService";
 
-const sidebarItems = [
-    { label: "Dashboard",    icon: LayoutDashboard, key: "dashboard" },
-    { label: "Permohonan",   icon: ClipboardList,   key: "permohonan" },
+const ALL_SIDEBAR_ITEMS = [
+    { label: "Dashboard",    icon: LayoutDashboard, key: "dashboard", roles: ["Admin", "PetugasLab", "PetugasLayanan", "PetugasBenih"] },
+    { label: "Permohonan",   icon: ClipboardList,   key: "permohonan", roles: ["Admin", "PetugasLayanan"] },
     {
         label: "Laboratorium",
         icon: FlaskConical,
         key: "laboratorium-jenis-sampel",
+        roles: ["Admin", "PetugasLab"],
         children: [
             { label: "Jenis Sampel",     key: "laboratorium-jenis-sampel" },
             { label: "Masuk",            key: "laboratorium-masuk" },
@@ -33,17 +34,30 @@ const sidebarItems = [
         label: "Data Benih",
         icon: Sprout,
         key: "benih-jenis-benih",
+        roles: ["Admin", "PetugasBenih"],
         children: [
             { label: "Jenis Benih",  key: "benih-jenis-benih" },
             { label: "Update Benih", key: "benih-update-benih" },
         ],
     },
-    { label: "User",        icon: Users,    key: "user" },
-    { label: "Pengaturan",  icon: Settings, key: "pengaturan" },
+    { label: "User",        icon: Users,    key: "user", roles: ["Admin"] },
+    { label: "Pengaturan",  icon: Settings, key: "pengaturan", roles: ["Admin", "PetugasLab", "PetugasLayanan", "PetugasBenih"] },
 ];
 
 export default function AdminShell({ activeView, onNavigate, onLogout, children }) {
     const user = authService.getUser();
+    const userRole = user?.role || "Admin";
+    const roleMeta = ROLE_DETAILS[userRole] || {
+        label: "Administrator",
+        shortCode: "ADM",
+        desc: "Superadmin",
+        badgeClass: "bg-emerald-500/15 text-emerald-700",
+    };
+
+    // Filter sidebar items based on current user role
+    const visibleSidebarItems = ALL_SIDEBAR_ITEMS.filter((item) =>
+        item.roles ? item.roles.includes(userRole) : true
+    );
 
     return (
         <div className="min-h-screen lg:flex bg-transparent">
@@ -92,7 +106,7 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
 
                     {/* Nav Items */}
                     <nav className="flex flex-1 flex-col gap-1">
-                        {sidebarItems.map((item) => {
+                        {visibleSidebarItems.map((item) => {
                             const Icon = item.icon;
                             const hasChildren = Array.isArray(item.children);
                             const isOpen = hasChildren && (
@@ -108,7 +122,7 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
                                         onClick={() => onNavigate?.(item.key)}
                                         className={`
                                             group relative w-full flex items-center justify-between gap-3
-                                            rounded-xl px-3.5 py-3 text-left text-sm font-semibold
+                                             rounded-xl px-3.5 py-3 text-left text-sm font-semibold
                                             transition-all duration-200
                                             ${isActive
                                                 ? "bg-white/12 text-white shadow-inner-sm"
@@ -179,38 +193,49 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
                     {/* Divider */}
                     <div className="h-px bg-white/8" />
 
-                    {/* Priority Notification Card */}
-                    <div className="rounded-2xl border border-amber-400/20 bg-amber-400/6 p-4 backdrop-blur-sm">
-                        <div className="flex items-center gap-2 text-amber-300">
-                            <Bell size={15} strokeWidth={2.5} />
-                            <span className="text-xs font-bold uppercase tracking-wide">Prioritas</span>
+                    {/* Priority Notification Card (Jika role Admin atau PetugasLayanan) */}
+                    {(userRole === "Admin" || userRole === "PetugasLayanan") && (
+                        <div className="rounded-2xl border border-amber-400/20 bg-amber-400/6 p-4 backdrop-blur-sm">
+                            <div className="flex items-center gap-2 text-amber-300">
+                                <Bell size={15} strokeWidth={2.5} />
+                                <span className="text-xs font-bold uppercase tracking-wide">Prioritas Layanan</span>
+                            </div>
+                            <p className="mt-2 text-xs leading-relaxed text-white/55">
+                                Periksa permohonan yang menunggu tanggapan sebelum jam 15.00.
+                            </p>
+                            <button
+                                onClick={() => onNavigate?.("permohonan")}
+                                className="mt-3 flex items-center gap-1.5 text-xs font-bold text-amber-300 transition-colors hover:text-amber-200"
+                            >
+                                Buka daftar <ArrowUpRight size={13} />
+                            </button>
                         </div>
-                        <p className="mt-2 text-xs leading-relaxed text-white/55">
-                            Periksa permohonan yang menunggu tanggapan sebelum jam 15.00.
-                        </p>
-                        <button
-                            onClick={() => onNavigate?.("permohonan")}
-                            className="mt-3 flex items-center gap-1.5 text-xs font-bold text-amber-300 transition-colors hover:text-amber-200"
-                        >
-                            Buka daftar <ArrowUpRight size={13} />
-                        </button>
-                    </div>
+                    )}
 
                     {/* User Badge + Logout */}
                     <div className="rounded-2xl border border-white/8 bg-white/5 p-3 backdrop-blur-sm">
                         <div className="flex items-center gap-3 mb-3">
                             <div
                                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-black text-white"
-                                style={{ background: "linear-gradient(135deg, #25c47a, #0f5033)" }}
+                                style={{
+                                    background:
+                                        userRole === "Admin"
+                                            ? "linear-gradient(135deg, #059669, #065f46)"
+                                            : userRole === "PetugasLab"
+                                            ? "linear-gradient(135deg, #2563eb, #1e40af)"
+                                            : userRole === "PetugasLayanan"
+                                            ? "linear-gradient(135deg, #d97706, #92400e)"
+                                            : "linear-gradient(135deg, #0d9488, #115e59)",
+                                }}
                             >
-                                {user?.role === "PetugasLab" ? "LAB" : "ADM"}
+                                {roleMeta.shortCode}
                             </div>
                             <div className="min-w-0">
                                 <p className="truncate text-xs font-bold text-white/90">
-                                    {user?.nama || "Administrator"}
+                                    {user?.nama || "Petugas BRMP DIY"}
                                 </p>
-                                <p className="text-[10px] font-medium text-white/40">
-                                    {user?.role === "Admin" ? "Superadmin" : "Petugas Lab"}
+                                <p className="text-[10px] font-medium text-white/50 truncate">
+                                    {roleMeta.label}
                                 </p>
                             </div>
                         </div>

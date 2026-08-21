@@ -178,7 +178,7 @@ export const internalLabService = {
   },
 };
 
-// 3. Service Internal Pengaduan (Khusus Admin)
+// 3. Service Internal Pengaduan (Admin & PetugasLayanan)
 export const internalPengaduanService = {
   getAll: (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -189,12 +189,72 @@ export const internalPengaduanService = {
   delete: (id) => api.delete(`/api/internal/pengaduan/${id}`),
 };
 
-// 4. Service Internal Benih (Khusus Admin)
+// 4. Service Internal Benih (Admin & PetugasBenih)
 export const internalBenihService = {
   getAll: () => api.get('/api/internal/benih'),
   create: (data) => api.post('/api/internal/benih', data),
   update: (id, data) => api.put(`/api/internal/benih/${id}`, data),
   delete: (id) => api.delete(`/api/internal/benih/${id}`),
+};
+
+// 5. Service Internal Manajemen User (Khusus Admin)
+export const internalUserService = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/api/internal/users${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => api.get(`/api/internal/users/${id}`),
+  create: (data) => api.post('/api/internal/users', data),
+  update: (id, data) => api.put(`/api/internal/users/${id}`, data),
+  delete: (id) => api.delete(`/api/internal/users/${id}`),
+};
+
+// =============================================================
+// KONFIGURASI ROLE SISTEM BRMP DIY
+// =============================================================
+export const ROLES = {
+  ADMIN: 'Admin',
+  PETUGAS_LAB: 'PetugasLab',
+  PETUGAS_LAYANAN: 'PetugasLayanan',
+  PETUGAS_BENIH: 'PetugasBenih',
+};
+
+export const ROLE_LIST = [
+  'Admin',
+  'PetugasLab',
+  'PetugasLayanan',
+  'PetugasBenih',
+];
+
+export const ROLE_DETAILS = {
+  Admin: {
+    label: 'Administrator',
+    shortCode: 'ADM',
+    desc: 'Akses penuh seluruh modul sistem & manajemen akun',
+    badgeClass: 'bg-emerald-500/15 text-emerald-700 border-emerald-300',
+    color: '#0f9957',
+  },
+  PetugasLab: {
+    label: 'Petugas Laboratorium',
+    shortCode: 'LAB',
+    desc: 'Pengujian sampel & tracking status laboratorium benih',
+    badgeClass: 'bg-blue-500/15 text-blue-700 border-blue-300',
+    color: '#2563eb',
+  },
+  PetugasLayanan: {
+    label: 'Petugas Layanan & Pengaduan',
+    shortCode: 'LYN',
+    desc: 'Penerimaan permohonan & tindak lanjut aduan masyarakat',
+    badgeClass: 'bg-amber-500/15 text-amber-700 border-amber-300',
+    color: '#d97706',
+  },
+  PetugasBenih: {
+    label: 'Petugas Perbenihan',
+    shortCode: 'BNH',
+    desc: 'Pengelolaan data jenis benih & monitoring stok gudang',
+    badgeClass: 'bg-teal-500/15 text-teal-700 border-teal-300',
+    color: '#0d9488',
+  },
 };
 
 export default api;

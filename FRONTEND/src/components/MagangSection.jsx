@@ -54,6 +54,7 @@ export default function MagangSection() {
         email_pelapor: `${formData.nama.toLowerCase().replace(/\s+/g, '')}@student.ac.id`,
         no_telp_pelapor: formData.telepon,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Permohonan Magang',
       });
 
       const code = res?.data?.kode_tracking || `MAGANG-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;

@@ -21,6 +21,7 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+deploy_ftp.py
 
 # Editor & IDE directories
 .vscode/
@@ -35,3 +36,6 @@ lerna-debug.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+__pycache__/
+*.zip
+

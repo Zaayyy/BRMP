@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, X, MapPin, Calendar,
   Building2, Phone, FlaskConical, Sprout, Home, Loader2,
@@ -140,6 +140,7 @@ const LOKASI_LIST = [
 ];
 
 export default function KunjunganPage() {
+  const navigate = useNavigate();
   const [activeIdx, setActiveIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState(null);
   const [transitioning, setTransitioning] = useState(false);
@@ -209,6 +210,7 @@ export default function KunjunganPage() {
         email_pelapor: formData.email,
         no_telp_pelapor: formData.noHp,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Permohonan Kunjungan',
       });
       const code = res?.data?.kode_tracking || `KUN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
       setSubmitted({ code, nama: formData.nama, instansi: formData.instansi, lokasiPilihan: formData.lokasiPilihan, tanggal: formData.tanggal, jumlahPeserta: formData.jumlahPeserta });
@@ -1105,6 +1107,10 @@ export default function KunjunganPage() {
               <a
                 href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Admin BRMP DIY, saya telah mengajukan permohonan kunjungan ke ${submitted.lokasiPilihan} dengan Nomor Tiket: ${submitted.code}. Mohon konfirmasi jadwalnya. Terima kasih.`)}`}
                 target="_blank" rel="noreferrer"
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   background: 'linear-gradient(135deg, #25D366, #128C7E)',
                   color: '#fff', padding: '0.9rem', borderRadius: '12px',
@@ -1114,11 +1120,17 @@ export default function KunjunganPage() {
               >
                 <Phone size={18} /> Konfirmasi via WhatsApp
               </a>
-              <button onClick={() => setSubmitted(null)} style={{
-                backgroundColor: '#f1f5f9', color: '#475569', padding: '0.75rem',
-                borderRadius: '12px', fontWeight: 700, border: 'none', cursor: 'pointer',
-              }}>
-                Tutup
+              <button
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
+                style={{
+                  backgroundColor: '#f1f5f9', color: '#475569', padding: '0.75rem',
+                  borderRadius: '12px', fontWeight: 700, border: 'none', cursor: 'pointer',
+                }}
+              >
+                Tutup & Kembali ke Beranda
               </button>
             </div>
           </div>

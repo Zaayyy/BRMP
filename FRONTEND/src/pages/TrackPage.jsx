@@ -210,7 +210,7 @@ function PengaduanResult({ data, onClose }) {
             {data.kode_tracking}
           </span>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', marginTop: '0.35rem', lineHeight: 1.25 }}>
-            Status Pengaduan Publik
+            {data.jenis_layanan ? `Status: ${data.jenis_layanan}` : 'Status Permohonan / Pengaduan'}
           </h3>
         </div>
       </div>

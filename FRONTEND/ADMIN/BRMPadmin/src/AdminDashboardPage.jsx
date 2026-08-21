@@ -17,6 +17,7 @@ import {
     internalBenihService,
     authService,
 } from "./services/apiService";
+import { getJenisLayananInfo } from "./PermohonanPage";
 import StatCard from "./components/StatCard";
 import StatusDonutChart from "./components/StatusDonutChart";
 import SkeletonDashboard from "./components/SkeletonDashboard";
@@ -306,6 +307,9 @@ export default function AdminDashboardPage({ onNavigate }) {
                         ) : (
                             pengaduanList.slice(0, 5).map((req) => {
                                 const cfg = STATUS[req.status_tanggapan] || STATUS.Menunggu;
+                                const formInfo = getJenisLayananInfo(req);
+                                const FormIcon = formInfo.icon;
+
                                 return (
                                     <div
                                         key={req.id}
@@ -330,6 +334,10 @@ export default function AdminDashboardPage({ onNavigate }) {
                                                     <code className="rounded-md border border-brand-100 bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">
                                                         {req.kode_tracking || `#${req.id}`}
                                                     </code>
+                                                    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${formInfo.badgeClass}`}>
+                                                        <FormIcon size={10} className={formInfo.iconColor} />
+                                                        <span>{formInfo.shortLabel}</span>
+                                                    </span>
                                                     {req.tanggal && (
                                                         <span className="text-[11px] text-slate-400">
                                                             {new Date(req.tanggal).toLocaleDateString("id-ID", { day:"numeric", month:"short" })}

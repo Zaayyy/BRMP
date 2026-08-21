@@ -16,6 +16,8 @@ datasource db {
 enum Role {
   Admin
   PetugasLab
+  PetugasLayanan
+  PetugasBenih
 }
 
 enum StatusUji {
@@ -59,7 +61,7 @@ model Benih {
   nama_benih   String   @map("nama_benih") @db.VarChar(150)
   deskripsi    String   @db.Text
   stok         Int      @default(0)
-  gambar_url   String?  @map("gambar_url") @db.VarChar(500)
+  gambar_url   String?  @map("gambar_url") @db.MediumText
   created_by_id Int?    @map("created_by_id")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -76,7 +78,7 @@ model LabTracking {
   kode_tracking     String    @unique @map("kode_tracking") @db.VarChar(50)
   nama_pemohon      String    @map("nama_pemohon") @db.VarChar(150)
   status_uji        StatusUji @default(Diterima) @map("status_uji")
-  hasil_dokumen_url String?   @map("hasil_dokumen_url") @db.VarChar(500)
+  hasil_dokumen_url String?   @map("hasil_dokumen_url") @db.MediumText
   keterangan        String?   @db.Text
   petugas_id        Int?      @map("petugas_id")
   tanggal_masuk     DateTime  @default(now()) @map("tanggal_masuk")
@@ -94,6 +96,7 @@ model LabTracking {
 model Pengaduan {
   id                 Int             @id @default(autoincrement())
   kode_tracking      String          @unique @map("kode_tracking") @db.VarChar(50)
+  jenis_layanan      String?         @default("Pengaduan Masyarakat") @map("jenis_layanan") @db.VarChar(100)
   nama_pelapor       String          @map("nama_pelapor") @db.VarChar(150)
   email_pelapor      String?         @map("email_pelapor") @db.VarChar(150)
   no_telp_pelapor    String?         @map("no_telp_pelapor") @db.VarChar(30)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, FileText, Image as ImageIcon,
   X, ShieldCheck, MessageCircle, HelpCircle, Loader2, Sprout,
@@ -18,6 +18,7 @@ const TOPIK_KONSULTASI = [
 ];
 
 export default function KonsultasiPage() {
+  const navigate = useNavigate();
   const [selectedTopik, setSelectedTopik] = useState(TOPIK_KONSULTASI[0].label);
   const [formData, setFormData] = useState({
     nama: '',
@@ -69,6 +70,7 @@ export default function KonsultasiPage() {
         email_pelapor: formData.email,
         no_telp_pelapor: formData.noHp,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Permohonan Konsultasi',
       });
 
       const code = res?.data?.kode_tracking || `KON-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -632,6 +634,10 @@ export default function KonsultasiPage() {
                 href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Admin BRMP DIY, saya telah mengajukan permohonan konsultasi (${submitted.topik}) dengan Nomor Tiket: ${submitted.code}. Mohon info tanggapannya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #25D366, #128C7E)',
@@ -652,7 +658,10 @@ export default function KonsultasiPage() {
               </a>
 
               <button
-                onClick={() => setSubmitted(null)}
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   backgroundColor: '#f1f5f9',
@@ -665,7 +674,7 @@ export default function KonsultasiPage() {
                   cursor: 'pointer',
                 }}
               >
-                Tutup
+                Tutup & Kembali ke Beranda
               </button>
             </div>
           </div>

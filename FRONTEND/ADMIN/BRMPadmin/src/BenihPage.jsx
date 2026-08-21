@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Plus, Search, Trash2, Pencil, RefreshCw, Check, X, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Search, Trash2, Pencil, RefreshCw, Check, X, Loader2, AlertCircle, Upload, Image as ImageIcon } from "lucide-react";
 import { internalBenihService } from "./services/apiService";
 
 export default function BenihPage({ activeTab, onNavigate }) {
@@ -49,6 +49,36 @@ export default function BenihPage({ activeTab, onNavigate }) {
             gambar_url: row.gambar_url || "",
         });
     }
+
+    const handleEditImageFile = (file) => {
+        if (!file || !file.type.startsWith("image/")) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const maxDim = 1200;
+                let { width, height } = img;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+                setEditValues((prev) => ({ ...prev, gambar_url: dataUrl }));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
 
     async function saveEdit(id) {
         setActionLoading(true);
@@ -173,12 +203,36 @@ export default function BenihPage({ activeTab, onNavigate }) {
                                             #{row.id}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <img
-                                                src={row.gambar_url || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
-                                                alt={row.nama_benih}
-                                                className="h-12 w-12 rounded-xl object-cover border border-slate-200"
-                                                onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"; }}
-                                            />
+                                            {isEditing ? (
+                                                <label className="relative group/img block h-12 w-12 cursor-pointer rounded-xl overflow-hidden border-2 border-dashed border-brand-400 bg-brand-50 hover:bg-brand-100 transition shadow-sm">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={(e) => {
+                                                            if (e.target.files && e.target.files[0]) {
+                                                                handleEditImageFile(e.target.files[0]);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <img
+                                                        src={editValues.gambar_url || row.gambar_url || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
+                                                        alt={row.nama_benih}
+                                                        className="h-full w-full object-cover"
+                                                        onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"; }}
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition">
+                                                        <Upload size={14} />
+                                                    </div>
+                                                </label>
+                                            ) : (
+                                                <img
+                                                    src={row.gambar_url || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
+                                                    alt={row.nama_benih}
+                                                    className="h-12 w-12 rounded-xl object-cover border border-slate-200"
+                                                    onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"; }}
+                                                />
+                                            )}
                                         </td>
                                         <td className="px-4 py-4 font-semibold text-slate-900">
                                             {isEditing ? (

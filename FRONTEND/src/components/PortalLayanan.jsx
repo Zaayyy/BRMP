@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Users, MessageSquareWarning, Building2, Volume2, UserCheck, MapPin,
-  Search, CheckCircle, X, Send, FileCheck, Upload, FileText, Sparkles, ArrowRight,
+  Search, CheckCircle, X, Send, FileCheck, Upload, FileText, Sparkles, ArrowRight, Phone,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { pengaduanService } from '../services/apiService';
@@ -177,6 +177,7 @@ export default function PortalLayanan() {
         email_pelapor: formData.email || 'pemohon@layanan.go.id',
         no_telp_pelapor: formData.telepon || '-',
         isi_pengaduan: fullDescription,
+        jenis_layanan: selectedService?.title || 'Permohonan Layanan',
       });
 
       const code = res?.data?.kode_tracking || `REQ-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -441,6 +442,55 @@ export default function PortalLayanan() {
               Lacak Layanan
             </button>
           </form>
+
+          {/* WhatsApp Assistance Bar */}
+          <div style={{
+            marginTop: '1.25rem',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.65rem',
+            fontSize: '0.88rem',
+            color: '#334155',
+            fontWeight: 600,
+            opacity: sectionVisible ? 1 : 0,
+            transition: 'opacity 0.7s 0.6s ease',
+          }}>
+            <span style={{ color: '#475569' }}>
+              Butuh bantuan? Hubungi kami
+            </span>
+            <a
+              href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY%2C%20saya%20butuh%20bantuan%20mengenai%20layanan%20dan%20permohonan%20BRMP."
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: '#25D366',
+                color: '#ffffff',
+                padding: '0.45rem 1.1rem',
+                borderRadius: '9999px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(37,211,102,0.35)',
+                transition: 'all 0.25s ease',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.backgroundColor = '#1eb956';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.backgroundColor = '#25D366';
+              }}
+            >
+              <Phone size={14} />
+              <span>Hubungi WhatsApp</span>
+            </a>
+          </div>
         </div>
       </div>
 

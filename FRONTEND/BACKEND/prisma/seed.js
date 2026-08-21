@@ -8,11 +8,12 @@ async function main() {
   const defaultPassword = 'Password123!';
   const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-  // 1. Seed Users (Admin & Petugas Lab)
+  // 1. Seed Users (4 Role: Admin, Petugas Lab, Petugas Layanan, Petugas Benih)
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@brmpdiy.go.id' },
     update: {
       password_hash: hashedPassword,
+      role: 'Admin',
     },
     create: {
       nama: 'Administrator BRMP DIY',
@@ -26,18 +27,49 @@ async function main() {
     where: { email: 'petugaslab@brmpdiy.go.id' },
     update: {
       password_hash: hashedPassword,
+      role: 'PetugasLab',
     },
     create: {
-      nama: 'Petugas Lab Pengujian',
+      nama: 'Petugas Laboratorium',
       email: 'petugaslab@brmpdiy.go.id',
       password_hash: hashedPassword,
       role: 'PetugasLab',
     },
   });
 
-  console.log('✅ Users berhasil di-seed:');
+  const petugasLayanan = await prisma.user.upsert({
+    where: { email: 'petugaslayanan@brmpdiy.go.id' },
+    update: {
+      password_hash: hashedPassword,
+      role: 'PetugasLayanan',
+    },
+    create: {
+      nama: 'Petugas Layanan & Pengaduan',
+      email: 'petugaslayanan@brmpdiy.go.id',
+      password_hash: hashedPassword,
+      role: 'PetugasLayanan',
+    },
+  });
+
+  const petugasBenih = await prisma.user.upsert({
+    where: { email: 'petugasbenih@brmpdiy.go.id' },
+    update: {
+      password_hash: hashedPassword,
+      role: 'PetugasBenih',
+    },
+    create: {
+      nama: 'Petugas Perbenihan',
+      email: 'petugasbenih@brmpdiy.go.id',
+      password_hash: hashedPassword,
+      role: 'PetugasBenih',
+    },
+  });
+
+  console.log('✅ Users (4 Role) berhasil di-seed:');
   console.log(`   - Admin: ${adminUser.email} (Password: ${defaultPassword})`);
   console.log(`   - Petugas Lab: ${petugasLab.email} (Password: ${defaultPassword})`);
+  console.log(`   - Petugas Layanan: ${petugasLayanan.email} (Password: ${defaultPassword})`);
+  console.log(`   - Petugas Benih: ${petugasBenih.email} (Password: ${defaultPassword})`);
 
   // 2. Seed Benih
   const benih1 = await prisma.benih.create({

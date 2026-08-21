@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, FileText, X,
   Building2, GraduationCap, Calendar, User, Phone, Mail,
@@ -9,6 +9,7 @@ import {
 import { pengaduanService } from '../services/apiService';
 
 export default function MagangPage() {
+  const navigate = useNavigate();
   const [jenjang, setJenjang] = useState('S1 / D4 Perguruan Tinggi');
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
 
@@ -55,6 +56,7 @@ export default function MagangPage() {
         email_pelapor: formData.email,
         no_telp_pelapor: formData.noHp,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Permohonan Magang',
       });
 
       const code = res?.data?.kode_tracking || `MAGANG-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1006,6 +1008,10 @@ export default function MagangPage() {
                 href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Pengelola Magang BRMP DIY, saya telah mendaftar Program Magang/PKL dengan Nomor Tiket: ${submitted.code}. Mohon konfirmasi ketersediaan kuotanya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #25D366, #128C7E)',
@@ -1026,7 +1032,10 @@ export default function MagangPage() {
               </a>
 
               <button
-                onClick={() => setSubmitted(null)}
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   backgroundColor: '#f1f5f9',
@@ -1039,7 +1048,7 @@ export default function MagangPage() {
                   cursor: 'pointer',
                 }}
               >
-                Tutup
+                Tutup & Kembali ke Beranda
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle, Sparkles } from 'lucide-react';
+import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle, Sparkles, Phone } from 'lucide-react';
 import { labService } from '../services/apiService';
 
 function useScrollReveal(threshold = 0.15) {
@@ -173,6 +173,53 @@ export default function LabTracking() {
             </button>
           </form>
 
+          {/* WhatsApp Assistance Bar */}
+          <div style={{
+            marginTop: '1.25rem',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.65rem',
+            fontSize: '0.88rem',
+            color: '#334155',
+            fontWeight: 600,
+          }}>
+            <span style={{ color: '#475569' }}>
+              Butuh bantuan? Hubungi kami
+            </span>
+            <a
+              href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY%2C%20saya%20butuh%20bantuan%20mengenai%20informasi%20pengujian%20lab%20dan%20layanan%20BRMP."
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: '#25D366',
+                color: '#ffffff',
+                padding: '0.45rem 1.1rem',
+                borderRadius: '9999px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 14px rgba(37,211,102,0.35)',
+                transition: 'all 0.25s ease',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.backgroundColor = '#1eb956';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.backgroundColor = '#25D366';
+              }}
+            >
+              <Phone size={14} />
+              <span>Hubungi WhatsApp</span>
+            </a>
+          </div>
+
           {/* Not Found Alert */}
           {notFoundMsg && (
             <div style={{
@@ -307,6 +354,56 @@ export default function LabTracking() {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Keterangan & Catatan Proses Pengujian oleh Petugas */}
+            <div style={{
+              backgroundColor: '#f8fafc',
+              border: '1.5px solid #cbd5e1',
+              borderRadius: '16px',
+              padding: '1.2rem',
+              marginBottom: '1.4rem',
+              textAlign: 'left',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '0.45rem',
+              }}>
+                <span style={{
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: '#047857',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}>
+                  🔬 <span>Catatan & Keterangan Proses Petugas:</span>
+                </span>
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: '9999px',
+                  backgroundColor: activeResult.status === 'Selesai' ? '#dcfce7' : '#e0f2fe',
+                  color: activeResult.status === 'Selesai' ? '#15803d' : '#0369a1',
+                }}>
+                  Status: {activeResult.status || 'Proses'}
+                </span>
+              </div>
+              <p style={{
+                margin: 0,
+                fontSize: '0.9rem',
+                lineHeight: 1.6,
+                color: '#1e293b',
+                fontWeight: 500,
+                whiteSpace: 'pre-line',
+              }}>
+                {activeResult.keterangan || 'Sampel sedang dalam tahapan pengujian dan verifikasi oleh tim laboratorium BRMP DIY.'}
+              </p>
             </div>
 
             {/* Document Link */}

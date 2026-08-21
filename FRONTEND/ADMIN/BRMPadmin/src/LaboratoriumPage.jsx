@@ -1,6 +1,7 @@
-import { ArrowLeft, CheckCircle2, Edit3, Eye, FileText, Filter, Plus, Search, Trash2, RefreshCw, Loader2, Save, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Edit3, Eye, FileText, Filter, Plus, Search, Trash2, RefreshCw, Loader2, Save, X, ExternalLink, Pencil } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { internalLabService } from "./services/apiService";
+import UpdateLabStatusModal from "./UpdateLabStatusModal";
 
 const tabMeta = {
     "laboratorium-jenis-sampel": {
@@ -11,12 +12,12 @@ const tabMeta = {
     "laboratorium-masuk": {
         title: "Data Masuk Laboratorium",
         breadcrumb: "Laboratorium / Masuk",
-        description: "Kelola sampel pengujian yang sudah diterima dan sedang diproses.",
+        description: "Kelola sampel pengujian yang sudah diterima, perbarui catatan/keterangan proses petugas, dan ubah status pengujian.",
     },
     "laboratorium-laporan-selesai": {
         title: "Laporan Lab Selesai",
         breadcrumb: "Laboratorium / Laporan Selesai",
-        description: "Daftar laporan hasil uji laboratorium yang telah selesai diproses.",
+        description: "Daftar laporan hasil uji laboratorium yang telah selesai diproses dan siap diunduh.",
     },
 };
 
@@ -33,6 +34,10 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
     const [actionLoading, setActionLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [notification, setNotification] = useState(null);
+
+    // Modal Edit Status & Keterangan Petugas
+    const [editModalItem, setEditModalItem] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // Jenis Sampel State
     const [sampleRows, setSampleRows] = useState(() => {
@@ -350,9 +355,9 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                     <tr>
                                         <th className="px-4 py-3 text-left">Kode Tracking</th>
                                         <th className="px-4 py-3 text-left">Pemohon</th>
-                                        <th className="px-4 py-3 text-left">Keterangan Analisis</th>
+                                        <th className="px-4 py-3 text-left">Keterangan & Catatan Proses</th>
                                         <th className="px-4 py-3 text-left">Status</th>
-                                        <th className="px-4 py-3 text-right">Ubah Status</th>
+                                        <th className="px-4 py-3 text-right">Aksi Petugas</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50 bg-white">
@@ -360,19 +365,36 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                         <tr key={row.id} className="hover:bg-slate-50">
                                             <td className="px-4 py-3.5 font-mono font-bold text-sky-800">{row.kode_tracking || `#${row.id}`}</td>
                                             <td className="px-4 py-3.5 font-semibold text-slate-800">{row.nama_pemohon}</td>
-                                            <td className="px-4 py-3.5 text-slate-500 max-w-xs truncate">{row.keterangan || "-"}</td>
+                                            <td className="px-4 py-3.5 text-slate-600 max-w-sm">
+                                                <div className="line-clamp-2 leading-relaxed" title={row.keterangan || "Belum ada catatan proses"}>
+                                                    {row.keterangan || <span className="text-slate-400 italic">Belum ada keterangan proses</span>}
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3.5">
                                                 <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ${statusStyles[row.status_uji] || "bg-slate-100"}`}>
                                                     {row.status_uji}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3.5 text-right">
-                                                <button
-                                                    onClick={() => handleToggleStatus(row.id, row.status_uji)}
-                                                    className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
-                                                >
-                                                    {row.status_uji === "Proses" ? "Tandai Selesai ✓" : "Set ke Proses"}
-                                                </button>
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditModalItem(row);
+                                                            setIsEditModalOpen(true);
+                                                        }}
+                                                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 text-[11px] font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-sm"
+                                                    >
+                                                        <Pencil size={12} />
+                                                        <span>Ubah Keterangan</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleStatus(row.id, row.status_uji)}
+                                                        className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition"
+                                                        title="Klik untuk ubah status cepat"
+                                                    >
+                                                        {row.status_uji === "Proses" ? "Tandai Selesai ✓" : "Set Proses"}
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -402,15 +424,16 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                 <tr>
                                     <th className="px-4 py-3 text-left">Kode Tracking</th>
                                     <th className="px-4 py-3 text-left">Nama Pemohon</th>
+                                    <th className="px-4 py-3 text-left">Keterangan / Hasil Akhir</th>
                                     <th className="px-4 py-3 text-left">Tanggal Selesai</th>
                                     <th className="px-4 py-3 text-left">Status</th>
-                                    <th className="px-4 py-3 text-right">Dokumen Hasil</th>
+                                    <th className="px-4 py-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 bg-white">
                                 {finishedSamples.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="text-center py-8 text-slate-400">
+                                        <td colSpan={6} className="text-center py-8 text-slate-400">
                                             Belum ada laporan laboratorium yang berstatus selesai.
                                         </td>
                                     </tr>
@@ -419,6 +442,11 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                         <tr key={row.id} className="hover:bg-slate-50">
                                             <td className="px-4 py-3.5 font-mono font-bold text-sky-800">{row.kode_tracking || `#${row.id}`}</td>
                                             <td className="px-4 py-3.5 font-semibold text-slate-800">{row.nama_pemohon}</td>
+                                            <td className="px-4 py-3.5 text-slate-600 max-w-xs">
+                                                <div className="line-clamp-2 leading-relaxed" title={row.keterangan || ""}>
+                                                    {row.keterangan || <span className="text-slate-400 italic">-</span>}
+                                                </div>
+                                            </td>
                                             <td className="px-4 py-3.5 text-slate-500">
                                                 {row.tanggal_selesai ? new Date(row.tanggal_selesai).toLocaleDateString("id-ID") : "Tersedia"}
                                             </td>
@@ -428,19 +456,29 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3.5 text-right">
-                                                {row.hasil_dokumen_url ? (
-                                                    <a
-                                                        href={row.hasil_dokumen_url}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline"
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {row.hasil_dokumen_url ? (
+                                                        <a
+                                                            href={row.hasil_dokumen_url}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline"
+                                                        >
+                                                            <span>PDF</span>
+                                                            <ExternalLink size={12} />
+                                                        </a>
+                                                    ) : null}
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditModalItem(row);
+                                                            setIsEditModalOpen(true);
+                                                        }}
+                                                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50"
                                                     >
-                                                        <span>Buka PDF</span>
-                                                        <ExternalLink size={12} />
-                                                    </a>
-                                                ) : (
-                                                    <span className="text-slate-400 italic">Dokumen digital siap</span>
-                                                )}
+                                                        <Pencil size={11} />
+                                                        <span>Edit</span>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
@@ -450,6 +488,21 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                     </div>
                 </section>
             )}
+
+            {/* Modal Update Keterangan & Status Uji Laboratorium */}
+            <UpdateLabStatusModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditModalItem(null);
+                }}
+                trackingItem={editModalItem}
+                onSuccess={() => {
+                    fetchLabData();
+                    setNotification("Keterangan proses dan status pengujian lab berhasil diperbarui!");
+                    setTimeout(() => setNotification(null), 3500);
+                }}
+            />
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, FileText, X,
   Building2, User, Phone, Mail, MapPin, Loader2,
@@ -10,6 +10,7 @@ import {
 import { pengaduanService } from '../services/apiService';
 
 export default function InformasiPublikPage() {
+  const navigate = useNavigate();
   const [pemohonType, setPemohonType] = useState('perorangan'); // 'perorangan' | 'lembaga'
   const [caraPeroleh, setCaraPeroleh] = useState('Salinan Elektronik (Email / PDF)');
   const [caraKirim, setCaraKirim] = useState('Email / WhatsApp Online');
@@ -58,6 +59,7 @@ export default function InformasiPublikPage() {
         email_pelapor: formData.email,
         no_telp_pelapor: formData.noHp,
         isi_pengaduan: fullDescription,
+        jenis_layanan: 'Informasi Publik (PPID)',
       });
 
       const code = res?.data?.kode_tracking || `PPID-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -720,6 +722,10 @@ export default function InformasiPublikPage() {
                 href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Petugas PPID BRMP DIY, saya telah mengajukan Permohonan Informasi Publik (${submitted.kategori}) dengan Nomor Tiket: ${submitted.code}. Mohon info proses selanjutnya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   background: 'linear-gradient(135deg, #25D366, #128C7E)',
@@ -740,7 +746,10 @@ export default function InformasiPublikPage() {
               </a>
 
               <button
-                onClick={() => setSubmitted(null)}
+                onClick={() => {
+                  setSubmitted(null);
+                  navigate('/');
+                }}
                 style={{
                   width: '100%',
                   backgroundColor: '#f3f4f6',
@@ -753,7 +762,7 @@ export default function InformasiPublikPage() {
                   cursor: 'pointer',
                 }}
               >
-                Tutup
+                Tutup & Kembali ke Beranda
               </button>
             </div>
           </div>

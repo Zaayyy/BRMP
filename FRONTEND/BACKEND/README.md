@@ -39,8 +39,13 @@ BACKEND/
 
 ### 1. Model & Entitas
 - **`User`**: Menyimpan data pegawai & admin BRMP DIY.
-  - Kolom: `id`, `nama`, `email`, `password_hash`, `role` (`Admin`, `PetugasLab`), `created_at`, `updated_at`.
-  - Relasi: Menangani `Pengaduan`, `LabTracking`, dan `Benih`.
+  - Kolom: `id`, `nama`, `email`, `password_hash`, `role` (`Admin`, `PetugasLab`, `PetugasLayanan`, `PetugasBenih`), `created_at`, `updated_at`.
+  - Relasi: Menangani `Pengaduan` (`PetugasLayanan` / `Admin`), `LabTracking` (`PetugasLab` / `Admin`), dan `Benih` (`PetugasBenih` / `Admin`).
+  - **4 Role Hak Akses**:
+    1. `Admin`: Akses penuh ke seluruh fitur & Manajemen Pengguna (`/api/internal/users`).
+    2. `PetugasLab`: Pengujian & tracking laboratorium (`/api/internal/tracking`).
+    3. `PetugasLayanan`: Layanan permohonan & pengaduan masyarakat (`/api/internal/pengaduan`).
+    4. `PetugasBenih`: Pengelolaan stok & katalog benih (`/api/internal/benih`).
 - **`Benih`**: Katalog benih publik.
   - Kolom: `id`, `nama_benih`, `deskripsi`, `stok`, `gambar_url`, `created_by_id`, `created_at`, `updated_at`.
   - Relasi: Dikelola oleh `User` (`createdBy`).
@@ -49,7 +54,7 @@ BACKEND/
   - Relasi: Ditangani oleh `User` / `PetugasLab` (`petugas`).
 - **`Pengaduan`**: Laporan & aspirasi dari masyarakat.
   - Kolom: `id`, `nama_pelapor`, `email_pelapor`, `no_telp_pelapor`, `isi_pengaduan`, `tanggal`, `status_tanggapan` (`Menunggu`, `Diproses`, `Selesai`, `Ditolak`), `isi_tanggapan`, `ditanggapi_oleh_id`, `tanggal_tanggapan`, `created_at`, `updated_at`.
-  - Relasi: Ditanggapi oleh `User` / `Admin` (`ditanggapiOleh`).
+  - Relasi: Ditanggapi oleh `User` / `PetugasLayanan` (`ditanggapiOleh`).
 
 ---
 
