@@ -167,16 +167,22 @@ try {
         ];
         $token = generateJWT($tokenPayload);
 
+        $userData = [
+            'id' => (int)$user['id'],
+            'nama' => $user['nama'],
+            'email' => $user['email'],
+            'role' => $user['role'],
+            'createdAt' => $user['created_at']
+        ];
+
         echo json_encode([
             'success' => true,
             'message' => 'Login berhasil. Selamat datang kembali, ' . $user['nama'] . '!',
             'token' => $token,
-            'user' => [
-                'id' => (int)$user['id'],
-                'nama' => $user['nama'],
-                'email' => $user['email'],
-                'role' => $user['role'],
-                'createdAt' => $user['created_at']
+            'user' => $userData,
+            'data' => [
+                'token' => $token,
+                'user' => $userData
             ]
         ]);
         exit();

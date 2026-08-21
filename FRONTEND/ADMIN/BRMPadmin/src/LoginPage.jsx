@@ -42,7 +42,7 @@ export default function LoginPage({ onLogin }) {
         try {
             const res = await authService.login({ email: form.username.trim(), password: form.password });
             if (res?.success) {
-                if (onLogin) onLogin(res.data?.user);
+                if (onLogin) onLogin(res.user || res.data?.user);
             } else {
                 setError(res?.message || "Login gagal. Periksa kredensial Anda.");
             }

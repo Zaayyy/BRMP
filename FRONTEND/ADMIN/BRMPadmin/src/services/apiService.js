@@ -131,14 +131,22 @@ export const authService = {
   login: async (credentials) => {
     // credentials: { email, password }
     const response = await api.post('/api/auth/login', credentials);
-    if (response && response.data && response.data.token) {
-      // Simpan token dan data user ke localStorage
-      localStorage.setItem('token', response.data.token);
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+    const token = response?.token || response?.data?.token;
+    const user = response?.user || response?.data?.user;
+    if (token) {
+      localStorage.setItem('token', token);
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
       }
     }
-    return response;
+    return {
+      ...response,
+      user,
+      data: {
+        token,
+        user,
+      },
+    };
   },
   getProfile: () => api.get('/api/auth/me'),
   logout: () => {
