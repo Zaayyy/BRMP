@@ -43,10 +43,10 @@ export default function BenihPage({ activeTab, onNavigate }) {
     function startEdit(row) {
         setEditingId(row.id);
         setEditValues({
-            nama_benih: row.nama_benih || "",
+            nama_benih: row.nama_benih || row.namaBenih || "",
             stok: row.stok !== undefined ? row.stok : 0,
             deskripsi: row.deskripsi || "",
-            gambar_url: row.gambar_url || "",
+            gambar_url: row.gambar_url || row.gambarUrl || "",
         });
     }
 
@@ -204,7 +204,7 @@ export default function BenihPage({ activeTab, onNavigate }) {
                                         </td>
                                         <td className="px-4 py-4">
                                             {isEditing ? (
-                                                <label className="relative group/img block h-12 w-12 cursor-pointer rounded-xl overflow-hidden border-2 border-dashed border-brand-400 bg-brand-50 hover:bg-brand-100 transition shadow-sm">
+                                                <label className="relative group/img block h-12 w-12 cursor-pointer rounded-xl overflow-hidden border-2 border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 transition shadow-sm">
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -216,8 +216,8 @@ export default function BenihPage({ activeTab, onNavigate }) {
                                                         }}
                                                     />
                                                     <img
-                                                        src={editValues.gambar_url || row.gambar_url || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
-                                                        alt={row.nama_benih}
+                                                        src={editValues.gambar_url || row.gambar_url || row.gambarUrl || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
+                                                        alt={row.nama_benih || row.namaBenih || "Benih"}
                                                         className="h-full w-full object-cover"
                                                         onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"; }}
                                                     />
@@ -227,8 +227,8 @@ export default function BenihPage({ activeTab, onNavigate }) {
                                                 </label>
                                             ) : (
                                                 <img
-                                                    src={row.gambar_url || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
-                                                    alt={row.nama_benih}
+                                                    src={row.gambar_url || row.gambarUrl || "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"}
+                                                    alt={row.nama_benih || row.namaBenih || "Benih"}
                                                     className="h-12 w-12 rounded-xl object-cover border border-slate-200"
                                                     onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1524591902995-a986c4cc0367?auto=format&fit=crop&w=72&q=80"; }}
                                                 />
@@ -240,10 +240,10 @@ export default function BenihPage({ activeTab, onNavigate }) {
                                                     type="text"
                                                     value={editValues.nama_benih}
                                                     onChange={(e) => setEditValues((prev) => ({ ...prev, nama_benih: e.target.value }))}
-                                                    className="w-full rounded-xl border border-brand-300 px-3 py-1.5 text-sm font-semibold outline-none focus:ring-2 focus:ring-brand-500"
+                                                    className="w-full rounded-xl border border-emerald-300 px-3 py-1.5 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-500"
                                                 />
                                             ) : (
-                                                row.nama_benih
+                                                row.nama_benih || row.namaBenih || "-"
                                             )}
                                         </td>
                                         <td className="px-4 py-4">

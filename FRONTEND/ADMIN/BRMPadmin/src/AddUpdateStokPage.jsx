@@ -67,6 +67,9 @@ export default function AddUpdateStokPage({ onNavigate }) {
         try {
             // Update stok benih di database backend via PUT /api/internal/benih/:id
             await internalBenihService.update(selectedSeed.id, {
+                nama_benih: selectedSeed.nama_benih,
+                deskripsi: selectedSeed.deskripsi,
+                gambar_url: selectedSeed.gambar_url,
                 stok: newStok,
             });
 

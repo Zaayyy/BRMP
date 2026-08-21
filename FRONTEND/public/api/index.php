@@ -377,12 +377,29 @@ try {
 
             if ($method === 'PUT' && $id) {
                 $body = getJsonBody();
+                
+                // Ambil data existing terlebih dahulu agar partial update (seperti update stok saja) tidak menghapus nama/foto/deskripsi
+                $stmtExisting = $pdo->prepare("SELECT * FROM benih WHERE id = :id LIMIT 1");
+                $stmtExisting->execute([':id' => $id]);
+                $existing = $stmtExisting->fetch();
+
+                if (!$existing) {
+                    http_response_code(404);
+                    echo json_encode(['success' => false, 'message' => 'Data benih tidak ditemukan.']);
+                    exit();
+                }
+
+                $nama = isset($body['nama_benih']) ? $body['nama_benih'] : (isset($body['namaBenih']) ? $body['namaBenih'] : $existing['nama_benih']);
+                $deskripsi = isset($body['deskripsi']) ? $body['deskripsi'] : $existing['deskripsi'];
+                $stok = isset($body['stok']) ? (int)$body['stok'] : (int)$existing['stok'];
+                $gambar = array_key_exists('gambar_url', $body) ? $body['gambar_url'] : (array_key_exists('gambarUrl', $body) ? $body['gambarUrl'] : $existing['gambar_url']);
+
                 $stmt = $pdo->prepare("UPDATE benih SET nama_benih = :nama, deskripsi = :deskripsi, stok = :stok, gambar_url = :gambar WHERE id = :id");
                 $stmt->execute([
-                    ':nama' => $body['nama_benih'] ?? $body['namaBenih'] ?? '',
-                    ':deskripsi' => $body['deskripsi'] ?? '',
-                    ':stok' => (int)($body['stok'] ?? 0),
-                    ':gambar' => $body['gambar_url'] ?? $body['gambarUrl'] ?? null,
+                    ':nama' => $nama,
+                    ':deskripsi' => $deskripsi,
+                    ':stok' => $stok,
+                    ':gambar' => $gambar,
                     ':id' => $id
                 ]);
                 echo json_encode(['success' => true, 'message' => 'Data benih berhasil diperbarui.']);
