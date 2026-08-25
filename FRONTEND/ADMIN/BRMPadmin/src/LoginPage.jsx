@@ -20,7 +20,7 @@ const STATS = [
 ];
 
 export default function LoginPage({ onLogin }) {
-    const [form,      setForm]      = useState({ username: "admin@brmpdiy.go.id", password: "Password123!" });
+    const [form,      setForm]      = useState({ username: "", password: "" });
     const [error,     setError]     = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showPw,    setShowPw]    = useState(false);
@@ -113,7 +113,7 @@ export default function LoginPage({ onLogin }) {
                                 name="username"
                                 value={form.username}
                                 onChange={handleChange}
-                                placeholder="admin@brmpdiy.go.id"
+                                placeholder="Masukkan email atau username"
                                 autoComplete="username"
                             />
                         </label>
@@ -151,7 +151,7 @@ export default function LoginPage({ onLogin }) {
                         {/* Row */}
                         <div className="row-between">
                             <label className="checkbox-wrap">
-                                <input type="checkbox" defaultChecked />
+                                <input type="checkbox" />
                                 <span>Ingat saya</span>
                             </label>
                             <button

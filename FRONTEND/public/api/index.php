@@ -227,21 +227,100 @@ try {
     }
 
     // ==========================================
-    // ROUTE: /public/tracking/:kode
+    // ROUTE: /public/tracking/:kode (Lab & Smart Fallback)
     // ==========================================
     if ($segments[0] === 'public' && ($segments[1] ?? '') === 'tracking' && isset($segments[2]) && $method === 'GET') {
-        $kode = $segments[2];
-        $stmt = $pdo->prepare("SELECT t.id, t.kode_tracking, t.kode_tracking as kodeTracking, t.nama_pemohon, t.nama_pemohon as namaPemohon, t.status_uji, t.status_uji as statusUji, t.hasil_dokumen_url, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas, u.nama as nama_petugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id WHERE t.kode_tracking = :kode LIMIT 1");
+        $kode = trim($segments[2]);
+        $stmt = $pdo->prepare("SELECT t.id, t.kode_tracking, t.kode_tracking as kodeTracking, t.nama_pemohon, t.nama_pemohon as namaPemohon, t.status_uji, t.status_uji as statusUji, t.hasil_dokumen_url, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas, u.nama as nama_petugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id WHERE LOWER(TRIM(t.kode_tracking)) = LOWER(:kode) LIMIT 1");
         $stmt->execute([':kode' => $kode]);
         $tracking = $stmt->fetch();
 
-        if (!$tracking) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Kode permohonan tracking tidak ditemukan.']);
+        if ($tracking) {
+            echo json_encode(['success' => true, 'data' => $tracking]);
             exit();
         }
 
-        echo json_encode(['success' => true, 'data' => $tracking]);
+        // Smart fallback: Cek apakah kode ini adalah kode pengaduan
+        $stmtP = $pdo->prepare("SELECT id, kode_tracking, kode_tracking as kodeTracking, jenis_layanan, jenis_layanan as jenisLayanan, nama_pelapor, nama_pelapor as namaPelapor, status_tanggapan, status_tanggapan as statusTanggapan, tanggapan_petugas, tanggapan_petugas as tanggapanPetugas, tanggal, tanggal as tanggal_masuk, tanggal as tanggalMasuk, tanggal_tanggapan, tanggal_tanggapan as tanggalTanggapan FROM pengaduan WHERE LOWER(TRIM(kode_tracking)) = LOWER(:kode) LIMIT 1");
+        $stmtP->execute([':kode' => $kode]);
+        $pengaduan = $stmtP->fetch();
+
+        if ($pengaduan) {
+            echo json_encode(['success' => true, 'data' => $pengaduan]);
+            exit();
+        }
+
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => "Kode tracking '{$kode}' tidak ditemukan."]);
+        exit();
+    }
+
+    // ==========================================
+    // ROUTE: /public/pengaduan/track/:kode or /public/pengaduan/:kode (GET)
+    // ==========================================
+    if ($segments[0] === 'public' && ($segments[1] ?? '') === 'pengaduan' && $method === 'GET') {
+        $kode = '';
+        if (($segments[2] ?? '') === 'track' && isset($segments[3])) {
+            $kode = $segments[3];
+        } else if (isset($segments[2]) && $segments[2] !== 'track') {
+            $kode = $segments[2];
+        }
+
+        $kode = trim($kode);
+        if (!$kode) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Parameter kode tracking pengaduan wajib diisi.']);
+            exit();
+        }
+
+        $stmt = $pdo->prepare("SELECT id, kode_tracking, kode_tracking as kodeTracking, jenis_layanan, jenis_layanan as jenisLayanan, nama_pelapor, nama_pelapor as namaPelapor, tanggal, tanggal as tanggal_masuk, tanggal as tanggalMasuk, status_tanggapan, status_tanggapan as statusTanggapan, tanggapan_petugas, tanggapan_petugas as tanggapanPetugas, tanggal_tanggapan, tanggal_tanggapan as tanggalTanggapan FROM pengaduan WHERE LOWER(TRIM(kode_tracking)) = LOWER(:kode) LIMIT 1");
+        $stmt->execute([':kode' => $kode]);
+        $pengaduan = $stmt->fetch();
+
+        if ($pengaduan) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Status pengaduan berhasil ditemukan.',
+                'data' => $pengaduan
+            ]);
+            exit();
+        }
+
+        // Smart fallback: Cek apakah kode ini adalah kode lab
+        $stmtL = $pdo->prepare("SELECT t.id, t.kode_tracking, t.kode_tracking as kodeTracking, t.nama_pemohon, t.nama_pemohon as namaPemohon, t.status_uji, t.status_uji as statusUji, t.hasil_dokumen_url, t.hasil_dokumen_url as hasilDokumenUrl, t.keterangan, t.tanggal_masuk, t.tanggal_masuk as tanggalMasuk, t.tanggal_selesai, t.tanggal_selesai as tanggalSelesai, u.nama as namaPetugas, u.nama as nama_petugas FROM lab_trackings t LEFT JOIN users u ON t.petugas_id = u.id WHERE LOWER(TRIM(t.kode_tracking)) = LOWER(:kode) LIMIT 1");
+        $stmtL->execute([':kode' => $kode]);
+        $lab = $stmtL->fetch();
+
+        if ($lab) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Status pengujian lab berhasil ditemukan.',
+                'data' => [
+                    'id' => $lab['id'],
+                    'kode_tracking' => $lab['kode_tracking'],
+                    'kodeTracking' => $lab['kode_tracking'],
+                    'jenis_layanan' => 'Uji Mutu Laboratorium',
+                    'jenisLayanan' => 'Uji Mutu Laboratorium',
+                    'nama_pelapor' => $lab['nama_pemohon'],
+                    'tanggal_masuk' => $lab['tanggal_masuk'],
+                    'tanggalMasuk' => $lab['tanggal_masuk'],
+                    'status_tanggapan' => $lab['status_uji'],
+                    'statusTanggapan' => $lab['status_uji'],
+                    'tanggapan_petugas' => $lab['keterangan'] ?: ('Status pengujian: ' . $lab['status_uji']),
+                    'tanggapanPetugas' => $lab['keterangan'] ?: ('Status pengujian: ' . $lab['status_uji']),
+                    'tanggal_tanggapan' => $lab['tanggal_selesai'],
+                    'tanggalTanggapan' => $lab['tanggal_selesai'],
+                    'hasil_dokumen_url' => $lab['hasil_dokumen_url']
+                ]
+            ]);
+            exit();
+        }
+
+        http_response_code(404);
+        echo json_encode([
+            'success' => false,
+            'message' => "Pengaduan dengan kode tracking '{$kode}' tidak ditemukan. Mohon periksa kembali kode tiket Anda."
+        ]);
         exit();
     }
 
