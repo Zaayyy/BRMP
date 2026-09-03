@@ -6,7 +6,7 @@ const prisma = require('../config/prisma');
 
 /**
  * GET /api/public/tracking/:kode_tracking
- * Mencari status uji laboratorium berdasarkan kode tracking unik
+ * Mencari status uji laboratorium berdasarkan kode tracking, nomor SPK, atau telepon
  */
 const getTrackingByCodePublic = async (req, res, next) => {
   try {
@@ -15,15 +15,33 @@ const getTrackingByCodePublic = async (req, res, next) => {
     if (!kode_tracking || !kode_tracking.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Kode tracking wajib disertakan.',
+        message: 'Kode tracking atau Nomor SPK wajib disertakan.',
       });
     }
 
-    const trackingData = await prisma.labTracking.findUnique({
-      where: { kode_tracking: kode_tracking.trim() },
+    const searchKey = kode_tracking.trim();
+
+    const trackingData = await prisma.labTracking.findFirst({
+      where: {
+        OR: [
+          { kode_tracking: searchKey },
+          { spk: searchKey },
+          { no_reg: searchKey },
+          { telepon: searchKey },
+        ],
+      },
       select: {
+        id: true,
+        no_reg: true,
+        spk: true,
         kode_tracking: true,
         nama_pemohon: true,
+        sampel_tanah: true,
+        sampel_air: true,
+        sampel_pupuk: true,
+        sampel_tanaman: true,
+        telepon: true,
+        biaya: true,
         status_uji: true,
         keterangan: true,
         hasil_dokumen_url: true,
@@ -37,7 +55,7 @@ const getTrackingByCodePublic = async (req, res, next) => {
     if (!trackingData) {
       return res.status(404).json({
         success: false,
-        message: `Status uji lab dengan kode tracking '${kode_tracking.trim()}' tidak ditemukan.`,
+        message: `Status uji lab dengan kode tracking / SPK '${searchKey}' tidak ditemukan.`,
       });
     }
 
@@ -70,13 +88,15 @@ const getAllTrackingInternal = async (req, res, next) => {
     if (search) {
       where.OR = [
         { kode_tracking: { contains: search } },
+        { spk: { contains: search } },
         { nama_pemohon: { contains: search } },
+        { telepon: { contains: search } },
       ];
     }
 
     const list = await prisma.labTracking.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { id: 'desc' },
       include: {
         petugas: {
           select: {
@@ -153,26 +173,39 @@ const getTrackingByIdInternal = async (req, res, next) => {
  */
 const createTrackingInternal = async (req, res, next) => {
   try {
-    const { kode_tracking, nama_pemohon, keterangan, status_uji, hasil_dokumen_url } = req.body;
+    const {
+      no_reg,
+      spk,
+      kode_tracking,
+      nama_pemohon,
+      sampel_tanah,
+      sampel_air,
+      sampel_pupuk,
+      sampel_tanaman,
+      telepon,
+      biaya,
+      keterangan,
+      status_uji,
+      hasil_dokumen_url,
+      tanggal_masuk,
+    } = req.body;
 
-    if (!nama_pemohon) {
+    if (!nama_pemohon || !nama_pemohon.trim()) {
       return res.status(400).json({
         success: false,
         message: 'Nama pemohon wajib diisi.',
       });
     }
 
-    // Generate kode tracking otomatis jika tidak disediakan (Format: LAB-YYYYMMDD-RANDOM)
+    const spkClean = spk ? spk.trim() : null;
     let generatedCode = kode_tracking;
     if (!generatedCode || !generatedCode.trim()) {
-      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      generatedCode = `LAB-${dateStr}-${randomSuffix}`;
+      generatedCode = spkClean || `LAB-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     } else {
       generatedCode = generatedCode.trim();
     }
 
-    // Periksa duplikasi kode tracking
+    // Periksa duplikasi kode tracking jika bukan auto
     const existing = await prisma.labTracking.findUnique({
       where: { kode_tracking: generatedCode },
     });
@@ -180,18 +213,27 @@ const createTrackingInternal = async (req, res, next) => {
     if (existing) {
       return res.status(409).json({
         success: false,
-        message: `Kode tracking '${generatedCode}' sudah terdaftar dalam sistem.`,
+        message: `Kode tracking / SPK '${generatedCode}' sudah terdaftar dalam sistem.`,
       });
     }
 
     const newTracking = await prisma.labTracking.create({
       data: {
+        no_reg: no_reg ? no_reg.toString().trim() : null,
+        spk: spkClean,
         kode_tracking: generatedCode,
         nama_pemohon: nama_pemohon.trim(),
+        sampel_tanah: sampel_tanah ? sampel_tanah.trim() : null,
+        sampel_air: sampel_air ? sampel_air.trim() : null,
+        sampel_pupuk: sampel_pupuk ? sampel_pupuk.trim() : null,
+        sampel_tanaman: sampel_tanaman ? sampel_tanaman.trim() : null,
+        telepon: telepon ? telepon.trim() : null,
+        biaya: biaya ? biaya.trim() : null,
         status_uji: status_uji || 'Diterima',
         keterangan: keterangan ? keterangan.trim() : null,
         hasil_dokumen_url: hasil_dokumen_url ? hasil_dokumen_url.trim() : null,
         petugas_id: req.user ? req.user.id : null,
+        ...(tanggal_masuk && { tanggal_masuk: new Date(tanggal_masuk) }),
       },
     });
 
@@ -207,7 +249,7 @@ const createTrackingInternal = async (req, res, next) => {
 
 /**
  * PUT /api/internal/tracking/:id
- * Mengupdate status uji laboratorium & hasil dokumen (PetugasLab / Admin)
+ * Mengupdate data & status uji laboratorium (PetugasLab / Admin)
  */
 const updateTrackingStatusInternal = async (req, res, next) => {
   try {
@@ -232,7 +274,21 @@ const updateTrackingStatusInternal = async (req, res, next) => {
       });
     }
 
-    const { status_uji, hasil_dokumen_url, keterangan, tanggal_selesai, nama_pemohon } = req.body;
+    const {
+      no_reg,
+      spk,
+      nama_pemohon,
+      sampel_tanah,
+      sampel_air,
+      sampel_pupuk,
+      sampel_tanaman,
+      telepon,
+      biaya,
+      status_uji,
+      hasil_dokumen_url,
+      keterangan,
+      tanggal_selesai,
+    } = req.body;
 
     const allowedStatus = ['Diterima', 'Proses', 'Selesai'];
     if (status_uji && !allowedStatus.includes(status_uji)) {
@@ -243,19 +299,26 @@ const updateTrackingStatusInternal = async (req, res, next) => {
     }
 
     const updateData = {};
+    if (no_reg !== undefined) updateData.no_reg = no_reg ? no_reg.toString().trim() : null;
+    if (spk !== undefined) updateData.spk = spk ? spk.trim() : null;
+    if (nama_pemohon !== undefined) updateData.nama_pemohon = nama_pemohon.trim();
+    if (sampel_tanah !== undefined) updateData.sampel_tanah = sampel_tanah ? sampel_tanah.trim() : null;
+    if (sampel_air !== undefined) updateData.sampel_air = sampel_air ? sampel_air.trim() : null;
+    if (sampel_pupuk !== undefined) updateData.sampel_pupuk = sampel_pupuk ? sampel_pupuk.trim() : null;
+    if (sampel_tanaman !== undefined) updateData.sampel_tanaman = sampel_tanaman ? sampel_tanaman.trim() : null;
+    if (telepon !== undefined) updateData.telepon = telepon ? telepon.trim() : null;
+    if (biaya !== undefined) updateData.biaya = biaya ? biaya.trim() : null;
+
     if (status_uji !== undefined) {
       updateData.status_uji = status_uji;
-      // Jika status diubah menjadi 'Selesai' dan tanggal_selesai belum diset, otomatis set tanggal hari ini
       if (status_uji === 'Selesai' && !tanggal_selesai && !existing.tanggal_selesai) {
         updateData.tanggal_selesai = new Date();
       }
     }
     if (hasil_dokumen_url !== undefined) updateData.hasil_dokumen_url = hasil_dokumen_url ? hasil_dokumen_url.trim() : null;
     if (keterangan !== undefined) updateData.keterangan = keterangan ? keterangan.trim() : null;
-    if (nama_pemohon !== undefined) updateData.nama_pemohon = nama_pemohon.trim();
     if (tanggal_selesai !== undefined) updateData.tanggal_selesai = tanggal_selesai ? new Date(tanggal_selesai) : null;
 
-    // Update petugas yang memodifikasi jika petugas belum tercatat
     if (!existing.petugas_id && req.user) {
       updateData.petugas_id = req.user.id;
     }
@@ -267,7 +330,7 @@ const updateTrackingStatusInternal = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: `Status uji laboratorium [${existing.kode_tracking}] berhasil diperbarui.`,
+      message: `Data pengujian laboratorium [${existing.spk || existing.kode_tracking}] berhasil diperbarui.`,
       data: updated,
     });
   } catch (error) {

@@ -40,10 +40,18 @@ CREATE TABLE `benih` (
 -- 3. Table: lab_trackings
 CREATE TABLE `lab_trackings` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `no_reg` VARCHAR(50) NULL,
+    `spk` VARCHAR(100) NULL,
     `kode_tracking` VARCHAR(50) NOT NULL,
     `nama_pemohon` VARCHAR(150) NOT NULL,
+    `sampel_tanah` VARCHAR(100) NULL,
+    `sampel_air` VARCHAR(100) NULL,
+    `sampel_pupuk` VARCHAR(100) NULL,
+    `sampel_tanaman` VARCHAR(100) NULL,
+    `telepon` VARCHAR(50) NULL,
+    `biaya` VARCHAR(100) NULL,
     `status_uji` ENUM('Diterima', 'Proses', 'Selesai') NOT NULL DEFAULT 'Diterima',
-    `hasil_dokumen_url` VARCHAR(500) NULL,
+    `hasil_dokumen_url` MEDIUMTEXT NULL,
     `keterangan` TEXT NULL,
     `petugas_id` INTEGER NULL,
     `tanggal_masuk` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -51,6 +59,7 @@ CREATE TABLE `lab_trackings` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE INDEX `lab_trackings_kode_tracking_key`(`kode_tracking`),
+    INDEX `lab_trackings_spk_idx`(`spk`),
     PRIMARY KEY (`id`),
     CONSTRAINT `lab_trackings_petugas_id_fkey` FOREIGN KEY (`petugas_id`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -94,10 +103,13 @@ INSERT INTO `benih` (`id`, `nama_benih`, `deskripsi`, `stok`, `gambar_url`, `cre
 (3, 'Kedelai Anjasmoro', 'Varietas unggul nasional berbiji besar dengan adaptasi luas di lahan sawah maupun tegalan.', 60, '/images/seed_kedelai.png', 1),
 (4, 'Bawang Merah Bima Brebes', 'Varietas unggul adaptif dataran rendah, anakan produktif dan aroma tajam.', 40, '/images/seed_bawang.png', 1);
 
--- Data Tracking Lab
-INSERT INTO `lab_trackings` (`id`, `kode_tracking`, `nama_pemohon`, `status_uji`, `hasil_dokumen_url`, `keterangan`, `petugas_id`) VALUES
-(1, 'LAB-2026-001', 'Kelompok Tani Makmur Sejahtera', 'Proses', NULL, 'Sampel benih padi dalam tahap uji daya berkecambah dan kadar air.', 2),
-(2, 'LAB-2026-002', 'PT Agro Tani Nusantara', 'Selesai', 'https://example.com/sertifikat-uji.pdf', 'Pengujian mutu benih jagung telah selesai memenuhi standar SNI.', 2);
+-- Data Tracking Lab (Sesuai Register Logbook)
+INSERT INTO `lab_trackings` (`id`, `no_reg`, `spk`, `kode_tracking`, `nama_pemohon`, `sampel_tanah`, `sampel_air`, `sampel_pupuk`, `sampel_tanaman`, `telepon`, `biaya`, `status_uji`, `hasil_dokumen_url`, `keterangan`, `petugas_id`, `tanggal_masuk`) VALUES
+(1, '279', 'CE-3/08-26/279', 'CE-3/08-26/279', 'SMKN 1 Cangkringan', NULL, '274-275', NULL, NULL, '085743250777', 'Rp 150.000', 'Proses', NULL, 'Pengujian sampel air irigasi', 2, '2026-08-19 09:00:00'),
+(2, '280', 'CE-3/08-26/280', 'CE-3/08-26/280', 'Suryandaru Rizky Pangestu', NULL, NULL, NULL, '327-333', '087843586570', 'Rp 200.000', 'Proses', NULL, 'Pengujian jaringan tanaman', 2, '2026-08-20 10:15:00'),
+(3, '283', 'CE-3/08-26/283', 'CE-3/08-26/283', 'Aidi Putra Hasiholan', '1089', NULL, NULL, NULL, '081398155269', 'Rp 175.000', 'Selesai', 'https://example.com/lhu-283.pdf', 'Pengujian unsur hara tanah lengkap', 2, '2026-08-21 11:30:00'),
+(4, '285', 'CE-3/08-26/285', 'CE-3/08-26/285', 'Eko Hartono', NULL, NULL, 'PA. 196', NULL, '085729110138', 'Rp 120.000', 'Proses', NULL, 'Uji pupuk anorganik', 2, '2026-08-21 14:00:00'),
+(5, '290', 'CE-3/08-26/290', 'CE-3/08-26/290', 'Nindy Nava Hapsari', '1105-1252', NULL, NULL, NULL, '081226571495', 'Rp 350.000', 'Proses', NULL, '', 2, '2026-08-27 08:45:00');
 
 -- Data Pengaduan
 INSERT INTO `pengaduan` (`id`, `kode_tracking`, `jenis_layanan`, `nama_pelapor`, `email_pelapor`, `no_telp_pelapor`, `isi_pengaduan`, `status_tanggapan`, `tanggapan_petugas`, `ditanggapi_oleh_id`, `tanggal_tanggapan`) VALUES

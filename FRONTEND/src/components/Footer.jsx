@@ -411,12 +411,6 @@ export default function Footer() {
             <strong style={{ color: '#f8fafc' }}>Balai Besar Modernisasi Pertanian (BRMP) D.I. Yogyakarta</strong>
             <span>— Hak Cipta Dilindungi.</span>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#10b981', fontWeight: 600 }}>
-              <ShieldCheck size={15} /> Portal Resmi Pemerintah RI
-            </span>
-          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
     ArrowUpRight,
     CheckCircle2,
@@ -10,12 +10,28 @@ import {
     RefreshCw,
     Calendar,
     ChevronRight,
+    Shield,
+    ShieldCheck,
+    User,
+    Activity as ActivityIcon,
+    Clock,
+    Search,
+    Download,
+    Printer,
+    X,
+    Filter,
+    FileSpreadsheet,
+    Layers,
+    History,
+    FileText,
 } from "lucide-react";
 import {
     internalPengaduanService,
     internalLabService,
     internalBenihService,
+    internalActivityService,
     authService,
+    ROLE_DETAILS,
 } from "./services/apiService";
 import { getJenisLayananInfo } from "./PermohonanPage";
 import StatCard from "./components/StatCard";
@@ -46,6 +62,18 @@ function todayLabel() {
     }).format(new Date());
 }
 
+function formatRelativeTime(dateStr) {
+    if (!dateStr) return "Baru saja";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "Hari ini";
+    const now = new Date();
+    const diffSec = Math.floor((now - date) / 1000);
+    if (diffSec < 60) return "Baru saja";
+    if (diffSec < 3600) return `${Math.floor(diffSec / 60)} mnt lalu`;
+    if (diffSec < 86400) return `${Math.floor(diffSec / 3600)} jam lalu`;
+    return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+}
+
 function initials(name = "") {
     return (name || "?")
         .split(" ")
@@ -58,24 +86,37 @@ function initials(name = "") {
    MAIN COMPONENT
    ================================================================ */
 export default function AdminDashboardPage({ onNavigate }) {
-    const [user]          = useState(authService.getUser());
-    const [pengaduanList, setPengaduanList] = useState([]);
-    const [labList,       setLabList]       = useState([]);
-    const [benihList,     setBenihList]     = useState([]);
-    const [isLoading,     setIsLoading]     = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [user]             = useState(authService.getUser());
+    const [pengaduanList,    setPengaduanList]    = useState([]);
+    const [labList,          setLabList]          = useState([]);
+    const [benihList,        setBenihList]        = useState([]);
+    const [activitiesList,   setActivitiesList]   = useState([]);
+    const [isLoading,        setIsLoading]        = useState(false);
+    const [isInitialLoad,    setIsInitialLoad]    = useState(true);
+
+    // State Audit Trail Modal & Penelusuran Log
+    const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+    const [auditSearch, setAuditSearch] = useState("");
+    const [auditTipe, setAuditTipe] = useState("semua");
+    const [auditRole, setAuditRole] = useState("semua");
+    const [auditPeriod, setAuditPeriod] = useState("all");
+    const [auditStartDate, setAuditStartDate] = useState("");
+    const [auditEndDate, setAuditEndDate] = useState("");
+    const [isLogRefreshing, setIsLogRefreshing] = useState(false);
 
     const load = async () => {
         setIsLoading(true);
         try {
-            const [pR, lR, bR] = await Promise.allSettled([
+            const [pR, lR, bR, aR] = await Promise.allSettled([
                 internalPengaduanService.getAll(),
                 internalLabService.getAll(),
                 internalBenihService.getAll(),
+                internalActivityService.getAll({ limit: 1000 }),
             ]);
             if (pR.status === "fulfilled" && pR.value?.success && Array.isArray(pR.value.data)) setPengaduanList(pR.value.data);
             if (lR.status === "fulfilled" && lR.value?.success && Array.isArray(lR.value.data)) setLabList(lR.value.data);
             if (bR.status === "fulfilled" && bR.value?.success && Array.isArray(bR.value.data)) setBenihList(bR.value.data);
+            if (aR.status === "fulfilled" && aR.value?.success && Array.isArray(aR.value.data)) setActivitiesList(aR.value.data);
         } catch (e) {
             console.warn("Dashboard load:", e.message);
         } finally {
@@ -84,11 +125,25 @@ export default function AdminDashboardPage({ onNavigate }) {
         }
     };
 
+    const refreshLogsOnly = async () => {
+        setIsLogRefreshing(true);
+        try {
+            const res = await internalActivityService.getAll({ limit: 1000 });
+            if (res && res.success && Array.isArray(res.data)) {
+                setActivitiesList(res.data);
+            }
+        } catch (e) {
+            console.warn("Refresh logs:", e.message);
+        } finally {
+            setIsLogRefreshing(false);
+        }
+    };
+
     useEffect(() => { load(); }, []);
 
     /* --- Derived metrics --- */
     const totalStok        = benihList.reduce((s, b) => s + (Number(b.stok) || 0), 0);
-    const labAktif         = labList.filter((l) => ["Proses", "Diterima"].includes(l.status_uji)).length;
+    const labAktif         = labList.filter((l) => ["Proses", "Diterima", "Pengujian", "Verif Sampel", "Analis Data"].includes(l.status_uji)).length;
     const pMenunggu        = pengaduanList.filter((p) => p.status_tanggapan === "Menunggu").length;
     const pDiproses        = pengaduanList.filter((p) => p.status_tanggapan === "Diproses").length;
     const pSelesai         = pengaduanList.filter((p) => p.status_tanggapan === "Selesai").length;
@@ -101,22 +156,134 @@ export default function AdminDashboardPage({ onNavigate }) {
         { label: "Ditolak",  value: pDitolak,  color: "#f43f5e" },
     ];
 
-    const recentActivities = [
-        ...pengaduanList.slice(0, 3).map((p) => ({
-            type: "pengaduan",
-            title: `Permohonan #${p.kode_tracking || p.id}`,
-            detail: `${p.nama_pelapor} — ${(p.isi_pengaduan || "Permohonan layanan").slice(0, 55)}${(p.isi_pengaduan?.length || 0) > 55 ? "…" : ""}`,
-            time: p.tanggal
-                ? new Date(p.tanggal).toLocaleDateString("id-ID", { day: "numeric", month: "short" })
-                : "Hari ini",
-        })),
-        ...benihList.slice(0, 2).map((b) => ({
-            type: "benih",
-            title: `Benih '${b.nama_benih}'`,
-            detail: `Stok: ${b.stok} kg tersedia — Data tersinkron ke website publik`,
-            time: "Sinkron",
-        })),
-    ];
+    // Filter Logs untuk Audit Trail Modal
+    const filteredFullLogs = useMemo(() => {
+        const now = new Date();
+        return activitiesList.filter((act) => {
+            // Filter Search Query
+            if (auditSearch.trim()) {
+                const q = auditSearch.toLowerCase();
+                const uNama = String(act.user_nama || act.userNama || act.nama || "").toLowerCase();
+                const uRole = String(act.user_role || act.userRole || act.role || "").toLowerCase();
+                const uAct = String(act.action || act.title || "").toLowerCase();
+                const uDet = String(act.detail || "").toLowerCase();
+                if (!uNama.includes(q) && !uRole.includes(q) && !uAct.includes(q) && !uDet.includes(q)) {
+                    return false;
+                }
+            }
+
+            // Filter Tipe / Modul
+            if (auditTipe !== "semua" && (act.tipe || act.type) !== auditTipe) {
+                return false;
+            }
+
+            // Filter Role
+            if (auditRole !== "semua") {
+                const r = act.user_role || act.userRole || act.role || "";
+                if (r !== auditRole) return false;
+            }
+
+            // Filter Periode Waktu
+            const createdStr = act.created_at || act.createdAt || act.time;
+            if (createdStr) {
+                const logDate = new Date(createdStr);
+                if (!isNaN(logDate.getTime())) {
+                    if (auditPeriod === "today") {
+                        const todayStr = now.toISOString().slice(0, 10);
+                        const itemDateStr = logDate.toISOString().slice(0, 10);
+                        if (todayStr !== itemDateStr) return false;
+                    } else if (auditPeriod === "week") {
+                        const diffDays = (now.getTime() - logDate.getTime()) / (1000 * 60 * 60 * 24);
+                        if (diffDays > 7) return false;
+                    } else if (auditPeriod === "month") {
+                        const diffDays = (now.getTime() - logDate.getTime()) / (1000 * 60 * 60 * 24);
+                        if (diffDays > 30) return false;
+                    } else if (auditPeriod === "custom") {
+                        if (auditStartDate) {
+                            const sDate = new Date(auditStartDate);
+                            sDate.setHours(0, 0, 0, 0);
+                            if (logDate < sDate) return false;
+                        }
+                        if (auditEndDate) {
+                            const eDate = new Date(auditEndDate);
+                            eDate.setHours(23, 59, 59, 999);
+                            if (logDate > eDate) return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        });
+    }, [activitiesList, auditSearch, auditTipe, auditRole, auditPeriod, auditStartDate, auditEndDate]);
+
+    // Export Log to CSV (Excel)
+    const handleExportCSV = () => {
+        if (!filteredFullLogs || filteredFullLogs.length === 0) {
+            alert("Tidak ada data riwayat log untuk diekspor.");
+            return;
+        }
+        const headers = ["No", "Tanggal & Waktu", "Nama Petugas", "Role Akun", "Modul Sistem", "Aksi Operasional", "Rincian / Detail Aktivitas"];
+        const rows = filteredFullLogs.map((l, idx) => {
+            const rawDate = l.created_at || l.createdAt || l.time;
+            const formattedDate = rawDate ? new Date(rawDate).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }) : "-";
+            const uNama = l.user_nama || l.userNama || l.nama || "Petugas";
+            const uRole = l.user_role || l.userRole || l.role || "Petugas";
+            const uTipe = l.tipe || l.type || "System";
+            const uAct = l.action || l.title || "Pembaruan";
+            const uDet = (l.detail || "").replace(/"/g, '""');
+
+            return [
+                idx + 1,
+                `"${formattedDate}"`,
+                `"${uNama}"`,
+                `"${uRole}"`,
+                `"${uTipe}"`,
+                `"${uAct}"`,
+                `"${uDet}"`
+            ];
+        });
+
+        const csvString = "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `BRMP_Audit_Log_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Build unified activities if API data is ready
+    const displayActivities = activitiesList.length > 0
+        ? activitiesList.slice(0, 7)
+        : [
+            ...labList.slice(0, 3).map((l) => ({
+                tipe: "lab",
+                user_nama: l.namaPetugas || "Petugas Laboratorium",
+                user_role: l.status_uji === "Selesai" ? "PetugasLab" : "Analis",
+                action: "Update Analisis Lab",
+                detail: `SPK ${l.spk || l.kode_tracking} (${l.nama_pemohon}) — Tahap: ${l.tahap_proses || l.status_uji}`,
+                created_at: l.tanggal_masuk,
+            })),
+            ...pengaduanList.slice(0, 2).map((p) => ({
+                tipe: "pengaduan",
+                user_nama: p.ditanggapiOleh || "Petugas Layanan",
+                user_role: "PetugasLayanan",
+                action: "Tindak Lanjut Permohonan",
+                detail: `Tiket #${p.kode_tracking || p.id} (${p.nama_pelapor}) — Status: ${p.status_tanggapan}`,
+                created_at: p.tanggal,
+            })),
+            ...benihList.slice(0, 2).map((b) => ({
+                tipe: "benih",
+                user_nama: "Petugas Perbenihan",
+                user_role: "PetugasBenih",
+                action: "Sinkronisasi Stok Benih",
+                detail: `Benih '${b.nama_benih}' — Stok: ${b.stok} kg tersedia`,
+                created_at: b.createdAt || b.created_at,
+            })),
+        ];
 
     if (isInitialLoad && isLoading) return <SkeletonDashboard />;
 
@@ -187,18 +354,22 @@ export default function AdminDashboardPage({ onNavigate }) {
                             <div
                                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
                                 style={{
-                                    background: "linear-gradient(135deg, #25c47a, #0f5033)",
-                                    boxShadow: "0 6px 18px rgba(37,196,122,0.30)",
+                                    background: user?.role === "Analis"
+                                        ? "linear-gradient(135deg, #9333ea, #581c87)"
+                                        : "linear-gradient(135deg, #25c47a, #0f5033)",
+                                    boxShadow: user?.role === "Analis"
+                                        ? "0 6px 18px rgba(147,51,234,0.30)"
+                                        : "0 6px 18px rgba(37,196,122,0.30)",
                                 }}
                             >
-                                {user?.role === "PetugasLab" ? "LAB" : "ADM"}
+                                {ROLE_DETAILS[user?.role]?.shortCode || "ADM"}
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-slate-900 line-clamp-1">
                                     {user?.nama || "Administrator"}
                                 </p>
                                 <p className="text-[11px] font-semibold text-brand-700">
-                                    {user?.role === "Admin" ? "Superadmin" : "Petugas Lab"}
+                                    {ROLE_DETAILS[user?.role]?.label || "Administrator"}
                                 </p>
                             </div>
                         </div>
@@ -226,8 +397,8 @@ export default function AdminDashboardPage({ onNavigate }) {
                     value={(labAktif || labList.length || 0).toString()}
                     badgeText={`${labAktif} Dalam Pengujian`}
                     variant="sky"
-                    subtext="Status Laboratorium"
-                    onClick={() => onNavigate?.("laboratorium-masuk")}
+                    subtext={user?.role === "Analis" ? "Buku Analis (Parameter)" : "Status Laboratorium"}
+                    onClick={() => onNavigate?.(user?.role === "Analis" ? "laboratorium-buku-analis" : "laboratorium-masuk")}
                     delay="0.10s"
                 />
                 <StatCard
@@ -243,11 +414,11 @@ export default function AdminDashboardPage({ onNavigate }) {
                 <StatCard
                     icon={Users}
                     label="Akses Sistem"
-                    value={user?.role === "Admin" ? "Superadmin" : "Petugas"}
+                    value={ROLE_DETAILS[user?.role]?.label || "Pengguna"}
                     badgeText="Sesi Aktif"
                     variant="violet"
                     subtext="BRMP DIY Portal"
-                    onClick={() => onNavigate?.("user")}
+                    onClick={() => onNavigate?.(user?.role === "Admin" ? "user" : "pengaturan")}
                     delay="0.20s"
                 />
             </section>
@@ -456,52 +627,381 @@ export default function AdminDashboardPage({ onNavigate }) {
                         </div>
                     </article>
 
-                    {/* Activity Timeline */}
+                    {/* Activity Timeline (Menampilkan Akun Pelaksana) */}
                     <article className="rounded-[2.25rem] border border-slate-100 bg-white/95 p-6 shadow-card backdrop-blur-lg">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-brand-700">
-                            Log Aktivitas
-                        </p>
-                        <h2 className="mt-1 text-lg font-black text-slate-900">
-                            Aktivitas Terkini
-                        </h2>
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                            <div>
+                                <p className="text-[11px] font-bold uppercase tracking-widest text-brand-700">
+                                    Audit Trail &amp; Log
+                                </p>
+                                <h2 className="text-lg font-black text-slate-900">
+                                    Log Aktivitas Petugas
+                                </h2>
+                            </div>
+                            <button
+                                onClick={() => setIsAuditModalOpen(true)}
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-brand-200 bg-brand-50/80 px-3 py-1.5 text-xs font-bold text-brand-800 hover:bg-brand-100 transition shadow-xs"
+                            >
+                                <Search size={12} className="text-brand-600" />
+                                <span>Lihat Semua Log</span>
+                            </button>
+                        </div>
 
-                        <div className="relative mt-5">
+                        <div className="relative mt-2">
                             {/* Vertical line */}
-                            <div className="pointer-events-none absolute left-4 top-3 bottom-3 w-px bg-gradient-to-b from-brand-300/50 via-slate-200 to-transparent" />
+                            <div className="pointer-events-none absolute left-4 top-3 bottom-3 w-px bg-gradient-to-b from-brand-400/50 via-slate-200 to-transparent" />
 
-                            <div className="space-y-4">
-                                {recentActivities.map((act, i) => (
-                                    <div key={i} className="flex items-start gap-4">
-                                        {/* Node */}
-                                        <div
-                                            className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-brand-500 bg-white text-brand-600 shadow-sm"
-                                        >
-                                            {act.type === "benih"
-                                                ? <Sprout size={15} />
-                                                : <CheckCircle2 size={15} />
-                                            }
-                                        </div>
+                            <div className="space-y-3.5">
+                                {displayActivities.map((act, i) => {
+                                    const role = act.user_role || act.userRole || act.role || "PetugasLab";
+                                    const namaAkun = act.user_nama || act.userNama || act.nama || "Petugas";
+                                    const roleMeta = ROLE_DETAILS[role] || {
+                                        label: role,
+                                        shortCode: role?.slice(0, 3)?.toUpperCase() || "USR",
+                                        badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+                                    };
 
-                                        <div className="flex-1 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <p className="text-xs font-bold text-slate-800 line-clamp-1">{act.title}</p>
-                                                <span className="shrink-0 text-[10px] font-semibold text-slate-400">{act.time}</span>
+                                    const getNodeConfig = (t) => {
+                                        switch (t) {
+                                            case "lab":
+                                                return { icon: FlaskConical, color: "text-purple-600 border-purple-500 bg-purple-50/50" };
+                                            case "benih":
+                                                return { icon: Sprout, color: "text-amber-600 border-amber-500 bg-amber-50/50" };
+                                            case "pengaduan":
+                                                return { icon: ClipboardList, color: "text-blue-600 border-blue-500 bg-blue-50/50" };
+                                            case "user":
+                                                return { icon: Users, color: "text-emerald-600 border-emerald-500 bg-emerald-50/50" };
+                                            case "auth":
+                                                return { icon: ShieldCheck, color: "text-sky-600 border-sky-500 bg-sky-50/50" };
+                                            default:
+                                                return { icon: CheckCircle2, color: "text-brand-600 border-brand-500 bg-brand-50/50" };
+                                        }
+                                    };
+
+                                    const nodeCfg = getNodeConfig(act.tipe || act.type);
+                                    const NodeIcon = nodeCfg.icon;
+
+                                    return (
+                                        <div key={act.id || i} className="flex items-start gap-3.5 group">
+                                            {/* Node Circle */}
+                                            <div
+                                                className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 bg-white shadow-xs transition-transform group-hover:scale-110 ${nodeCfg.color}`}
+                                            >
+                                                <NodeIcon size={14} />
                                             </div>
-                                            <p className="mt-1 text-[11px] leading-relaxed text-slate-500 line-clamp-2">
-                                                {act.detail}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
 
-                                {recentActivities.length === 0 && (
-                                    <p className="pl-12 text-xs text-slate-400">Belum ada aktivitas.</p>
+                                            {/* Card Detail */}
+                                            <div className="flex-1 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 transition-all group-hover:bg-white group-hover:shadow-sm group-hover:border-slate-200">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <p className="text-xs font-black text-slate-900 line-clamp-1">
+                                                        {act.action || act.title || "Pembaruan Data"}
+                                                    </p>
+                                                    <span className="shrink-0 text-[10px] font-semibold text-slate-400 flex items-center gap-1">
+                                                        <Clock size={10} />
+                                                        {formatRelativeTime(act.created_at || act.createdAt || act.time)}
+                                                    </span>
+                                                </div>
+
+                                                <p className="mt-1 text-[11px] leading-relaxed text-slate-600 line-clamp-2">
+                                                    {act.detail}
+                                                </p>
+
+                                                {/* Akun yang Melakukan Perubahan */}
+                                                <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-700 text-[10px] font-black">
+                                                            {initials(namaAkun)}
+                                                        </div>
+                                                        <span className="text-[11px] font-bold text-slate-800 truncate">
+                                                            {namaAkun}
+                                                        </span>
+                                                    </div>
+                                                    <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide ${roleMeta.badgeClass}`}>
+                                                        {roleMeta.shortCode || role}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {displayActivities.length === 0 && (
+                                    <p className="pl-12 text-xs text-slate-400">Belum ada aktivitas tercatat.</p>
                                 )}
+                            </div>
+
+                            {/* Tombol Buka Modal Selengkapnya */}
+                            <div className="mt-4 pt-3 border-t border-slate-100 text-center">
+                                <button
+                                    onClick={() => setIsAuditModalOpen(true)}
+                                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-brand-700 transition"
+                                >
+                                    <History size={14} className="text-slate-500" />
+                                    <span>Telusuri Arsip Riwayat Log ({activitiesList.length} Tersimpan)</span>
+                                </button>
                             </div>
                         </div>
                     </article>
                 </div>
             </section>
+
+            {/* ============================================================ */}
+            {/* 4. MODAL PUSAT AUDIT TRAIL & PENELUSURAN LOG LENGKAP        */}
+            {/* ============================================================ */}
+            {isAuditModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-fade-in"
+                    onClick={() => setIsAuditModalOpen(false)}
+                >
+                    <div
+                        className="relative flex flex-col w-full max-w-5xl max-h-[92vh] rounded-[2rem] border border-slate-200 bg-white shadow-2xl overflow-hidden animate-scale-in"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header Modal */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-6 py-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-md shadow-brand-500/20">
+                                    <ShieldCheck size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                                        <span>Audit Trail &amp; Riwayat Log Sistem</span>
+                                        <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-bold text-brand-800 border border-brand-200">
+                                            {filteredFullLogs.length} Log
+                                        </span>
+                                    </h3>
+                                    <p className="text-xs text-slate-500">
+                                        Arsip permanen pencatatan seluruh aktivitas petugas di server MySQL.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={refreshLogsOnly}
+                                    disabled={isLogRefreshing}
+                                    title="Segarkan Log"
+                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                                >
+                                    <RefreshCw size={13} className={isLogRefreshing ? "animate-spin text-brand-600" : ""} />
+                                    <span>Segarkan</span>
+                                </button>
+                                <button
+                                    onClick={handleExportCSV}
+                                    title="Unduh format CSV/Excel"
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm"
+                                >
+                                    <Download size={13} />
+                                    <span>Unduh Excel (CSV)</span>
+                                </button>
+                                <button
+                                    onClick={() => setIsAuditModalOpen(false)}
+                                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Filter Toolbar */}
+                        <div className="border-b border-slate-100 bg-slate-50/60 p-4 sm:px-6">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                {/* Search */}
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        placeholder="Cari petugas, SPK, aksi..."
+                                        value={auditSearch}
+                                        onChange={(e) => setAuditSearch(e.target.value)}
+                                        className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3 py-2 text-xs font-medium outline-none focus:border-brand-500"
+                                    />
+                                    <Search size={14} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
+                                </div>
+
+                                {/* Filter Periode */}
+                                <div>
+                                    <select
+                                        value={auditPeriod}
+                                        onChange={(e) => setAuditPeriod(e.target.value)}
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-brand-500"
+                                    >
+                                        <option value="all">🗓️ Semua Waktu</option>
+                                        <option value="today">☀️ Hari Ini</option>
+                                        <option value="week">📅 7 Hari Terakhir (1 Minggu)</option>
+                                        <option value="month">📊 30 Hari Terakhir (1 Bulan)</option>
+                                        <option value="custom">⚙️ Rentang Tanggal Manual</option>
+                                    </select>
+                                </div>
+
+                                {/* Filter Modul */}
+                                <div>
+                                    <select
+                                        value={auditTipe}
+                                        onChange={(e) => setAuditTipe(e.target.value)}
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-brand-500"
+                                    >
+                                        <option value="semua">📁 Semua Modul</option>
+                                        <option value="lab">🧪 Laboratorium (Lab / Analis)</option>
+                                        <option value="benih">🌱 Perbenihan (Benih)</option>
+                                        <option value="pengaduan">📋 Layanan &amp; Permohonan</option>
+                                        <option value="auth">🔐 Akun &amp; Sesi Login</option>
+                                    </select>
+                                </div>
+
+                                {/* Filter Role */}
+                                <div>
+                                    <select
+                                        value={auditRole}
+                                        onChange={(e) => setAuditRole(e.target.value)}
+                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-brand-500"
+                                    >
+                                        <option value="semua">👥 Semua Role Petugas</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Analis">Analis</option>
+                                        <option value="PetugasLab">Petugas Lab</option>
+                                        <option value="PetugasBenih">Petugas Benih</option>
+                                        <option value="PetugasLayanan">Petugas Layanan</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Custom Date Range if chosen */}
+                            {auditPeriod === "custom" && (
+                                <div className="mt-3 flex flex-wrap items-center gap-3 pt-3 border-t border-slate-200">
+                                    <span className="text-xs font-bold text-slate-600">Pilih Rentang:</span>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="date"
+                                            value={auditStartDate}
+                                            onChange={(e) => setAuditStartDate(e.target.value)}
+                                            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-brand-500"
+                                        />
+                                        <span className="text-xs text-slate-400">s/d</span>
+                                        <input
+                                            type="date"
+                                            value={auditEndDate}
+                                            onChange={(e) => setAuditEndDate(e.target.value)}
+                                            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-brand-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* List Content Table */}
+                        <div className="flex-1 overflow-y-auto p-4 sm:px-6">
+                            {filteredFullLogs.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 text-center">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-50 text-slate-300">
+                                        <History size={32} />
+                                    </div>
+                                    <p className="mt-3 text-sm font-bold text-slate-600">Tidak ada riwayat log yang cocok</p>
+                                    <p className="mt-1 max-w-xs text-xs text-slate-400">
+                                        Coba sesuaikan kata kunci pencarian atau ganti filter periode waktu.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                                    <table className="w-full text-left text-xs border-collapse">
+                                        <thead className="bg-slate-100/90 text-slate-700 font-extrabold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                            <tr>
+                                                <th className="px-3 py-3 text-center w-12 border-r border-slate-200">No</th>
+                                                <th className="px-4 py-3 min-w-[150px] border-r border-slate-200">Waktu &amp; Tanggal</th>
+                                                <th className="px-4 py-3 min-w-[160px] border-r border-slate-200">Petugas Pelaksana</th>
+                                                <th className="px-3.5 py-3 text-center min-w-[100px] border-r border-slate-200">Modul</th>
+                                                <th className="px-4 py-3 min-w-[160px] border-r border-slate-200">Aksi Operasional</th>
+                                                <th className="px-4 py-3 min-w-[240px]">Rincian Detail</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 bg-white">
+                                            {filteredFullLogs.map((log, idx) => {
+                                                const rawDate = log.created_at || log.createdAt || log.time;
+                                                const dObj = rawDate ? new Date(rawDate) : null;
+                                                const formattedTime = dObj && !isNaN(dObj.getTime())
+                                                    ? dObj.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) + " WIB"
+                                                    : "-";
+                                                const formattedDate = dObj && !isNaN(dObj.getTime())
+                                                    ? dObj.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+                                                    : "-";
+
+                                                const role = log.user_role || log.userRole || log.role || "Petugas";
+                                                const roleMeta = ROLE_DETAILS[role] || {
+                                                    label: role,
+                                                    badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
+                                                };
+                                                const namaAkun = log.user_nama || log.userNama || log.nama || "Petugas";
+                                                const modul = log.tipe || log.type || "system";
+
+                                                const getModulBadge = (m) => {
+                                                    switch (m) {
+                                                        case "lab": return "bg-purple-100 text-purple-900 border-purple-200";
+                                                        case "benih": return "bg-amber-100 text-amber-900 border-amber-200";
+                                                        case "pengaduan": return "bg-blue-100 text-blue-900 border-blue-200";
+                                                        case "auth": return "bg-sky-100 text-sky-900 border-sky-200";
+                                                        default: return "bg-slate-100 text-slate-800 border-slate-200";
+                                                    }
+                                                };
+
+                                                return (
+                                                    <tr key={log.id || idx} className="hover:bg-slate-50/80 transition-colors">
+                                                        <td className="px-3 py-3 text-center text-slate-400 font-mono border-r border-slate-100">
+                                                            {idx + 1}
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-slate-100 whitespace-nowrap">
+                                                            <div className="font-black text-slate-800">{formattedDate}</div>
+                                                            <div className="text-[10px] text-slate-500 font-mono flex items-center gap-1 mt-0.5">
+                                                                <Clock size={10} className="text-slate-400" />
+                                                                <span>{formattedTime}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-slate-100">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-700 text-[10px] font-black">
+                                                                    {initials(namaAkun)}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-bold text-slate-900 line-clamp-1">{namaAkun}</div>
+                                                                    <span className={`inline-flex rounded-md border px-1.5 py-0.2 text-[9px] font-extrabold ${roleMeta.badgeClass}`}>
+                                                                        {roleMeta.label || role}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-3.5 py-3 text-center border-r border-slate-100 whitespace-nowrap">
+                                                            <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getModulBadge(modul)}`}>
+                                                                {modul}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-4 py-3 border-r border-slate-100 font-black text-slate-900">
+                                                            {log.action || log.title || "Pembaruan Data"}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-slate-700 leading-relaxed max-w-md font-medium">
+                                                            {log.detail}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer Modal */}
+                        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 px-6 py-3.5">
+                            <span className="text-xs text-slate-500 font-medium">
+                                Menampilkan <strong>{filteredFullLogs.length}</strong> dari total <strong>{activitiesList.length}</strong> riwayat log tersimpan.
+                            </span>
+                            <button
+                                onClick={() => setIsAuditModalOpen(false)}
+                                className="rounded-xl bg-slate-900 px-5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

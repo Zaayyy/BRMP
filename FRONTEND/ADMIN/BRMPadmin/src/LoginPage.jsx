@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authService } from "./services/apiService";
-import { Eye, EyeOff, ShieldCheck, Leaf, FlaskConical, Sprout } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck, Leaf, FlaskConical, Sprout, Clock } from "lucide-react";
 
 function BrmpLogo() {
     return (
@@ -22,8 +22,17 @@ const STATS = [
 export default function LoginPage({ onLogin }) {
     const [form,      setForm]      = useState({ username: "", password: "" });
     const [error,     setError]     = useState("");
+    const [notice,    setNotice]    = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [showPw,    setShowPw]    = useState(false);
+
+    useEffect(() => {
+        const savedNotice = sessionStorage.getItem("logout_notice");
+        if (savedNotice) {
+            setNotice(savedNotice);
+            sessionStorage.removeItem("logout_notice");
+        }
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -39,9 +48,11 @@ export default function LoginPage({ onLogin }) {
         }
         setIsLoading(true);
         setError("");
+        setNotice("");
         try {
             const res = await authService.login({ email: form.username.trim(), password: form.password });
             if (res?.success) {
+                sessionStorage.removeItem("logout_notice");
                 if (onLogin) onLogin(res.user || res.data?.user);
             } else {
                 setError(res?.message || "Login gagal. Periksa kredensial Anda.");
@@ -102,6 +113,29 @@ export default function LoginPage({ onLogin }) {
                         <h2>Selamat datang kembali</h2>
                         <p>Masuk untuk mengelola data, stok, dan aktivitas dashboard sistem BRMP DIY.</p>
                     </div>
+
+                    {notice && (
+                        <div
+                            style={{
+                                marginBottom: "16px",
+                                padding: "12px 16px",
+                                borderRadius: "12px",
+                                background: "rgba(245, 158, 11, 0.12)",
+                                border: "1px solid rgba(245, 158, 11, 0.35)",
+                                color: "#b45309",
+                                fontSize: "0.86rem",
+                                fontWeight: "600",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                lineHeight: "1.4",
+                            }}
+                            role="status"
+                        >
+                            <Clock size={18} style={{ flexShrink: 0, color: "#d97706" }} />
+                            <span>{notice}</span>
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="login-form" noValidate>
                         {/* Email */}

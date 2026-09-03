@@ -58,7 +58,7 @@ function LabResult({ data, onClose }) {
       </button>
 
       {/* Header */}
-      <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', gap: '0.9rem', marginBottom: '1.5rem', alignItems: 'center' }}>
         <div style={{
           width: '52px', height: '52px', borderRadius: '14px',
           background: 'linear-gradient(135deg, #dcfce7, #bbf7d0)',
@@ -68,22 +68,125 @@ function LabResult({ data, onClose }) {
         </div>
         <div>
           <span style={{
-            fontSize: '0.72rem', fontWeight: 700, color: '#0d6e38',
+            fontSize: '0.72rem', fontWeight: 800, color: '#0d6e38',
             backgroundColor: '#dcfce7', padding: '0.15rem 0.55rem', borderRadius: '6px',
-          }}>{data.code || data.kode_tracking}</span>
+            fontFamily: 'monospace',
+          }}>{data.spk || data.code || data.kode_tracking}</span>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginTop: '0.3rem', lineHeight: 1.3 }}>
-            {data.title || `Uji Laboratorium - ${data.nama_pemohon || 'Sampel Benih'}`}
+            {data.nama_pemohon || data.pemohon || 'Pengujian Laboratorium BRMP DIY'}
           </h3>
         </div>
       </div>
 
-      {/* Info */}
+      {/* Rincian Kategori Sampel jika ada */}
+      {(data.sampel_tanah || data.sampelTanah || data.sampel_air || data.sampelAir || data.sampel_pupuk || data.sampelPupuk || data.sampel_tanaman || data.sampelTanaman) && (
+        <div style={{ marginBottom: '1.2rem', padding: '0.8rem', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '0.4rem', textTransform: 'uppercase' }}>
+            Sampel Teruji:
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+            {(data.sampel_tanah || data.sampelTanah) && (
+              <span style={{ backgroundColor: '#fef3c7', color: '#78350f', border: '1px solid #fde68a', borderRadius: '8px', padding: '0.2rem 0.6rem', fontSize: '0.78rem', fontWeight: 700 }}>
+                TH: {data.sampel_tanah || data.sampelTanah}
+              </span>
+            )}
+            {(data.sampel_air || data.sampelAir) && (
+              <span style={{ backgroundColor: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '8px', padding: '0.2rem 0.6rem', fontSize: '0.78rem', fontWeight: 700 }}>
+                A: {data.sampel_air || data.sampelAir}
+              </span>
+            )}
+            {(data.sampel_pupuk || data.sampelPupuk) && (
+              <span style={{ backgroundColor: '#f3e8ff', color: '#6b21a8', border: '1px solid #e9d5ff', borderRadius: '8px', padding: '0.2rem 0.6rem', fontSize: '0.78rem', fontWeight: 700 }}>
+                P: {data.sampel_pupuk || data.sampelPupuk}
+              </span>
+            )}
+            {(data.sampel_tanaman || data.sampelTanaman) && (
+              <span style={{ backgroundColor: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '0.2rem 0.6rem', fontSize: '0.78rem', fontWeight: 700 }}>
+                TMN: {data.sampel_tanaman || data.sampelTanaman}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 5 Tahapan Progress Timeline */}
+      <div style={{ marginBottom: '1.4rem', backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', display: 'block', marginBottom: '0.8rem' }}>
+          Tahapan Uji Laboratorium:
+        </span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+          {['Pembayaran', 'Verif Sampel', 'Pengujian', 'Analis Data', 'Selesai'].map((stepName, i) => {
+            let activeIdx = 2;
+            const st = (data.status_uji || data.statusUji || '').toLowerCase();
+            if (st.includes('selesai')) activeIdx = 4;
+            else if (st.includes('analis') || st.includes('data')) activeIdx = 3;
+            else if (st.includes('pengujian') || st.includes('proses') || st.includes('destruksi') || st.includes('ekstraksi')) activeIdx = 2;
+            else if (st.includes('verif') || st.includes('preparasi')) activeIdx = 1;
+            else if (st.includes('pembayaran') || st.includes('belum')) activeIdx = 0;
+
+            const isCompleted = i <= activeIdx;
+            const isCurrent = i === activeIdx;
+
+            return (
+              <div key={stepName} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, zIndex: 1 }}>
+                <div style={{
+                  width: '28px', height: '28px', borderRadius: '50%',
+                  backgroundColor: isCompleted ? '#059669' : '#ffffff',
+                  color: isCompleted ? '#ffffff' : '#94a3b8',
+                  border: isCompleted ? 'none' : '2px solid #cbd5e1',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.75rem', fontWeight: 800,
+                  boxShadow: isCurrent ? '0 0 0 3px #a7f3d0' : 'none'
+                }}>
+                  {i + 1}
+                </div>
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: isCurrent ? 800 : 600,
+                  color: isCurrent ? '#064e3b' : isCompleted ? '#059669' : '#94a3b8',
+                  marginTop: '0.35rem',
+                  textAlign: 'center'
+                }}>
+                  {stepName}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tahapan Proses Realtime */}
+      <div style={{
+        backgroundColor: '#ecfdf5', border: '1.5px solid #a7f3d0', borderRadius: '14px',
+        padding: '0.85rem 1rem', marginBottom: '1.2rem',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem',
+      }}>
+        <div>
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#047857', textTransform: 'uppercase', display: 'block' }}>
+            📍 Tahapan Analisis Saat Ini:
+          </span>
+          <strong style={{ fontSize: '0.92rem', color: '#064e3b', display: 'block', marginTop: '0.15rem' }}>
+            {data.tahap_proses || data.tahapProses || (data.status_uji === 'Selesai' ? '6. Penerbitan & Pengesahan Laporan Hasil Uji (LHU)' : '3. Destruksi / Ekstraksi Kimia di Laboratorium')}
+          </strong>
+        </div>
+        <span style={{
+          backgroundColor: '#059669', color: '#ffffff',
+          fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.55rem', borderRadius: '6px',
+          flexShrink: 0,
+        }}>
+          {data.status_uji || data.statusUji || 'Progres Lab'}
+        </span>
+      </div>
+
+      {/* Info Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '1.5rem' }}>
         {[
           { label: 'Pemohon', val: data.pemohon || data.nama_pemohon },
           { label: 'Tgl Masuk', val: data.tanggalMasuk || (data.tanggal_masuk ? new Date(data.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-') },
-          { label: 'Status Uji', val: data.status_uji || (data.step ? `Tahap ${data.step}/5` : 'Proses') },
-          { label: 'Keterangan', val: data.keterangan || 'Sedang dalam pengujian mutu' },
+          { label: 'Status Uji', val: data.status_uji || data.statusUji || 'Pengujian' },
+          { label: 'Status Bayar', val: data.status_bayar || data.statusBayar || 'Lunas' },
+          { label: 'Parameter Uji', val: data.parameter_uji || data.parameterUji || '-' },
+          { label: 'Catatan Analis', val: data.keterangan || '-' },
         ].map((i) => (
           <div key={i.label} style={{ backgroundColor: '#f8fafc', padding: '0.75rem', borderRadius: '10px' }}>
             <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.15rem' }}>{i.label}</div>
@@ -121,17 +224,22 @@ function LabResult({ data, onClose }) {
         </>
       )}
 
-      {(data.hasil_dokumen_url || data.step === LAB_STEPS.length) && (
-        <button onClick={() => alert(`Mengunduh Laporan Hasil Uji ${data.code || data.kode_tracking}`)} style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-          background: 'linear-gradient(135deg, #0d6e38, #10b981)',
-          color: '#ffffff', padding: '0.8rem', borderRadius: '10px',
-          fontWeight: 700, fontSize: '0.9rem', border: 'none', cursor: 'pointer',
-          boxShadow: '0 6px 16px rgba(13,110,56,0.25)',
-        }}>
-          <Download size={18} /> Unduh Laporan Uji PDF
-        </button>
-      )}
+      {(data.hasil_dokumen_url || data.hasilDokumenUrl) ? (
+        <a
+          href={data.hasil_dokumen_url || data.hasilDokumenUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            background: 'linear-gradient(135deg, #0d6e38, #10b981)',
+            color: '#ffffff', padding: '0.8rem', borderRadius: '10px',
+            fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none',
+            boxShadow: '0 6px 16px rgba(13,110,56,0.25)',
+          }}
+        >
+          <Download size={18} /> Unduh Laporan Uji (LHU) PDF
+        </a>
+      ) : null}
     </div>
   );
 }
@@ -314,10 +422,13 @@ export default function TrackPage() {
     try {
       // Coba panggil API backend
       const res = await labService.trackByCodePublic(q);
-      if (res && res.data) {
-        setLabResult(res.data);
+      if (res && (res.data || res.id || res.spk)) {
+        setLabResult(res.data || res);
+      } else {
+        throw new Error('Data pengujian tidak ditemukan.');
       }
     } catch (err) {
+      console.warn('Track lab error:', err);
       // Fallback ke data demo jika server lokal/mock
       const match = labDatabase.find((s) =>
         s.code.toLowerCase() === q.toLowerCase() || s.pemohon.toLowerCase().includes(q.toLowerCase())
@@ -326,7 +437,7 @@ export default function TrackPage() {
         setLabResult(match);
       } else {
         setLabError(
-          err.status === 404
+          err.status === 404 || err.message?.includes('tidak ditemukan')
             ? `Pengujian laboratorium dengan kode '${q}' tidak ditemukan. Mohon periksa kembali nomor SPK atau kode sampel Anda.`
             : err.message || 'Gagal memeriksa status lab. Silakan coba lagi.'
         );
@@ -434,7 +545,7 @@ export default function TrackPage() {
               </div>
               <div>
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>Tracking Uji Lab</h2>
-                <p style={{ fontSize: '0.78rem', color: '#64748b' }}>Nomor SPK atau Kode Sampel Lab</p>
+                <p style={{ fontSize: '0.78rem', color: '#64748b' }}>Nomor SPK Laboratorium</p>
               </div>
             </div>
 
@@ -446,7 +557,7 @@ export default function TrackPage() {
               <input
                 type="text" value={labQuery}
                 onChange={(e) => setLabQuery(e.target.value)}
-                placeholder="Contoh: LAB-2026-001"
+                placeholder="Contoh: CE-2/09-26/297"
                 style={{
                   flex: 1, padding: '0.85rem 1rem', border: 'none', outline: 'none',
                   fontSize: '0.9rem', color: '#1e293b', backgroundColor: 'transparent',
@@ -480,18 +591,15 @@ export default function TrackPage() {
               </div>
             )}
 
-            {/* Demo Tags */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '0.77rem', color: '#64748b', alignSelf: 'center' }}>Demo Lab:</span>
-              {labDatabase.map((s) => (
-                <button key={s.code} onClick={() => { setLabQuery(s.code); setLabResult(s); setLabError(null); }} style={{
-                  backgroundColor: '#f1f5f9', border: '1.5px solid #cbd5e1', borderRadius: '9999px',
-                  padding: '0.15rem 0.65rem', fontSize: '0.75rem', fontWeight: 700, color: '#0d6e38',
-                  cursor: 'pointer', transition: 'all 0.2s ease',
-                }}>
-                  {s.code}
-                </button>
-              ))}
+            {/* Hint Tips */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.77rem', color: '#64748b' }}>Pelacakan SPK:</span>
+              <span style={{
+                backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '6px',
+                padding: '0.2rem 0.6rem', fontSize: '0.75rem', fontWeight: 700, color: '#047857',
+              }}>
+                Hanya dapat dilacak menggunakan Nomor SPK (Contoh: CE-2/09-26/297)
+              </span>
             </div>
 
             {labResult && <LabResult data={labResult} onClose={() => setLabResult(null)} />}

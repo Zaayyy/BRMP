@@ -67,10 +67,14 @@ export async function apiFetch(endpoint, options = {}) {
   try {
     const response = await fetch(url, fetchConfig);
 
-    // Parse response
-    const contentType = response.headers.get('content-type');
-    const isJson = contentType && contentType.includes('application/json');
-    const responseData = isJson ? await response.json() : await response.text();
+    // Parse response secara aman (cegah Unexpected end of JSON input)
+    const responseText = await response.text();
+    let responseData;
+    try {
+      responseData = responseText ? JSON.parse(responseText) : {};
+    } catch (parseErr) {
+      responseData = { message: responseText || `HTTP ${response.status}: ${response.statusText}` };
+    }
 
     // -------------------------------------------------------------
     // 5. INTERCEPTOR ERROR HANDLING (401 Unauthorized / Token Expired)
@@ -86,6 +90,10 @@ export async function apiFetch(endpoint, options = {}) {
       const errorMessage =
         (typeof responseData === 'object' && (responseData.message || responseData.error)) ||
         'Sesi telah berakhir atau Anda belum login. Silakan login kembali.';
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: errorMessage }));
+      }
 
       const authError = new Error(errorMessage);
       authError.status = 401;
@@ -215,12 +223,28 @@ export const internalUserService = {
   delete: (id) => api.delete(`/api/internal/users/${id}`),
 };
 
+// 6. Service Internal Log Aktivitas Pengguna (Audit Trail)
+export const internalActivityService = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/api/internal/activities${query ? `?${query}` : ''}`);
+  },
+};
+
+// 7. Service Internal Pengaturan Sistem & Keamanan Akun (Khusus Admin)
+export const internalSettingsService = {
+  get: () => api.get('/api/internal/settings'),
+  update: (data) => api.post('/api/internal/settings', data),
+  changePassword: (data) => api.post('/api/internal/change-password', data),
+};
+
 // =============================================================
 // KONFIGURASI ROLE SISTEM BRMP DIY
 // =============================================================
 export const ROLES = {
   ADMIN: 'Admin',
   PETUGAS_LAB: 'PetugasLab',
+  ANALIS: 'Analis',
   PETUGAS_LAYANAN: 'PetugasLayanan',
   PETUGAS_BENIH: 'PetugasBenih',
 };
@@ -228,9 +252,21 @@ export const ROLES = {
 export const ROLE_LIST = [
   'Admin',
   'PetugasLab',
+  'Analis',
   'PetugasLayanan',
   'PetugasBenih',
 ];
+
+export const normalizeRole = (rawRole) => {
+  if (!rawRole) return 'Admin';
+  const r = String(rawRole).trim().toLowerCase();
+  if (r.includes('analis') || r === 'anl') return 'Analis';
+  if (r.includes('lab') || r === 'petugaslab') return 'PetugasLab';
+  if (r.includes('layan') || r === 'petugaslayanan' || r === 'lyn') return 'PetugasLayanan';
+  if (r.includes('benih') || r === 'petugasbenih' || r === 'bnh') return 'PetugasBenih';
+  if (r.includes('admin') || r === 'adm') return 'Admin';
+  return rawRole;
+};
 
 export const ROLE_DETAILS = {
   Admin: {
@@ -240,14 +276,49 @@ export const ROLE_DETAILS = {
     badgeClass: 'bg-emerald-500/15 text-emerald-700 border-emerald-300',
     color: '#0f9957',
   },
+  admin: {
+    label: 'Administrator',
+    shortCode: 'ADM',
+    desc: 'Akses penuh seluruh modul sistem & manajemen akun',
+    badgeClass: 'bg-emerald-500/15 text-emerald-700 border-emerald-300',
+    color: '#0f9957',
+  },
   PetugasLab: {
     label: 'Petugas Laboratorium',
     shortCode: 'LAB',
-    desc: 'Pengujian sampel & tracking status laboratorium benih',
+    desc: 'Pendaftaran sampel, register, dan manajemen logbook lab',
     badgeClass: 'bg-blue-500/15 text-blue-700 border-blue-300',
     color: '#2563eb',
   },
+  petugaslab: {
+    label: 'Petugas Laboratorium',
+    shortCode: 'LAB',
+    desc: 'Pendaftaran sampel, register, dan manajemen logbook lab',
+    badgeClass: 'bg-blue-500/15 text-blue-700 border-blue-300',
+    color: '#2563eb',
+  },
+  Analis: {
+    label: 'Analis Laboratorium',
+    shortCode: 'ANL',
+    desc: 'Pengujian teknis, isi parameter uji, buku logbook & tahapan proses',
+    badgeClass: 'bg-purple-500/15 text-purple-700 border-purple-300',
+    color: '#9333ea',
+  },
+  analis: {
+    label: 'Analis Laboratorium',
+    shortCode: 'ANL',
+    desc: 'Pengujian teknis, isi parameter uji, buku logbook & tahapan proses',
+    badgeClass: 'bg-purple-500/15 text-purple-700 border-purple-300',
+    color: '#9333ea',
+  },
   PetugasLayanan: {
+    label: 'Petugas Layanan & Pengaduan',
+    shortCode: 'LYN',
+    desc: 'Penerimaan permohonan & tindak lanjut aduan masyarakat',
+    badgeClass: 'bg-amber-500/15 text-amber-700 border-amber-300',
+    color: '#d97706',
+  },
+  petugaslayanan: {
     label: 'Petugas Layanan & Pengaduan',
     shortCode: 'LYN',
     desc: 'Penerimaan permohonan & tindak lanjut aduan masyarakat',
@@ -261,6 +332,27 @@ export const ROLE_DETAILS = {
     badgeClass: 'bg-teal-500/15 text-teal-700 border-teal-300',
     color: '#0d9488',
   },
+  petugasbenih: {
+    label: 'Petugas Perbenihan',
+    shortCode: 'BNH',
+    desc: 'Pengelolaan data jenis benih & monitoring stok gudang',
+    badgeClass: 'bg-teal-500/15 text-teal-700 border-teal-300',
+    color: '#0d9488',
+  },
+};
+
+export const getRoleDetails = (rawRole) => {
+  const normalized = normalizeRole(rawRole);
+  return (
+    ROLE_DETAILS[normalized] ||
+    ROLE_DETAILS[rawRole] || {
+      label: rawRole || 'Pengguna',
+      shortCode: 'USR',
+      desc: 'Pengguna Sistem',
+      badgeClass: 'bg-slate-500/15 text-slate-700 border-slate-300',
+      color: '#64748b',
+    }
+  );
 };
 
 export default api;

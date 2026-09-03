@@ -17,17 +17,19 @@ import {
 import { authService, ROLE_DETAILS } from "../services/apiService";
 
 const ALL_SIDEBAR_ITEMS = [
-    { label: "Dashboard",    icon: LayoutDashboard, key: "dashboard", roles: ["Admin", "PetugasLab", "PetugasLayanan", "PetugasBenih"] },
+    { label: "Dashboard",    icon: LayoutDashboard, key: "dashboard", roles: ["Admin"] },
     { label: "Permohonan",   icon: ClipboardList,   key: "permohonan", roles: ["Admin", "PetugasLayanan"] },
     {
         label: "Laboratorium",
         icon: FlaskConical,
         key: "laboratorium-jenis-sampel",
-        roles: ["Admin", "PetugasLab"],
+        roles: ["Admin", "PetugasLab", "Analis"],
         children: [
-            { label: "Jenis Sampel",     key: "laboratorium-jenis-sampel" },
-            { label: "Masuk",            key: "laboratorium-masuk" },
-            { label: "Laporan Selesai",  key: "laboratorium-laporan-selesai" },
+            { label: "Jenis Sampel", key: "laboratorium-jenis-sampel", roles: ["Admin", "PetugasLab"] },
+            { label: "Masuk (Belum Bayar)", key: "laboratorium-masuk", roles: ["Admin", "PetugasLab"] },
+            { label: "Proses Pengujian", key: "laboratorium-proses-uji", roles: ["Admin", "PetugasLab"] },
+            { label: "Laporan Selesai", key: "laboratorium-laporan-selesai", roles: ["Admin", "PetugasLab"] },
+            { label: "Buku Analis (Parameter)", key: "laboratorium-buku-analis", roles: ["Admin", "Analis"] },
         ],
     },
     {
@@ -41,7 +43,7 @@ const ALL_SIDEBAR_ITEMS = [
         ],
     },
     { label: "User",        icon: Users,    key: "user", roles: ["Admin"] },
-    { label: "Pengaturan",  icon: Settings, key: "pengaturan", roles: ["Admin", "PetugasLab", "PetugasLayanan", "PetugasBenih"] },
+    { label: "Pengaturan",  icon: Settings, key: "pengaturan", roles: ["Admin"] },
 ];
 
 export default function AdminShell({ activeView, onNavigate, onLogout, children }) {
@@ -54,10 +56,26 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
         badgeClass: "bg-emerald-500/15 text-emerald-700",
     };
 
-    // Filter sidebar items based on current user role
-    const visibleSidebarItems = ALL_SIDEBAR_ITEMS.filter((item) =>
-        item.roles ? item.roles.includes(userRole) : true
-    );
+    // Filter sidebar items dan children berdasarkan userRole
+    const visibleSidebarItems = ALL_SIDEBAR_ITEMS
+        .filter((item) => (item.roles ? item.roles.includes(userRole) : true))
+        .map((item) => {
+            if (Array.isArray(item.children)) {
+                const filteredChildren = item.children.filter((c) =>
+                    c.roles ? c.roles.includes(userRole) : true
+                );
+                const defaultKey = userRole === "Analis" && item.key.startsWith("laboratorium")
+                    ? "laboratorium-buku-analis"
+                    : (filteredChildren[0]?.key || item.key);
+
+                return {
+                    ...item,
+                    key: defaultKey,
+                    children: filteredChildren,
+                };
+            }
+            return item;
+        });
 
     return (
         <div className="min-h-screen lg:flex bg-transparent">
@@ -216,11 +234,13 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
                     <div className="rounded-2xl border border-white/8 bg-white/5 p-3 backdrop-blur-sm">
                         <div className="flex items-center gap-3 mb-3">
                             <div
-                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-black text-white"
+                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-black text-white shadow-sm"
                                 style={{
                                     background:
                                         userRole === "Admin"
                                             ? "linear-gradient(135deg, #059669, #065f46)"
+                                            : userRole === "Analis"
+                                            ? "linear-gradient(135deg, #9333ea, #581c87)"
                                             : userRole === "PetugasLab"
                                             ? "linear-gradient(135deg, #2563eb, #1e40af)"
                                             : userRole === "PetugasLayanan"

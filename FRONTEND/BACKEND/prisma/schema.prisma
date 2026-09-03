@@ -75,8 +75,16 @@ model Benih {
 /// 3. LabTracking: Status uji laboratorium
 model LabTracking {
   id                Int       @id @default(autoincrement())
+  no_reg            String?   @map("no_reg") @db.VarChar(50)
+  spk               String?   @map("spk") @db.VarChar(100)
   kode_tracking     String    @unique @map("kode_tracking") @db.VarChar(50)
   nama_pemohon      String    @map("nama_pemohon") @db.VarChar(150)
+  sampel_tanah      String?   @map("sampel_tanah") @db.VarChar(100)
+  sampel_air        String?   @map("sampel_air") @db.VarChar(100)
+  sampel_pupuk      String?   @map("sampel_pupuk") @db.VarChar(100)
+  sampel_tanaman    String?   @map("sampel_tanaman") @db.VarChar(100)
+  telepon           String?   @map("telepon") @db.VarChar(50)
+  biaya             String?   @map("biaya") @db.VarChar(100)
   status_uji        StatusUji @default(Diterima) @map("status_uji")
   hasil_dokumen_url String?   @map("hasil_dokumen_url") @db.MediumText
   keterangan        String?   @db.Text

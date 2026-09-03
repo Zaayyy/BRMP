@@ -20,7 +20,7 @@ import {
     ArrowLeft,
     Check,
 } from "lucide-react";
-import { internalUserService, ROLE_LIST, ROLE_DETAILS, authService } from "./services/apiService";
+import { internalUserService, ROLE_LIST, ROLE_DETAILS, getRoleDetails, normalizeRole, authService } from "./services/apiService";
 
 const DEFAULT_USERS_MOCK = [
     { id: 1, nama: "Administrator BRMP DIY", email: "admin@brmpdiy.go.id", role: "Admin", createdAt: "2026-08-19T00:00:00.000Z" },
@@ -88,14 +88,18 @@ export default function UserMen({ onNavigate }) {
 
     // Filter and search computation
     const filteredUsers = useMemo(() => {
-        return users.filter((u) => {
+        return users.map((u) => ({
+            ...u,
+            role: normalizeRole(u.role),
+        })).filter((u) => {
             const matchRole = selectedRoleFilter === "ALL" || u.role === selectedRoleFilter;
             const query = searchQuery.toLowerCase().trim();
+            const roleInfo = getRoleDetails(u.role);
             const matchSearch =
                 !query ||
                 u.nama?.toLowerCase().includes(query) ||
                 u.email?.toLowerCase().includes(query) ||
-                ROLE_DETAILS[u.role]?.label?.toLowerCase().includes(query);
+                roleInfo.label?.toLowerCase().includes(query);
             return matchRole && matchSearch;
         });
     }, [users, selectedRoleFilter, searchQuery]);
@@ -106,12 +110,14 @@ export default function UserMen({ onNavigate }) {
             total: users.length,
             Admin: 0,
             PetugasLab: 0,
+            Analis: 0,
             PetugasLayanan: 0,
             PetugasBenih: 0,
         };
         users.forEach((u) => {
-            if (counts[u.role] !== undefined) {
-                counts[u.role] += 1;
+            const norm = normalizeRole(u.role);
+            if (counts[norm] !== undefined) {
+                counts[norm] += 1;
             }
         });
         return counts;
@@ -211,7 +217,7 @@ export default function UserMen({ onNavigate }) {
         setEditForm({
             nama: u.nama || "",
             email: u.email || "",
-            role: u.role || "PetugasLab",
+            role: normalizeRole(u.role) || "PetugasLab",
             password: "",
         });
         setIsEditModalOpen(true);
@@ -346,11 +352,14 @@ export default function UserMen({ onNavigate }) {
     };
 
     const getRoleIcon = (role) => {
-        switch (role) {
+        const norm = normalizeRole(role);
+        switch (norm) {
             case "Admin":
                 return <Shield size={16} className="text-emerald-600" />;
             case "PetugasLab":
                 return <FlaskConical size={16} className="text-blue-600" />;
+            case "Analis":
+                return <FlaskConical size={16} className="text-purple-600" />;
             case "PetugasLayanan":
                 return <Headphones size={16} className="text-amber-600" />;
             case "PetugasBenih":
@@ -376,7 +385,7 @@ export default function UserMen({ onNavigate }) {
                                 Manajemen Pengguna
                             </h1>
                             <p className="text-xs font-medium text-slate-500">
-                                Kelola akun petugas &amp; hak akses 4 role sistem BRMP DIY
+                                Kelola akun petugas &amp; hak akses role sistem BRMP DIY
                             </p>
                         </div>
                     </div>
@@ -404,9 +413,9 @@ export default function UserMen({ onNavigate }) {
             </div>
 
             {/* ====================================================
-                STATISTICS CARDS (4 ROLES)
+                STATISTICS CARDS (5 ROLES)
                 ==================================================== */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 {/* Total User */}
                 <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
                     <div className="flex items-center justify-between">
@@ -454,7 +463,26 @@ export default function UserMen({ onNavigate }) {
                         </div>
                     </div>
                     <p className="mt-2 text-2xl font-extrabold text-blue-900">{stats.PetugasLab}</p>
-                    <span className="text-[11px] font-medium text-blue-700/80">Laboratorium Uji</span>
+                    <span className="text-[11px] font-medium text-blue-700/80">Register Lab</span>
+                </div>
+
+                {/* Analis */}
+                <div
+                    onClick={() => setSelectedRoleFilter(selectedRoleFilter === "Analis" ? "ALL" : "Analis")}
+                    className={`cursor-pointer rounded-2xl border p-4 shadow-sm transition-all ${
+                        selectedRoleFilter === "Analis"
+                            ? "border-purple-500 bg-purple-50/60 ring-2 ring-purple-500/20"
+                            : "border-slate-200/80 bg-white hover:border-purple-300"
+                    }`}
+                >
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-purple-700">Analis</span>
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+                            <FlaskConical size={14} />
+                        </div>
+                    </div>
+                    <p className="mt-2 text-2xl font-extrabold text-purple-900">{stats.Analis}</p>
+                    <span className="text-[11px] font-medium text-purple-700/80">Analis Pengujian</span>
                 </div>
 
                 {/* Petugas Layanan */}
@@ -492,7 +520,7 @@ export default function UserMen({ onNavigate }) {
                         </div>
                     </div>
                     <p className="mt-2 text-2xl font-extrabold text-teal-900">{stats.PetugasBenih}</p>
-                    <span className="text-[11px] font-medium text-teal-700/80">Stok &amp; Katalog Benih</span>
+                    <span className="text-[11px] font-medium text-teal-700/80">Stok &amp; Benih</span>
                 </div>
             </div>
 
@@ -598,11 +626,8 @@ export default function UserMen({ onNavigate }) {
                                 </tr>
                             ) : (
                                 filteredUsers.map((u) => {
-                                    const roleInfo = ROLE_DETAILS[u.role] || {
-                                        label: u.role,
-                                        badgeClass: "bg-slate-100 text-slate-700 border-slate-300",
-                                        desc: "-",
-                                    };
+                                    const normRole = normalizeRole(u.role);
+                                    const roleInfo = getRoleDetails(u.role);
                                     const isSelf = currentUser?.id === u.id || currentUser?.email === u.email;
 
                                     return (
@@ -614,11 +639,13 @@ export default function UserMen({ onNavigate }) {
                                                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-sm"
                                                         style={{
                                                             background:
-                                                                u.role === "Admin"
+                                                                normRole === "Admin"
                                                                     ? "linear-gradient(135deg, #059669, #065f46)"
-                                                                    : u.role === "PetugasLab"
+                                                                    : normRole === "Analis"
+                                                                    ? "linear-gradient(135deg, #9333ea, #581c87)"
+                                                                    : normRole === "PetugasLab"
                                                                     ? "linear-gradient(135deg, #2563eb, #1e40af)"
-                                                                    : u.role === "PetugasLayanan"
+                                                                    : normRole === "PetugasLayanan"
                                                                     ? "linear-gradient(135deg, #d97706, #92400e)"
                                                                     : "linear-gradient(135deg, #0d9488, #115e59)",
                                                         }}

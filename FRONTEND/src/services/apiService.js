@@ -200,13 +200,17 @@ export const internalBenihService = {
 // 5. Service Publik (Tanpa Autentikasi)
 export const pengaduanService = {
   submitPublic: (data) => api.post('/api/public/pengaduan', data),
-  trackByCodePublic: (kodeTracking) =>
-    api.get(`/api/public/pengaduan/track/${encodeURIComponent(kodeTracking)}`),
+  trackByCodePublic: (kodeTracking) => {
+    const clean = String(kodeTracking || '').trim();
+    return api.get(`/api/public/pengaduan/track?q=${encodeURIComponent(clean)}`);
+  },
 };
 
 export const labService = {
-  trackByCodePublic: (kodeTracking) =>
-    api.get(`/api/public/tracking/${encodeURIComponent(kodeTracking)}`),
+  trackByCodePublic: (kodeTracking) => {
+    const clean = String(kodeTracking || '').trim();
+    return api.get(`/api/public/tracking?q=${encodeURIComponent(clean)}`);
+  },
 };
 
 export const benihService = {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle, Sparkles, Phone } from 'lucide-react';
+import { Search, CheckCircle, Download, X, FlaskConical, Clock, FileText, ExternalLink, AlertCircle, Sparkles, Phone, Tag } from 'lucide-react';
 import { labService } from '../services/apiService';
 
 function useScrollReveal(threshold = 0.15) {
@@ -13,7 +13,7 @@ function useScrollReveal(threshold = 0.15) {
   return [ref, visible];
 }
 
-const STEPS = ['Pengajuan Diterima', 'Verifikasi Sampel', 'Pengujian Lab', 'Analisis Hasil', 'Laporan Selesai'];
+const STEPS = ['Pembayaran', 'Verif Sampel', 'Pengujian', 'Analis Data', 'Selesai'];
 
 export default function LabTracking() {
   const [sectionRef, sectionVisible] = useScrollReveal();
@@ -34,17 +34,40 @@ export default function LabTracking() {
       const res = await labService.trackByCodePublic(q);
       if (res && res.success && res.data) {
         const item = res.data;
-        const stepNum = item.status_uji === 'Selesai' ? 5 : item.status_uji === 'Proses' ? 3 : 1;
+        let stepNum = 1;
+        const s = (item.status_uji || item.statusUji || '').toLowerCase().trim();
+        if (s.includes('selesai')) stepNum = 5;
+        else if (s.includes('analis') || s.includes('analisis') || s.includes('data')) stepNum = 4;
+        else if (s.includes('pengujian') || s.includes('proses') || s.includes('ekstraksi') || s.includes('destruksi')) stepNum = 3;
+        else if (s.includes('verif') || s.includes('preparasi')) stepNum = 2;
+        else stepNum = 1;
 
         setActiveResult({
-          code: item.kode_tracking || `#${item.id}`,
-          title: item.keterangan || 'Pengujian Mutu & Standar Laboratorium BRMP DIY',
-          pemohon: item.nama_pemohon || 'Pemohon Terdaftar',
-          tanggalMasuk: item.tanggal_masuk ? new Date(item.tanggal_masuk).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Baru Masuk',
-          status: item.status_uji,
+          id: item.id,
+          noReg: item.no_reg || item.noReg || `#${item.id}`,
+          spk: item.spk || item.noSpk || item.kode_tracking || `#${item.id}`,
+          code: item.spk || item.kode_tracking || `#${item.id}`,
+          pemohon: item.nama_pemohon || item.namaPemohon || 'Pemohon Terdaftar',
+          sampelTanah: item.sampel_tanah || item.sampelTanah || null,
+          sampelAir: item.sampel_air || item.sampelAir || null,
+          sampelPupuk: item.sampel_pupuk || item.sampelPupuk || null,
+          sampelTanaman: item.sampel_tanaman || item.sampelTanaman || null,
+          jumlahSampel: item.jumlah_sampel || item.jumlahSampel || item.jumlah || '1',
+          parameterUji: item.parameter_uji || item.parameterUji || null,
+          telepon: item.telepon || item.noTelepon || null,
+          biaya: item.biaya || null,
+          statusBayar: item.status_bayar || item.statusBayar || 'Belum Bayar',
+          tahapProses: item.tahap_proses || item.tahapProses || (item.status_uji === 'Selesai' ? '6. Penerbitan & Pengesahan Laporan Hasil Uji (LHU)' : '3. Destruksi / Ekstraksi Kimia di Laboratorium'),
+          tanggalMasuk: item.tanggal_masuk || item.tanggalMasuk
+            ? new Date(item.tanggal_masuk || item.tanggalMasuk).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : 'Baru Masuk',
+          tanggalSelesai: item.tanggal_selesai || item.tanggalSelesai
+            ? new Date(item.tanggal_selesai || item.tanggalSelesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+            : null,
+          status: item.status_uji || item.statusUji || 'Pengujian',
           step: stepNum,
-          dokumenUrl: item.hasil_dokumen_url,
-          keterangan: item.keterangan,
+          dokumenUrl: item.hasil_dokumen_url || item.hasilDokumenUrl || null,
+          keterangan: item.keterangan || '',
         });
         return;
       }
@@ -54,7 +77,7 @@ export default function LabTracking() {
       setIsLoading(false);
     }
 
-    setNotFoundMsg(`Kode sampel atau nomor pengujian '${q}' tidak ditemukan di database laboratorium BRMP DIY.`);
+    setNotFoundMsg(`Nomor SPK atau kode pengujian '${q}' tidak ditemukan di database laboratorium BRMP DIY.`);
   };
 
   return (
@@ -114,8 +137,8 @@ export default function LabTracking() {
             Tracking Uji Laboratorium BRMP DIY
           </h2>
 
-          <p style={{ fontSize: '0.98rem', color: '#64748b', lineHeight: 1.65, maxWidth: '640px', margin: '0 auto' }}>
-            Pantau proses pengujian mutu benih, analisis tanah, dan instrumen pertanian secara transparan langsung dari database laboratorium.
+          <p style={{ fontSize: '0.98rem', color: '#64748b', lineHeight: 1.65, maxWidth: '680px', margin: '0 auto' }}>
+            Pantau status pengujian sampel <strong>Tanah [TH]</strong>, <strong>Air [A]</strong>, <strong>Pupuk [P]</strong>, dan <strong>Jaringan Tanaman [TMN]</strong> secara transparan menggunakan Nomor SPK / Kode Register.
           </p>
         </div>
 
@@ -147,7 +170,7 @@ export default function LabTracking() {
               type="text"
               value={query}
               onChange={(e) => { setQuery(e.target.value); setNotFoundMsg(null); }}
-              placeholder="Masukkan Kode Tracking Pengujian Lab (contoh: LAB-2026-001)..."
+              placeholder="Masukkan Nomor SPK resmi (contoh: CE-2/09-26/297)..."
               style={{
                 flex: 1, border: 'none', outline: 'none',
                 fontSize: '0.95rem', color: '#1e293b', backgroundColor: 'transparent',
@@ -169,55 +192,24 @@ export default function LabTracking() {
               onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
               onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
-              {isLoading ? 'Mencari...' : 'Cari Hasil Lab'}
+              {isLoading ? 'Mencari...' : 'Lacak Status Uji'}
             </button>
           </form>
 
-          {/* WhatsApp Assistance Bar */}
+          {/* SPK Notice Bar */}
           <div style={{
             marginTop: '1.25rem',
             display: 'flex',
-            flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '0.65rem',
-            fontSize: '0.88rem',
-            color: '#334155',
-            fontWeight: 600,
+            gap: '0.5rem',
+            fontSize: '0.82rem',
+            color: '#065f46',
+            fontWeight: 700,
           }}>
-            <span style={{ color: '#475569' }}>
-              Butuh bantuan? Hubungi kami
+            <span style={{ backgroundColor: '#ecfdf5', color: '#047857', padding: '0.3rem 0.85rem', borderRadius: '9999px', border: '1px solid #a7f3d0' }}>
+              ℹ️ Pelacakan Resmi: Gunakan Nomor SPK lengkap yang tertera pada tanda terima sampel (Contoh: CE-2/09-26/297)
             </span>
-            <a
-              href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY%2C%20saya%20butuh%20bantuan%20mengenai%20informasi%20pengujian%20lab%20dan%20layanan%20BRMP."
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                backgroundColor: '#25D366',
-                color: '#ffffff',
-                padding: '0.45rem 1.1rem',
-                borderRadius: '9999px',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(37,211,102,0.35)',
-                transition: 'all 0.25s ease',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-                e.currentTarget.style.backgroundColor = '#1eb956';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.backgroundColor = '#25D366';
-              }}
-            >
-              <Phone size={14} />
-              <span>Hubungi WhatsApp</span>
-            </a>
           </div>
 
           {/* Not Found Alert */}
@@ -258,11 +250,10 @@ export default function LabTracking() {
             style={{
               backgroundColor: '#ffffff',
               borderRadius: '26px',
-              maxWidth: '660px', width: '100%',
+              maxWidth: '680px', width: '100%',
               maxHeight: '90vh', overflowY: 'auto',
               padding: '2.2rem',
               boxShadow: '0 30px 70px -15px rgba(0,0,0,0.35)',
-              animation: 'scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1)',
               position: 'relative',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -287,36 +278,142 @@ export default function LabTracking() {
                 <FlaskConical size={28} />
               </div>
               <div>
-                <span style={{
-                  fontSize: '0.75rem', fontWeight: 800, color: '#059669',
-                  backgroundColor: '#dcfce7', padding: '0.25rem 0.7rem', borderRadius: '6px',
-                }}>
-                  {activeResult.code}
-                </span>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0f172a', marginTop: '0.35rem', lineHeight: 1.3 }}>
-                  {activeResult.title}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  <span style={{
+                    fontSize: '0.75rem', fontWeight: 800, color: '#059669',
+                    backgroundColor: '#dcfce7', padding: '0.2rem 0.65rem', borderRadius: '6px',
+                    fontFamily: 'monospace',
+                  }}>
+                    SPK: {activeResult.spk}
+                  </span>
+                  {activeResult.noReg && (
+                    <span style={{
+                      fontSize: '0.75rem', fontWeight: 800, color: '#475569',
+                      backgroundColor: '#f1f5f9', padding: '0.2rem 0.65rem', borderRadius: '6px',
+                      fontFamily: 'monospace',
+                    }}>
+                      No. Reg: {activeResult.noReg}
+                    </span>
+                  )}
+                </div>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: '#0f172a', marginTop: '0.35rem', lineHeight: 1.3 }}>
+                  {activeResult.pemohon}
                 </h3>
               </div>
             </div>
 
-            {/* Info Row */}
+            {/* Info Box: Sample Breakdown with Badges */}
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem',
-              backgroundColor: '#f8fafc', padding: '1.1rem', borderRadius: '16px',
+              backgroundColor: '#f8fafc', padding: '1.2rem', borderRadius: '18px',
               fontSize: '0.86rem', marginBottom: '1.6rem', border: '1px solid #e2e8f0',
             }}>
-              <div>
-                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Nama Pemohon:</span>
-                <strong style={{ color: '#0f172a', fontSize: '0.92rem' }}>{activeResult.pemohon}</strong>
+              <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.9rem',
+                marginBottom: '1rem', paddingBottom: '0.9rem', borderBottom: '1px solid #e2e8f0',
+              }}>
+                <div>
+                  <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Tanggal Penerimaan:</span>
+                  <strong style={{ color: '#0f172a', fontSize: '0.9rem' }}>{activeResult.tanggalMasuk}</strong>
+                </div>
+                {activeResult.tanggalSelesai && (
+                  <div>
+                    <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Tanggal Selesai:</span>
+                    <strong style={{ color: '#166534', fontSize: '0.9rem' }}>{activeResult.tanggalSelesai}</strong>
+                  </div>
+                )}
+                <div>
+                  <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Status Pengujian:</span>
+                  <span style={{
+                    display: 'inline-block',
+                    fontSize: '0.75rem', fontWeight: 800, padding: '0.15rem 0.6rem', borderRadius: '9999px',
+                    backgroundColor: activeResult.status === 'Selesai' ? '#dcfce7' : '#fef3c7',
+                    color: activeResult.status === 'Selesai' ? '#166534' : '#92400e',
+                  }}>
+                    {activeResult.status}
+                  </span>
+                </div>
               </div>
+
+              {/* Rincian Nomor Sampel per Kategori */}
               <div>
-                <span style={{ color: '#64748b', display: 'block', marginBottom: '0.15rem', fontSize: '0.78rem' }}>Tanggal Penerimaan Sampel:</span>
-                <strong style={{ color: '#0f172a', fontSize: '0.92rem' }}>{activeResult.tanggalMasuk}</strong>
+                <span style={{ color: '#475569', fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.5rem' }}>
+                  Rincian Sampel Terdaftar ({activeResult.jumlahSampel || 1} Sampel):
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {activeResult.sampelTanah && (
+                    <div style={{ backgroundColor: '#fef3c7', border: '1px solid #fde68a', borderRadius: '10px', padding: '0.35rem 0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#92400e', display: 'block' }}>TANAH [TH]</span>
+                      <strong style={{ fontSize: '0.85rem', color: '#78350f', fontFamily: 'monospace' }}>{activeResult.sampelTanah}</strong>
+                    </div>
+                  )}
+                  {activeResult.sampelAir && (
+                    <div style={{ backgroundColor: '#e0f2fe', border: '1px solid #bae6fd', borderRadius: '10px', padding: '0.35rem 0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#0369a1', display: 'block' }}>AIR [A]</span>
+                      <strong style={{ fontSize: '0.85rem', color: '#075985', fontFamily: 'monospace' }}>{activeResult.sampelAir}</strong>
+                    </div>
+                  )}
+                  {activeResult.sampelPupuk && (
+                    <div style={{ backgroundColor: '#f3e8ff', border: '1px solid #e9d5ff', borderRadius: '10px', padding: '0.35rem 0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#7e22ce', display: 'block' }}>PUPUK [P]</span>
+                      <strong style={{ fontSize: '0.85rem', color: '#6b21a8', fontFamily: 'monospace' }}>{activeResult.sampelPupuk}</strong>
+                    </div>
+                  )}
+                  {activeResult.sampelTanaman && (
+                    <div style={{ backgroundColor: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '0.35rem 0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#15803d', display: 'block' }}>JARINGAN TANAMAN [TMN]</span>
+                      <strong style={{ fontSize: '0.85rem', color: '#166534', fontFamily: 'monospace' }}>{activeResult.sampelTanaman}</strong>
+                    </div>
+                  )}
+                  {!activeResult.sampelTanah && !activeResult.sampelAir && !activeResult.sampelPupuk && !activeResult.sampelTanaman && (
+                    <span style={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '0.82rem' }}>Sampel pengujian mutu umum</span>
+                  )}
+                </div>
               </div>
+
+              {/* Parameter Uji jika ada */}
+              {activeResult.parameterUji && (
+                <div style={{ marginTop: '0.9rem', paddingTop: '0.8rem', borderTop: '1px solid #e2e8f0' }}>
+                  <span style={{ color: '#475569', fontWeight: 800, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.3rem' }}>
+                    Parameter Uji Analisis:
+                  </span>
+                  <p style={{ margin: 0, fontSize: '0.86rem', color: '#0f172a', fontWeight: 600, lineHeight: 1.5 }}>
+                    {activeResult.parameterUji}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Tahapan Proses Analisis Saat Ini (Real-Time Badge) */}
+            <div style={{
+              backgroundColor: '#ecfdf5',
+              border: '1.5px solid #a7f3d0',
+              borderRadius: '16px',
+              padding: '1rem 1.2rem',
+              marginBottom: '1.6rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.8rem',
+            }}>
+              <div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                  📍 Tahapan Analisis Saat Ini:
+                </span>
+                <strong style={{ fontSize: '0.96rem', color: '#064e3b', display: 'block', marginTop: '0.2rem' }}>
+                  {activeResult.tahapProses || '3. Destruksi / Ekstraksi Kimia di Laboratorium'}
+                </strong>
+              </div>
+              <span style={{
+                backgroundColor: '#059669', color: '#ffffff',
+                fontSize: '0.72rem', fontWeight: 800, padding: '0.25rem 0.65rem', borderRadius: '8px',
+                flexShrink: 0,
+              }}>
+                Progres Lab
+              </span>
             </div>
 
             {/* Progress Timeline */}
-            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1e293b', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: '#1e293b', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Tahapan Pengujian Laboratorium:
             </h4>
             <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', marginBottom: '2rem' }}>
@@ -357,19 +454,14 @@ export default function LabTracking() {
             </div>
 
             {/* Keterangan & Catatan Proses Pengujian oleh Petugas */}
-            <div style={{
-              backgroundColor: '#f8fafc',
-              border: '1.5px solid #cbd5e1',
-              borderRadius: '16px',
-              padding: '1.2rem',
-              marginBottom: '1.4rem',
-              textAlign: 'left',
-            }}>
+            {activeResult.keterangan && (
               <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '0.45rem',
+                backgroundColor: '#f8fafc',
+                border: '1.5px solid #cbd5e1',
+                borderRadius: '16px',
+                padding: '1.2rem',
+                marginBottom: '1.4rem',
+                textAlign: 'left',
               }}>
                 <span style={{
                   fontSize: '0.78rem',
@@ -377,34 +469,23 @@ export default function LabTracking() {
                   color: '#047857',
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
+                  display: 'block',
+                  marginBottom: '0.35rem',
                 }}>
-                  🔬 <span>Catatan & Keterangan Proses Petugas:</span>
+                  🔬 Catatan & Keterangan Analis:
                 </span>
-                <span style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '9999px',
-                  backgroundColor: activeResult.status === 'Selesai' ? '#dcfce7' : '#e0f2fe',
-                  color: activeResult.status === 'Selesai' ? '#15803d' : '#0369a1',
+                <p style={{
+                  margin: 0,
+                  fontSize: '0.9rem',
+                  lineHeight: 1.6,
+                  color: '#1e293b',
+                  fontWeight: 500,
+                  whiteSpace: 'pre-line',
                 }}>
-                  Status: {activeResult.status || 'Proses'}
-                </span>
+                  {activeResult.keterangan}
+                </p>
               </div>
-              <p style={{
-                margin: 0,
-                fontSize: '0.9rem',
-                lineHeight: 1.6,
-                color: '#1e293b',
-                fontWeight: 500,
-                whiteSpace: 'pre-line',
-              }}>
-                {activeResult.keterangan || 'Sampel sedang dalam tahapan pengujian dan verifikasi oleh tim laboratorium BRMP DIY.'}
-              </p>
-            </div>
+            )}
 
             {/* Document Link */}
             {activeResult.dokumenUrl ? (
@@ -421,7 +502,7 @@ export default function LabTracking() {
                 }}
               >
                 <Download size={18} />
-                <span>Unduh Dokumen Laporan Hasil Uji (PDF)</span>
+                <span>Unduh Dokumen Laporan Hasil Uji (LHU)</span>
               </a>
             ) : (
               <div style={{
@@ -429,7 +510,7 @@ export default function LabTracking() {
                 borderRadius: '14px', padding: '0.9rem', textAlign: 'center',
                 fontSize: '0.86rem', color: '#065f46', fontWeight: 600, marginBottom: '1rem',
               }}>
-                ℹ️ Sampel sedang dalam tahapan pengujian aktif laboratorium BRMP DIY.
+                ℹ️ Sampel sedang dalam tahapan pengujian aktif di laboratorium BRMP DIY.
               </div>
             )}
 
