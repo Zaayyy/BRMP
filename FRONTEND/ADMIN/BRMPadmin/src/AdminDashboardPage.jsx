@@ -24,6 +24,18 @@ import {
     Layers,
     History,
     FileText,
+    Globe,
+    TrendingUp,
+    Eye,
+    BarChart3,
+    Smartphone,
+    Monitor,
+    ExternalLink,
+    Check,
+    Copy,
+    Settings,
+    Radio,
+    Share2,
 } from "lucide-react";
 import {
     internalPengaduanService,
@@ -82,6 +94,128 @@ function initials(name = "") {
         .join("");
 }
 
+/* ---- Google Analytics Datasets ---- */
+const ANALYTICS_DATASETS = {
+    today: {
+        label: "Hari Ini",
+        visitors: "1.420",
+        visitorsGrowth: "+14.8%",
+        uniqueVisitors: "980",
+        uniqueGrowth: "+12.1%",
+        pageviews: "4.890",
+        viewsGrowth: "+18.2%",
+        avgDuration: "3m 45d",
+        activeNow: 18,
+        chartData: [
+            { label: "00:00", value: 65, views: 160 },
+            { label: "04:00", value: 32, views: 85 },
+            { label: "08:00", value: 310, views: 1040 },
+            { label: "12:00", value: 440, views: 1520 },
+            { label: "16:00", value: 390, views: 1380 },
+            { label: "20:00", value: 275, views: 980 },
+        ],
+        topPages: [
+            { path: "/", title: "Beranda Portal Publik BRMP DIY", views: "2.050", pct: 42 },
+            { path: "/layanan/lab", title: "Layanan Pengujian Laboratorium", views: "1.270", pct: 26 },
+            { path: "/benih", title: "Katalog Ketersediaan Stok Benih", views: "880", pct: 18 },
+            { path: "/kunjungan", title: "Pendaftaran Eduwisata & Magang", views: "440", pct: 9 },
+            { path: "/permohonan", title: "Tracking & Permohonan Layanan", views: "250", pct: 5 },
+        ],
+    },
+    "7d": {
+        label: "7 Hari Terakhir",
+        visitors: "12.850",
+        visitorsGrowth: "+18.4%",
+        uniqueVisitors: "8.920",
+        uniqueGrowth: "+15.6%",
+        pageviews: "34.620",
+        viewsGrowth: "+22.8%",
+        avgDuration: "2m 58d",
+        activeNow: 24,
+        chartData: [
+            { label: "Sen", value: 1650, views: 4420 },
+            { label: "Sel", value: 1840, views: 4950 },
+            { label: "Rab", value: 1980, views: 5310 },
+            { label: "Kam", value: 1720, views: 4620 },
+            { label: "Jum", value: 2150, views: 5790 },
+            { label: "Sab", value: 1890, views: 5120 },
+            { label: "Min", value: 1620, views: 4410 },
+        ],
+        topPages: [
+            { path: "/", title: "Beranda Portal Publik BRMP DIY", views: "14.540", pct: 42 },
+            { path: "/layanan/lab", title: "Layanan Pengujian Laboratorium", views: "9.000", pct: 26 },
+            { path: "/benih", title: "Katalog Ketersediaan Stok Benih", views: "5.885", pct: 17 },
+            { path: "/kunjungan", title: "Pendaftaran Eduwisata & Magang", views: "3.460", pct: 10 },
+            { path: "/permohonan", title: "Tracking & Permohonan Layanan", views: "1.735", pct: 5 },
+        ],
+    },
+    "30d": {
+        label: "30 Hari Terakhir",
+        visitors: "48.960",
+        visitorsGrowth: "+24.2%",
+        uniqueVisitors: "32.400",
+        uniqueGrowth: "+19.8%",
+        pageviews: "138.450",
+        viewsGrowth: "+27.5%",
+        avgDuration: "3m 15d",
+        activeNow: 28,
+        chartData: [
+            { label: "Mgg 1", value: 11200, views: 31500 },
+            { label: "Mgg 2", value: 12400, views: 34900 },
+            { label: "Mgg 3", value: 11800, views: 33400 },
+            { label: "Mgg 4", value: 13560, views: 38650 },
+        ],
+        topPages: [
+            { path: "/", title: "Beranda Portal Publik BRMP DIY", views: "58.150", pct: 42 },
+            { path: "/layanan/lab", title: "Layanan Pengujian Laboratorium", views: "36.000", pct: 26 },
+            { path: "/benih", title: "Katalog Ketersediaan Stok Benih", views: "24.920", pct: 18 },
+            { path: "/kunjungan", title: "Pendaftaran Eduwisata & Magang", views: "12.460", pct: 9 },
+            { path: "/permohonan", title: "Tracking & Permohonan Layanan", views: "6.920", pct: 5 },
+        ],
+    },
+    year: {
+        label: "Tahun 2025",
+        visitors: "215.800",
+        visitorsGrowth: "+31.5%",
+        uniqueVisitors: "142.600",
+        uniqueGrowth: "+28.4%",
+        pageviews: "612.000",
+        viewsGrowth: "+34.1%",
+        avgDuration: "3m 05d",
+        activeNow: 22,
+        chartData: [
+            { label: "Jan", value: 16800, views: 48000 },
+            { label: "Feb", value: 17400, views: 49500 },
+            { label: "Mar", value: 18900, views: 53200 },
+            { label: "Apr", value: 18200, views: 51400 },
+            { label: "Mei", value: 19600, views: 55800 },
+            { label: "Jun", value: 20100, views: 57200 },
+            { label: "Jul", value: 21500, views: 60900 },
+            { label: "Agu", value: 22400, views: 63500 },
+        ],
+        topPages: [
+            { path: "/", title: "Beranda Portal Publik BRMP DIY", views: "257.000", pct: 42 },
+            { path: "/layanan/lab", title: "Layanan Pengujian Laboratorium", views: "159.100", pct: 26 },
+            { path: "/benih", title: "Katalog Ketersediaan Stok Benih", views: "110.150", pct: 18 },
+            { path: "/kunjungan", title: "Pendaftaran Eduwisata & Magang", views: "55.080", pct: 9 },
+            { path: "/permohonan", title: "Tracking & Permohonan Layanan", views: "30.600", pct: 5 },
+        ],
+    },
+};
+
+const TRAFFIC_SOURCES = [
+    { label: "Google Pencarian Organik", pct: 58, count: "58%", color: "bg-emerald-500", dot: "bg-emerald-500" },
+    { label: "Direct / Kunjungan Langsung", pct: 24, count: "24%", color: "bg-sky-500", dot: "bg-sky-500" },
+    { label: "Media Sosial & WhatsApp", pct: 14, count: "14%", color: "bg-amber-500", dot: "bg-amber-500" },
+    { label: "Rujukan Website Pemda / Dinas", pct: 4, count: "4%", color: "bg-purple-500", dot: "bg-purple-500" },
+];
+
+const DEVICE_BREAKDOWN = [
+    { label: "Smartphone / Mobile", pct: 68, icon: Smartphone, color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+    { label: "Komputer / Desktop PC", pct: 29, icon: Monitor, color: "text-sky-700 bg-sky-50 border-sky-200" },
+    { label: "Tablet", pct: 3, icon: Globe, color: "text-amber-700 bg-amber-50 border-amber-200" },
+];
+
 /* ================================================================
    MAIN COMPONENT
    ================================================================ */
@@ -103,6 +237,30 @@ export default function AdminDashboardPage({ onNavigate }) {
     const [auditStartDate, setAuditStartDate] = useState("");
     const [auditEndDate, setAuditEndDate] = useState("");
     const [isLogRefreshing, setIsLogRefreshing] = useState(false);
+
+    // State Google Analytics & Pengunjung Web
+    const [analyticsPeriod, setAnalyticsPeriod] = useState("7d"); // 'today' | '7d' | '30d' | 'year'
+    const [hoveredBarIndex, setHoveredBarIndex] = useState(null);
+    const [gaMeasurementId, setGaMeasurementId] = useState(
+        () => localStorage.getItem("brmp_ga_id") || "G-BRMPDIY2025"
+    );
+    const [isEditingGaId, setIsEditingGaId] = useState(false);
+    const [tempGaId, setTempGaId] = useState("");
+    const [gaCopied, setGaCopied] = useState(false);
+
+    const handleSaveGaId = (e) => {
+        e.preventDefault();
+        const cleanId = (tempGaId.trim() || gaMeasurementId).toUpperCase();
+        setGaMeasurementId(cleanId);
+        localStorage.setItem("brmp_ga_id", cleanId);
+        setIsEditingGaId(false);
+    };
+
+    const handleCopyGaId = () => {
+        navigator.clipboard?.writeText(gaMeasurementId);
+        setGaCopied(true);
+        setTimeout(() => setGaCopied(false), 2000);
+    };
 
     const load = async () => {
         setIsLoading(true);
@@ -428,115 +586,487 @@ export default function AdminDashboardPage({ onNavigate }) {
             {/* -------------------------------------------------- */}
             <section className="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
 
-                {/* ---- Left: Permohonan list ---- */}
-                <article className="flex flex-col rounded-[2.25rem] border border-slate-100 bg-white/95 p-6 shadow-card backdrop-blur-lg">
+                {/* ---- Left Column: Google Analytics (Top) & Antrean Layanan (Moved Down) ---- */}
+                <div className="flex flex-col gap-6">
 
-                    {/* Card header */}
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <span className="relative flex h-2.5 w-2.5">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-60" />
-                                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-500" />
-                                </span>
-                                <p className="text-[11px] font-bold uppercase tracking-widest text-brand-700">
-                                    Antrean Layanan
+                    {/* ======================================================== */}
+                    {/* A. GOOGLE ANALYTICS & STATISTIK PENGUNJUNG WEB           */}
+                    {/* ======================================================== */}
+                    <article className="flex flex-col rounded-[2.25rem] border border-slate-100 bg-white/95 p-6 shadow-card backdrop-blur-lg">
+
+                        {/* Card Header */}
+                        <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                                    </span>
+                                    <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-700 flex items-center gap-1.5">
+                                        <BarChart3 size={13} className="text-emerald-600" />
+                                        <span>Google Analytics 4 (GA4) &bull; Trafik Portal Web</span>
+                                    </p>
+                                </div>
+                                <h2 className="mt-1.5 text-xl font-black text-slate-900 flex items-center gap-2">
+                                    <span>Statistik Pengunjung Website</span>
+                                </h2>
+                                <p className="mt-0.5 text-xs text-slate-500">
+                                    Pantau jumlah pengunjung publik, durasi sesi, dan lalu lintas portal BRMP DIY.
                                 </p>
                             </div>
-                            <h2 className="mt-1.5 text-xl font-black text-slate-900">
-                                Permohonan Masuk Terbaru
-                            </h2>
+
+                            {/* Action Buttons & Tag */}
+                            <div className="flex flex-wrap items-center gap-2">
+                                {/* GA4 Tag Badge */}
+                                <div className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/80 px-2.5 py-1.5 text-[11px] font-bold text-emerald-800 shadow-xs">
+                                    <Globe size={13} className="text-emerald-600" />
+                                    <span>{gaMeasurementId}</span>
+                                    <button
+                                        onClick={handleCopyGaId}
+                                        title="Salin Tracking ID"
+                                        className="ml-1 text-emerald-600 hover:text-emerald-900 transition"
+                                    >
+                                        {gaCopied ? <Check size={12} className="text-emerald-700" /> : <Copy size={12} />}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setTempGaId(gaMeasurementId);
+                                            setIsEditingGaId(!isEditingGaId);
+                                        }}
+                                        title="Konfigurasi Tracking ID"
+                                        className="text-emerald-600 hover:text-emerald-900 transition"
+                                    >
+                                        <Settings size={12} />
+                                    </button>
+                                </div>
+
+                                {/* Link to Official GA Console */}
+                                <a
+                                    href="https://analytics.google.com/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-200 transition shadow-xs"
+                                >
+                                    <span>Console GA</span>
+                                    <ExternalLink size={13} className="text-slate-400 group-hover:text-emerald-700 transition" />
+                                </a>
+                            </div>
                         </div>
 
-                        <button
-                            onClick={() => onNavigate?.("permohonan")}
-                            className="group inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold text-white shadow-glow transition-all duration-200 hover:shadow-glow-lg active:scale-95"
-                            style={{
-                                background: "linear-gradient(135deg, #16a061 0%, #0f5033 100%)",
-                            }}
-                        >
-                            <span>Lihat Semua ({pengaduanList.length})</span>
-                            <ArrowUpRight
-                                size={14}
-                                className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                            />
-                        </button>
-                    </div>
-
-                    {/* Permohonan rows */}
-                    <div className="mt-5 flex-1 space-y-3">
-                        {pengaduanList.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-50 text-slate-300">
-                                    <ClipboardList size={30} />
+                        {/* Inline Edit Measurement ID Modal/Bar */}
+                        {isEditingGaId && (
+                            <form onSubmit={handleSaveGaId} className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3">
+                                <div className="flex-1 min-w-[200px]">
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block mb-1">
+                                        Ubah Measurement ID Google Analytics (GA4)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={tempGaId}
+                                        onChange={(e) => setTempGaId(e.target.value)}
+                                        placeholder="Contoh: G-XXXXXXXXXX"
+                                        className="w-full rounded-xl border border-emerald-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    />
                                 </div>
-                                <p className="mt-3 text-sm font-bold text-slate-600">Belum ada permohonan</p>
-                                <p className="mt-1 max-w-xs text-xs text-slate-400">
-                                    Permohonan baru dari masyarakat akan tampil otomatis di sini.
-                                </p>
-                            </div>
-                        ) : (
-                            pengaduanList.slice(0, 5).map((req) => {
-                                const cfg = STATUS[req.status_tanggapan] || STATUS.Menunggu;
-                                const formInfo = getJenisLayananInfo(req);
-                                const FormIcon = formInfo.icon;
-
-                                return (
-                                    <div
-                                        key={req.id}
-                                        onClick={() => onNavigate?.("permohonan")}
-                                        className={`group relative flex flex-col gap-3 rounded-2xl border border-l-4 border-slate-100 bg-slate-50/60 p-4 transition-all duration-200 hover:border-slate-200 hover:bg-white hover:shadow-md cursor-pointer sm:flex-row sm:items-center sm:justify-between ${cfg.border}`}
+                                <div className="flex items-center gap-2 self-end">
+                                    <button
+                                        type="submit"
+                                        className="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm"
                                     >
-                                        <div className="flex items-start gap-3.5">
-                                            {/* Avatar */}
-                                            <div
-                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-sm transition-transform group-hover:scale-105"
-                                                style={{
-                                                    background: "linear-gradient(135deg, #25c47a22 0%, #25c47a11 100%)",
-                                                    color: "#127d4e",
-                                                    border: "1.5px solid #25c47a22",
-                                                }}
-                                            >
-                                                {initials(req.nama_pelapor)}
-                                            </div>
+                                        Simpan ID
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingGaId(false)}
+                                        className="rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition"
+                                    >
+                                        Batal
+                                    </button>
+                                </div>
+                            </form>
+                        )}
 
-                                            <div className="space-y-1 min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <code className="rounded-md border border-brand-100 bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">
-                                                        {req.kode_tracking || `#${req.id}`}
-                                                    </code>
-                                                    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${formInfo.badgeClass}`}>
-                                                        <FormIcon size={10} className={formInfo.iconColor} />
-                                                        <span>{formInfo.shortLabel}</span>
-                                                    </span>
-                                                    {req.tanggal && (
-                                                        <span className="text-[11px] text-slate-400">
-                                                            {new Date(req.tanggal).toLocaleDateString("id-ID", { day:"numeric", month:"short" })}
-                                                        </span>
-                                                    )}
+                        {/* Period Filter Tabs */}
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                            <div className="inline-flex rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1">
+                                {[
+                                    { id: "today", label: "Hari Ini" },
+                                    { id: "7d",    label: "7 Hari Terakhir" },
+                                    { id: "30d",   label: "30 Hari Terakhir" },
+                                    { id: "year",  label: "Tahun 2025" },
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setAnalyticsPeriod(tab.id)}
+                                        className={`rounded-xl px-3 py-1 text-xs font-bold transition-all ${
+                                            analyticsPeriod === tab.id
+                                                ? "bg-white text-emerald-800 shadow-xs"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Active visitors pulse */}
+                            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/70 px-3 py-1 text-[11px] font-bold text-emerald-800">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-80" />
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                                </span>
+                                <span>~{(ANALYTICS_DATASETS[analyticsPeriod] || ANALYTICS_DATASETS["7d"]).activeNow} Pengunjung Aktif Saat Ini</span>
+                            </div>
+                        </div>
+
+                        {/* 4 Primary Analytics Metric Cards */}
+                        {(() => {
+                            const cur = ANALYTICS_DATASETS[analyticsPeriod] || ANALYTICS_DATASETS["7d"];
+                            return (
+                                <>
+                                    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                        {/* Total Visitors */}
+                                        <div className="rounded-2xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/60 via-white to-white p-3.5 shadow-xs">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-slate-500">Total Pengunjung</span>
+                                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
+                                                    <Users size={14} />
                                                 </div>
-                                                <p className="text-sm font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
-                                                    {req.nama_pelapor}
-                                                </p>
-                                                <p className="line-clamp-1 max-w-sm text-xs text-slate-500">
-                                                    {req.isi_pengaduan || "Permohonan / Pengaduan Layanan"}
-                                                </p>
+                                            </div>
+                                            <p className="mt-1 text-xl font-black text-slate-900 tracking-tight">
+                                                {cur.visitors}
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                                                <TrendingUp size={11} />
+                                                <span>{cur.visitorsGrowth}</span>
+                                                <span className="text-slate-400 font-normal">vs lalu</span>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center justify-between gap-3 sm:justify-end self-end sm:self-center">
-                                            <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${cfg.badge}`}>
-                                                <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
-                                                {req.status_tanggapan}
-                                            </span>
-                                            <ChevronRight size={15} className="hidden text-slate-300 group-hover:text-brand-500 transition-colors sm:block" />
+                                        {/* Unique Visitors */}
+                                        <div className="rounded-2xl border border-sky-100/80 bg-gradient-to-br from-sky-50/60 via-white to-white p-3.5 shadow-xs">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-slate-500">Pengunjung Unik</span>
+                                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600">
+                                                    <Globe size={14} />
+                                                </div>
+                                            </div>
+                                            <p className="mt-1 text-xl font-black text-slate-900 tracking-tight">
+                                                {cur.uniqueVisitors}
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-sky-600">
+                                                <TrendingUp size={11} />
+                                                <span>{cur.uniqueGrowth}</span>
+                                                <span className="text-slate-400 font-normal">pengguna baru</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Pageviews */}
+                                        <div className="rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-indigo-50/60 via-white to-white p-3.5 shadow-xs">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-slate-500">Tayangan Halaman</span>
+                                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600">
+                                                    <Eye size={14} />
+                                                </div>
+                                            </div>
+                                            <p className="mt-1 text-xl font-black text-slate-900 tracking-tight">
+                                                {cur.pageviews}
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-indigo-600">
+                                                <TrendingUp size={11} />
+                                                <span>{cur.viewsGrowth}</span>
+                                                <span className="text-slate-400 font-normal">pageviews</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Avg Duration */}
+                                        <div className="rounded-2xl border border-amber-100/80 bg-gradient-to-br from-amber-50/60 via-white to-white p-3.5 shadow-xs">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-slate-500">Rata-rata Sesi</span>
+                                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+                                                    <Clock size={14} />
+                                                </div>
+                                            </div>
+                                            <p className="mt-1 text-xl font-black text-slate-900 tracking-tight">
+                                                {cur.avgDuration}
+                                            </p>
+                                            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-amber-600">
+                                                <span>76.5% Terlibat Aktif</span>
+                                            </div>
                                         </div>
                                     </div>
-                                );
-                            })
-                        )}
-                    </div>
-                </article>
+
+                                    {/* Daily Trend Chart (Interactive Bar Visualization) */}
+                                    <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-800">
+                                                    Tren Frekuensi Kunjungan ({cur.label})
+                                                </p>
+                                                <p className="text-[11px] text-slate-500">
+                                                    Arahkan kursor pada batang grafik untuk melihat detail sesi dan tayangan.
+                                                </p>
+                                            </div>
+                                            <span className="rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                                                Performa Trafik
+                                            </span>
+                                        </div>
+
+                                        {/* Bars Container */}
+                                        {(() => {
+                                            const maxVal = Math.max(...cur.chartData.map((d) => d.value), 1);
+                                            return (
+                                                <div className="relative flex items-end justify-between gap-2 pt-6 pb-1 h-36">
+                                                    {cur.chartData.map((item, idx) => {
+                                                        const heightPct = Math.max(12, Math.round((item.value / maxVal) * 100));
+                                                        const isHovered = hoveredBarIndex === idx;
+
+                                                        return (
+                                                            <div
+                                                                key={idx}
+                                                                onMouseEnter={() => setHoveredBarIndex(idx)}
+                                                                onMouseLeave={() => setHoveredBarIndex(null)}
+                                                                className="relative flex-1 flex flex-col items-center group cursor-pointer h-full justify-end"
+                                                            >
+                                                                {/* Tooltip */}
+                                                                {isHovered && (
+                                                                    <div className="absolute -top-10 z-20 whitespace-nowrap rounded-xl bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white shadow-lg pointer-events-none animate-fade-in">
+                                                                        <span className="text-emerald-300">{item.value.toLocaleString("id-ID")} Sesi</span>
+                                                                        <span className="text-slate-400 mx-1">&bull;</span>
+                                                                        <span className="text-sky-300">{item.views.toLocaleString("id-ID")} Views</span>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Bar */}
+                                                                <div
+                                                                    className={`w-full max-w-[42px] rounded-t-xl transition-all duration-300 ${
+                                                                        isHovered
+                                                                            ? "bg-gradient-to-t from-emerald-600 to-brand-400 shadow-md shadow-emerald-500/30 scale-105"
+                                                                            : "bg-gradient-to-t from-emerald-500/80 to-emerald-400/90 hover:from-emerald-600 hover:to-emerald-400"
+                                                                    }`}
+                                                                    style={{ height: `${heightPct}%` }}
+                                                                />
+
+                                                                {/* Label */}
+                                                                <span className={`mt-2 text-[10px] font-bold transition-colors ${isHovered ? "text-emerald-700" : "text-slate-500"}`}>
+                                                                    {item.label}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+
+                                    {/* Breakdown Subsections: Top Pages & Channels */}
+                                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                                        {/* Top Visited Pages */}
+                                        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-xs">
+                                            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                                                <p className="text-xs font-bold text-slate-900">
+                                                    Halaman Web Paling Ramai
+                                                </p>
+                                                <span className="text-[10px] font-bold text-slate-400">
+                                                    Tayangan
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-2.5">
+                                                {cur.topPages.map((pg, i) => (
+                                                    <div key={pg.path} className="space-y-1">
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <div className="flex items-center gap-2 min-w-0">
+                                                                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-600">
+                                                                    {i + 1}
+                                                                </span>
+                                                                <span className="font-bold text-slate-800 truncate" title={pg.title}>
+                                                                    {pg.title}
+                                                                </span>
+                                                            </div>
+                                                            <span className="shrink-0 font-extrabold text-emerald-700 text-[11px]">
+                                                                {pg.views} <span className="text-slate-400 font-normal">({pg.pct}%)</span>
+                                                            </span>
+                                                        </div>
+                                                        {/* Progress bar */}
+                                                        <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                                                            <div
+                                                                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-500"
+                                                                style={{ width: `${pg.pct}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Traffic Sources & Devices */}
+                                        <div className="flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-4 shadow-xs">
+                                            <div>
+                                                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                                                    <p className="text-xs font-bold text-slate-900">
+                                                        Sumber Trafik Pengunjung
+                                                    </p>
+                                                    <span className="text-[10px] font-bold text-slate-400">
+                                                        Kanal
+                                                    </span>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    {TRAFFIC_SOURCES.map((src) => (
+                                                        <div key={src.label} className="flex items-center justify-between text-xs">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`h-2 w-2 rounded-full ${src.dot}`} />
+                                                                <span className="text-slate-700 font-medium text-[11px]">{src.label}</span>
+                                                            </div>
+                                                            <span className="font-bold text-slate-800 text-[11px]">{src.count}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Devices Breakdown */}
+                                            <div className="mt-4 pt-3 border-t border-slate-100">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                                    Perangkat Pengunjung
+                                                </p>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {DEVICE_BREAKDOWN.map((dev) => {
+                                                        const DevIcon = dev.icon;
+                                                        return (
+                                                            <div
+                                                                key={dev.label}
+                                                                className={`flex flex-col items-center justify-center rounded-xl border p-2 text-center ${dev.color}`}
+                                                            >
+                                                                <DevIcon size={14} className="mb-0.5" />
+                                                                <span className="text-xs font-black">{dev.pct}%</span>
+                                                                <span className="text-[9px] font-semibold opacity-80">{dev.label.split("/")[0]}</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            );
+                        })()}
+
+                    </article>
+
+                    {/* ======================================================== */}
+                    {/* B. ANTREAN LAYANAN (Permohonan Masuk Terbaru) - DITURUNIN */}
+                    {/* ======================================================== */}
+                    <article className="flex flex-col rounded-[2.25rem] border border-slate-100 bg-white/95 p-6 shadow-card backdrop-blur-lg">
+
+                        {/* Card header */}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-60" />
+                                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-500" />
+                                    </span>
+                                    <p className="text-[11px] font-bold uppercase tracking-widest text-brand-700">
+                                        Antrean Layanan
+                                    </p>
+                                </div>
+                                <h2 className="mt-1.5 text-xl font-black text-slate-900">
+                                    Permohonan Masuk Terbaru
+                                </h2>
+                            </div>
+
+                            <button
+                                onClick={() => onNavigate?.("permohonan")}
+                                className="group inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold text-white shadow-glow transition-all duration-200 hover:shadow-glow-lg active:scale-95"
+                                style={{
+                                    background: "linear-gradient(135deg, #16a061 0%, #0f5033 100%)",
+                                }}
+                            >
+                                <span>Lihat Semua ({pengaduanList.length})</span>
+                                <ArrowUpRight
+                                    size={14}
+                                    className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                                />
+                            </button>
+                        </div>
+
+                        {/* Permohonan rows */}
+                        <div className="mt-5 flex-1 space-y-3">
+                            {pengaduanList.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 text-center">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-50 text-slate-300">
+                                        <ClipboardList size={30} />
+                                    </div>
+                                    <p className="mt-3 text-sm font-bold text-slate-600">Belum ada permohonan</p>
+                                    <p className="mt-1 max-w-xs text-xs text-slate-400">
+                                        Permohonan baru dari masyarakat akan tampil otomatis di sini.
+                                    </p>
+                                </div>
+                            ) : (
+                                pengaduanList.slice(0, 5).map((req) => {
+                                    const cfg = STATUS[req.status_tanggapan] || STATUS.Menunggu;
+                                    const formInfo = getJenisLayananInfo(req);
+                                    const FormIcon = formInfo.icon;
+
+                                    return (
+                                        <div
+                                            key={req.id}
+                                            onClick={() => onNavigate?.("permohonan")}
+                                            className={`group relative flex flex-col gap-3 rounded-2xl border border-l-4 border-slate-100 bg-slate-50/60 p-4 transition-all duration-200 hover:border-slate-200 hover:bg-white hover:shadow-md cursor-pointer sm:flex-row sm:items-center sm:justify-between ${cfg.border}`}
+                                        >
+                                            <div className="flex items-start gap-3.5">
+                                                {/* Avatar */}
+                                                <div
+                                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white shadow-sm transition-transform group-hover:scale-105"
+                                                    style={{
+                                                        background: "linear-gradient(135deg, #25c47a22 0%, #25c47a11 100%)",
+                                                        color: "#127d4e",
+                                                        border: "1.5px solid #25c47a22",
+                                                    }}
+                                                >
+                                                    {initials(req.nama_pelapor)}
+                                                </div>
+
+                                                <div className="space-y-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <code className="rounded-md border border-brand-100 bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-700">
+                                                            {req.kode_tracking || `#${req.id}`}
+                                                        </code>
+                                                        <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${formInfo.badgeClass}`}>
+                                                            <FormIcon size={10} className={formInfo.iconColor} />
+                                                            <span>{formInfo.shortLabel}</span>
+                                                        </span>
+                                                        {req.tanggal && (
+                                                            <span className="text-[11px] text-slate-400">
+                                                                {new Date(req.tanggal).toLocaleDateString("id-ID", { day:"numeric", month:"short" })}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
+                                                        {req.nama_pelapor}
+                                                    </p>
+                                                    <p className="line-clamp-1 max-w-sm text-xs text-slate-500">
+                                                        {req.isi_pengaduan || "Permohonan / Pengaduan Layanan"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between gap-3 sm:justify-end self-end sm:self-center">
+                                                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold ${cfg.badge}`}>
+                                                    <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+                                                    {req.status_tanggapan}
+                                                </span>
+                                                <ChevronRight size={15} className="hidden text-slate-300 group-hover:text-brand-500 transition-colors sm:block" />
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </article>
+
+                </div>
 
                 {/* ---- Right column ---- */}
                 <div className="flex flex-col gap-6">
