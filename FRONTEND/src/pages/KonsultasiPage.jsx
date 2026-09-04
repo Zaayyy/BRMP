@@ -7,19 +7,8 @@ import {
 } from 'lucide-react';
 import { pengaduanService } from '../services/apiService';
 
-const TOPIK_KONSULTASI = [
-  { id: 'padi', label: '🌾 Budidaya & Mutu Benih Padi', icon: '🌾' },
-  { id: 'jagung', label: '🌽 Varietas Jagung Unggul', icon: '🌽' },
-  { id: 'kedelai', label: '🌱 Kedelai & Kacang-kacangan', icon: '🌱' },
-  { id: 'hortikultura', label: '🌶️ Cabai, Bawang & Sayuran', icon: '🌶️' },
-  { id: 'tanah', label: '🧪 Kesuburan Tanah & Pemupukan', icon: '🧪' },
-  { id: 'hama', label: '🐛 Pengendalian Hama & Penyakit (OPT)', icon: '🐛' },
-  { id: 'sertifikasi', label: '📜 Prosedur Sertifikasi Benih', icon: '📜' },
-];
-
 export default function KonsultasiPage() {
   const navigate = useNavigate();
-  const [selectedTopik, setSelectedTopik] = useState(TOPIK_KONSULTASI[0].label);
   const [formData, setFormData] = useState({
     nama: '',
     nik: '',
@@ -58,7 +47,6 @@ export default function KonsultasiPage() {
     try {
       const fullDescription = [
         `[Layanan: Konsultasi Teknis & Standarisasi Pertanian]`,
-        `\nTopik Utama: ${selectedTopik}`,
         formData.komoditas ? `\nKomoditas/Varietas: ${formData.komoditas}` : '',
         formData.nik ? `\nNIK: ${formData.nik}` : '',
         `\nUraian Pertanyaan/Keluhan: ${formData.pesan}`,
@@ -77,7 +65,6 @@ export default function KonsultasiPage() {
       setSubmitted({
         code,
         nama: formData.nama,
-        topik: selectedTopik,
         email: formData.email,
         fileName: file ? file.name : null,
       });
@@ -87,7 +74,6 @@ export default function KonsultasiPage() {
       setSubmitted({
         code,
         nama: formData.nama,
-        topik: selectedTopik,
         email: formData.email,
         fileName: file ? file.name : null,
       });
@@ -288,44 +274,8 @@ export default function KonsultasiPage() {
               Ajukan Pertanyaan atau Masalah Pertanian
             </h2>
             <p style={{ fontSize: '0.88rem', color: '#64748b', margin: 0 }}>
-              Pilih bidang konsultasi dan isi formulir di bawah ini agar tim teknis kami dapat memberikan rekomendasi yang tepat.
+              Isi formulir di bawah ini agar tim teknis kami dapat memberikan rekomendasi dan solusi yang tepat.
             </p>
-          </div>
-
-          {/* Topik Pilihan Selector */}
-          <div style={{ marginBottom: '1.8rem' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 800, color: '#334155', marginBottom: '0.6rem' }}>
-              Pilih Bidang / Topik Konsultasi *
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-              {TOPIK_KONSULTASI.map((t) => {
-                const isSelected = selectedTopik === t.label;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setSelectedTopik(t.label)}
-                    style={{
-                      padding: '0.65rem 1.1rem',
-                      borderRadius: '9999px',
-                      border: isSelected ? '2px solid #0d6e38' : '1.5px solid #e2e8f0',
-                      backgroundColor: isSelected ? '#dcfce7' : '#f8fafc',
-                      color: isSelected ? '#0d6e38' : '#475569',
-                      fontWeight: isSelected ? 800 : 600,
-                      fontSize: '0.86rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <span>{t.label}</span>
-                    {isSelected && <Check size={14} color="#0d6e38" />}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.3rem' }}>
@@ -625,13 +575,13 @@ export default function KonsultasiPage() {
                 <span style={{ color: '#64748b' }}>Nomor Resi / Tiket: </span>
                 <strong style={{ color: '#0d6e38', fontFamily: 'monospace', fontSize: '1rem' }}>{submitted.code}</strong>
               </div>
-              <div><span style={{ color: '#64748b' }}>Bidang Konsultasi: </span><strong>{submitted.topik}</strong></div>
               <div><span style={{ color: '#64748b' }}>Nama Pemohon: </span><strong>{submitted.nama}</strong></div>
+              {submitted.email && <div><span style={{ color: '#64748b' }}>Email: </span><strong>{submitted.email}</strong></div>}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <a
-                href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Admin BRMP DIY, saya telah mengajukan permohonan konsultasi (${submitted.topik}) dengan Nomor Tiket: ${submitted.code}. Mohon info tanggapannya. Terima kasih.`)}`}
+                href={`https://wa.me/6285878438548?text=${encodeURIComponent(`Halo Admin BRMP DIY, saya telah mengajukan permohonan konsultasi dengan Nomor Tiket: ${submitted.code}. Mohon info tanggapannya. Terima kasih.`)}`}
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => {

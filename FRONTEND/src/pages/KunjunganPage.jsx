@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Send, Upload, CheckCircle, X, MapPin, Calendar,
   Building2, Phone, FlaskConical, Sprout, Home, Loader2,
-  ChevronRight, Users, Clock, DollarSign, FileText, Star
+  ChevronRight, Users, Clock, DollarSign, FileText, Star,
+  ExternalLink, Compass, Navigation
 } from 'lucide-react';
 import { pengaduanService } from '../services/apiService';
 
@@ -12,8 +13,16 @@ const LOKASI_LIST = [
     id: 'lab-tanah',
     nama: 'Laboratorium Tanah',
     emoji: '🧪',
+    areaTag: 'Maguwoharjo, Sleman',
     kategori: 'Laboratorium & Analisis Mutu',
     badge: 'Fasilitas Pengujian',
+    namaGedung: 'Gedung Pengujian & Laboratorium Terpadu (Gedung B)',
+    posisi: 'Sayap Barat Kompleks Kantor Utama BRMP DIY',
+    alamat: 'Jl. Stadion Maguwoharjo No. 22, Karangsari, Wedomartani, Ngemplak, Sleman, D.I. Yogyakarta 55584',
+    titikKumpul: 'Lobi Depan Laboratorium Kimia & Fisika Tanah',
+    petunjukArah: 'Masuk melalui gerbang utama BRMP DIY, belok kiri menuju area parkir barat. Gedung laboratorium berada di sisi kiri aula serbaguna.',
+    mapsUrl: 'https://maps.google.com/maps?q=-7.7510648,110.4259274',
+    mapsEmbed: 'https://maps.google.com/maps?q=-7.7510648,110.4259274&hl=id&z=17&ie=UTF8&iwloc=&output=embed',
     // Different Unsplash images for each facility
     bgImage: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80',
     bgGradient: 'linear-gradient(180deg, rgba(2,56,110,0.3) 0%, rgba(2,56,110,0.92) 100%)',
@@ -45,15 +54,23 @@ const LOKASI_LIST = [
     id: 'kebun-percobaan',
     nama: 'Kebun Percobaan',
     emoji: '🌾',
+    areaTag: 'Piyungan, Bantul',
     kategori: 'Lahan Agro Eduwisata Modern',
     badge: 'Outdoor Field',
+    namaGedung: 'IP2SIP Banyakan (Kebun Percobaan & Sentra Eduwisata)',
+    posisi: 'Kawasan Riset Lapang & Sentra Perbenihan, Piyungan, Bantul',
+    alamat: 'Dusun Banyakan, Kalurahan Sitimulyo, Kapanewon Piyungan, Kabupaten Bantul, D.I. Yogyakarta 55792',
+    titikKumpul: 'Kantor Pengelola IP2SIP Banyakan / Pendopo Edukasi Pertanian',
+    petunjukArah: 'Dari Jl. Wonosari KM 10 / Perempatan Pasar Piyungan ke arah selatan menyusuri Jl. Sitimulyo – Segoroyoso menuju Dusun Banyakan (sekitar 10 menit dari Jl. Wonosari).',
+    mapsUrl: 'https://maps.google.com/maps?q=-7.842800,110.435600',
+    mapsEmbed: 'https://maps.google.com/maps?q=-7.842800,110.435600&hl=id&z=15&ie=UTF8&iwloc=&output=embed',
     bgImage: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1400&q=80',
     bgGradient: 'linear-gradient(180deg, rgba(5,56,27,0.25) 0%, rgba(5,56,27,0.92) 100%)',
     accentColor: '#10b981',
     tagColor: '#bbf7d0',
     tagBg: 'rgba(16,185,129,0.25)',
     icon: Sprout,
-    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani kunjungan agro eduwisata, studi lapang varietas benih unggul, dan percontohan smart farming.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY mengelola Kebun Percobaan IP2SIP Banyakan di Piyungan, Bantul sebagai sentra perbenihan sumber, pengujian lapang varietas unggul, dan agro eduwisata modern.',
     persyaratan: [
       'Menulis identitas penanggung jawab rombongan dan maksud kunjungan.',
       'Mengisi formulir permohonan kunjungan kebun percobaan secara digital.',
@@ -77,15 +94,23 @@ const LOKASI_LIST = [
     id: 'wisma-brmp',
     nama: 'Wisma BRMP DIY',
     emoji: '🏡',
+    areaTag: 'Demangan, Sleman',
     kategori: 'Akomodasi & Diklat Pertanian',
     badge: 'Fasilitas Wisma',
+    namaGedung: 'Wisma Tamu / Mess BPTP (BRMP) DIY Demangan Baru',
+    posisi: 'Kawasan Demangan Baru, Caturtunggal, Kapanewon Depok, Sleman',
+    alamat: 'Jl. Rajawali No. 28, Demangan Baru, Caturtunggal, Kec. Depok, Kabupaten Sleman, D.I. Yogyakarta 55281',
+    titikKumpul: 'Lobi Resepsionis / Front Desk Wisma BRMP DIY (Demangan Baru)',
+    petunjukArah: 'Dari Jl. Gejayan (Jl. Affandi) atau Jl. Laksda Adisucipto, masuk ke kawasan Demangan Baru menuju Jl. Rajawali No. 28 (sekitar 300 meter timur Kampus Sanata Dharma/UNY).',
+    mapsUrl: 'https://maps.google.com/maps?q=-7.776850,110.393200',
+    mapsEmbed: 'https://maps.google.com/maps?q=-7.776850,110.393200&hl=id&z=17&ie=UTF8&iwloc=&output=embed',
     bgImage: 'https://images.unsplash.com/photo-1501117716987-5c432a1c8e2e?auto=format&fit=crop&w=1400&q=80',
     bgGradient: 'linear-gradient(180deg, rgba(92,56,5,0.3) 0%, rgba(92,56,5,0.92) 100%)',
     accentColor: '#f59e0b',
     tagColor: '#fde68a',
     tagBg: 'rgba(245,158,11,0.25)',
     icon: Home,
-    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY melayani permohonan akomodasi wisma untuk peserta pelatihan, magang, bimbingan teknis, dan studi banding pertanian.',
+    descRingkas: 'Balai Besar Modernisasi Pertanian (BRMP) DIY menyediakan fasilitas Wisma/Guest House di Demangan Baru, Sleman untuk akomodasi peserta pelatihan, magang, bimbingan teknis, dan tamu kedinasan.',
     persyaratan: [
       'Menulis identitas resmi instansi penyelenggara diklat/rombongan tamu.',
       'Mengisi form permohonan reservasi wisma dengan mencantumkan jumlah peserta dan durasi menginap.',
@@ -109,8 +134,16 @@ const LOKASI_LIST = [
     id: 'balai-besar',
     nama: 'Balai Besar BRMP DIY',
     emoji: '🏛️',
+    areaTag: 'Kantor Utama, Sleman',
     kategori: 'Pusat Standarisasi & Audiensi',
     badge: 'Kantor Pusat',
+    namaGedung: 'Gedung A (Kantor Utama, Ruang Rapat & Front Office PPID)',
+    posisi: 'Lantai 1 & 2 Gedung Manajemen Utama BRMP DIY',
+    alamat: 'Jl. Stadion Maguwoharjo No. 22, Karangsari, Wedomartani, Ngemplak, Sleman, D.I. Yogyakarta 55584',
+    titikKumpul: 'Lobi Resepsionis Utama / Pusat Layanan Informasi Publik (PLIP)',
+    petunjukArah: 'Gedung utama tepat berada di depan gerbang akses utama. Meja penerimaan tamu berada di lobi tengah lantai 1.',
+    mapsUrl: 'https://maps.google.com/maps?q=-7.7510648,110.4259274',
+    mapsEmbed: 'https://maps.google.com/maps?q=-7.7510648,110.4259274&hl=id&z=17&ie=UTF8&iwloc=&output=embed',
     bgImage: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1400&q=80',
     bgGradient: 'linear-gradient(180deg, rgba(56,5,92,0.25) 0%, rgba(30,5,56,0.92) 100%)',
     accentColor: '#8b5cf6',
@@ -198,7 +231,9 @@ export default function KunjunganPage() {
     try {
       const fullDescription = [
         `[Layanan: Permohonan Kunjungan & Eduwisata]`,
-        `\nLokasi Tujuan: ${formData.lokasiPilihan}`,
+        `\nLokasi Tujuan: ${formData.lokasiPilihan} - ${formTarget.namaGedung}`,
+        `\nAlamat Fasilitas: ${formTarget.alamat}`,
+        `\nTitik Kumpul: ${formTarget.titikKumpul}`,
         formData.instansi ? `\nInstansi/Sekolah/Rombongan: ${formData.instansi}` : '',
         formData.jumlahPeserta ? `\nJumlah Rombongan: ${formData.jumlahPeserta} Peserta` : '',
         formData.tanggal ? `\nTanggal & Waktu: ${formData.tanggal} (Pukul ${formData.waktu} WIB)` : '',
@@ -213,11 +248,33 @@ export default function KunjunganPage() {
         jenis_layanan: 'Permohonan Kunjungan',
       });
       const code = res?.data?.kode_tracking || `KUN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      setSubmitted({ code, nama: formData.nama, instansi: formData.instansi, lokasiPilihan: formData.lokasiPilihan, tanggal: formData.tanggal, jumlahPeserta: formData.jumlahPeserta });
+      setSubmitted({
+        code,
+        nama: formData.nama,
+        instansi: formData.instansi,
+        lokasiPilihan: formData.lokasiPilihan,
+        namaGedung: formTarget.namaGedung,
+        alamat: formTarget.alamat,
+        titikKumpul: formTarget.titikKumpul,
+        mapsUrl: formTarget.mapsUrl,
+        tanggal: formData.tanggal,
+        jumlahPeserta: formData.jumlahPeserta,
+      });
       setModalFormOpen(false);
     } catch (err) {
       const code = `KUN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      setSubmitted({ code, nama: formData.nama, instansi: formData.instansi, lokasiPilihan: formData.lokasiPilihan, tanggal: formData.tanggal, jumlahPeserta: formData.jumlahPeserta });
+      setSubmitted({
+        code,
+        nama: formData.nama,
+        instansi: formData.instansi,
+        lokasiPilihan: formData.lokasiPilihan,
+        namaGedung: formTarget.namaGedung,
+        alamat: formTarget.alamat,
+        titikKumpul: formTarget.titikKumpul,
+        mapsUrl: formTarget.mapsUrl,
+        tanggal: formData.tanggal,
+        jumlahPeserta: formData.jumlahPeserta,
+      });
       setModalFormOpen(false);
     } finally {
       setIsLoading(false);
@@ -227,9 +284,9 @@ export default function KunjunganPage() {
   return (
     <div style={{ paddingTop: '76px', minHeight: '100vh', backgroundColor: '#f0fdf4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <style>{`
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-        @keyframes shimmer { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         .kunjungan-hero-img {
           transition: opacity 0.4s ease, transform 0.5s ease;
         }
@@ -241,398 +298,468 @@ export default function KunjunganPage() {
           opacity: 1;
           transform: scale(1);
         }
+        @media (max-width: 900px) {
+          .kunjungan-spotlight-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .kunjungan-visual-col {
+            min-height: 280px !important;
+            max-height: 320px !important;
+          }
+        }
       `}</style>
 
-      {/* ─────────────────────── BACK BUTTON ─────────────────────── */}
-      <div style={{ maxWidth: '1140px', margin: '0 auto 1.5rem', padding: '0 1.5rem' }}>
-        <Link
-          to="/"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            backgroundColor: '#fff', color: '#0d6e38', padding: '0.55rem 1.2rem',
-            borderRadius: '9999px', fontSize: '0.86rem', fontWeight: 700,
-            textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-            border: '1px solid #dcfce7', transition: 'all 0.2s ease',
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-        >
-          <ArrowLeft size={16} /><span>Kembali ke Beranda</span>
-        </Link>
-      </div>
+      {/* ─────────────────────── MAIN CONTAINER ─────────────────────── */}
+      <div style={{ maxWidth: '1180px', margin: '0 auto', padding: '0 1.25rem 4rem' }}>
 
-      <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '0 1.5rem 5rem' }}>
-
-        {/* ═══════════════════ MAIN HERO CARD ═══════════════════ */}
-        <div style={{
-          borderRadius: '28px', overflow: 'hidden',
-          boxShadow: '0 20px 60px rgba(13,110,56,0.16), 0 4px 12px rgba(0,0,0,0.05)',
-          border: '1.5px solid rgba(16,185,129,0.2)',
-          backgroundColor: '#fff', marginBottom: '2.5rem',
-          animation: 'fadeInScale 0.5s ease both',
-        }}>
-
-          {/* Green Header Bar */}
-          <div style={{
-            background: 'linear-gradient(135deg, #0d6e38 0%, #1a9e5a 50%, #0d6e38 100%)',
-            padding: '1.5rem 2.5rem', textAlign: 'center', position: 'relative', overflow: 'hidden',
-          }}>
-            <div style={{
-              position: 'absolute', top: '-40px', left: '10%', width: '200px', height: '200px',
-              borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.05)',
-            }} />
-            <div style={{
-              position: 'absolute', top: '-60px', right: '5%', width: '280px', height: '280px',
-              borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.05)',
-            }} />
-            <span style={{
+        {/* Top Action Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <Link
+            to="/"
+            style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-              backgroundColor: 'rgba(255,255,255,0.15)', color: '#d1fae5',
-              padding: '0.3rem 0.9rem', borderRadius: '9999px',
-              fontSize: '0.73rem', fontWeight: 700, letterSpacing: '0.05em',
-              textTransform: 'uppercase', backdropFilter: 'blur(4px)', marginBottom: '0.6rem',
-              display: 'block',
+              backgroundColor: '#fff', color: '#0d6e38', padding: '0.55rem 1.15rem',
+              borderRadius: '9999px', fontSize: '0.84rem', fontWeight: 700,
+              textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid #dcfce7', transition: 'all 0.2s ease',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+          >
+            <ArrowLeft size={15} /><span>Kembali ke Beranda</span>
+          </Link>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+              backgroundColor: '#dcfce7', color: '#15803d', padding: '0.35rem 0.85rem',
+              borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 800,
             }}>
-              🌱 Balai Besar Modernisasi Pertanian DIY
+              ✓ Layanan Resmi Bebas Biaya (Rp 0)
             </span>
-            <h1 style={{
-              fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', fontWeight: 900, color: '#fff',
-              margin: 0, letterSpacing: '-0.02em', textShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+              backgroundColor: '#fff', color: '#475569', padding: '0.35rem 0.85rem',
+              borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700,
+              border: '1px solid #e2e8f0',
             }}>
-              Kunjungan & Eduwisata
-            </h1>
-            <p style={{
-              fontSize: '0.88rem', color: 'rgba(255,255,255,0.8)',
-              margin: '0.4rem 0 0 0', fontWeight: 400,
-            }}>
-              Pilih fasilitas yang ingin Anda kunjungi untuk melihat informasi lengkap layanan
-            </p>
-          </div>
-
-          {/* ─── TAB BUTTONS (Vertical inside green panel) ─── */}
-          <div style={{
-            backgroundColor: '#4e9a7e',
-            padding: '1.25rem 1.5rem',
-            display: 'flex', flexDirection: 'column', gap: '0.7rem',
-          }}>
-            {LOKASI_LIST.map((item, idx) => {
-              const isActive = idx === activeIdx;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleOpenDetail(item, idx)}
-                  style={{
-                    width: '100%',
-                    backgroundColor: isActive ? '#fff' : '#ffba08',
-                    color: isActive ? '#0d6e38' : '#1a1a1a',
-                    padding: '0.95rem 1.5rem',
-                    borderRadius: '12px',
-                    fontWeight: 800,
-                    fontSize: '1rem',
-                    border: isActive ? '2.5px solid rgba(13,110,56,0.4)' : '2px solid transparent',
-                    boxShadow: isActive
-                      ? '0 4px 16px rgba(13,110,56,0.2), 0 1px 3px rgba(0,0,0,0.1)'
-                      : '0 2px 8px rgba(0,0,0,0.12)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem',
-                  }}
-                  onMouseOver={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = '#f59e0b';
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                      e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.2)';
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = '#ffba08';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
-                    }
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                    <span style={{ fontSize: '1.3rem' }}>{item.emoji}</span>
-                    <span>{item.nama}</span>
-                  </span>
-                  <span style={{
-                    fontSize: '0.7rem', fontWeight: 700,
-                    backgroundColor: isActive ? '#dcfce7' : 'rgba(0,0,0,0.12)',
-                    color: isActive ? '#15803d' : '#333',
-                    padding: '0.2rem 0.65rem', borderRadius: '9999px',
-                  }}>
-                    {isActive ? 'Aktif ✓' : item.badge}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* ─── HERO IMAGE (changes when tab switches) ─── */}
-          <div style={{
-            position: 'relative', height: '420px', overflow: 'hidden',
-          }}>
-            {/* Animated Background Image */}
-            <div
-              className={`kunjungan-hero-img ${transitioning ? 'out' : 'in'}`}
-              style={{
-                position: 'absolute', inset: 0,
-                backgroundImage: `url('${activeLokasi.bgImage}')`,
-                backgroundSize: 'cover', backgroundPosition: 'center',
-              }}
-            />
-
-            {/* Gradient Overlay */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: activeLokasi.bgGradient,
-              transition: 'background 0.5s ease',
-            }} />
-
-            {/* Animated color accent strip */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
-              background: `linear-gradient(90deg, transparent, ${activeLokasi.accentColor}, transparent)`,
-              transition: 'background 0.5s ease',
-            }} />
-
-            {/* Content Overlay */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              padding: '2.5rem',
-              transition: 'opacity 0.4s ease',
-              opacity: transitioning ? 0 : 1,
-            }}>
-              <div style={{ marginBottom: '0.8rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                  backgroundColor: activeLokasi.tagBg,
-                  color: activeLokasi.tagColor,
-                  padding: '0.3rem 0.8rem', borderRadius: '9999px',
-                  fontSize: '0.76rem', fontWeight: 700,
-                  backdropFilter: 'blur(6px)',
-                  border: `1px solid ${activeLokasi.accentColor}55`,
-                  transition: 'all 0.4s ease',
-                }}>
-                  <activeLokasi.icon size={13} />
-                  <span>{activeLokasi.kategori}</span>
-                </span>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                  backgroundColor: 'rgba(0,0,0,0.3)',
-                  color: 'rgba(255,255,255,0.9)',
-                  padding: '0.3rem 0.8rem', borderRadius: '9999px',
-                  fontSize: '0.76rem', fontWeight: 600,
-                  backdropFilter: 'blur(6px)',
-                }}>
-                  <Users size={12} />
-                  <span>Kapasitas: {activeLokasi.kapasitas}</span>
-                </span>
-              </div>
-
-              <h2 style={{
-                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                fontWeight: 900, color: '#fff', margin: '0 0 0.6rem 0',
-                lineHeight: 1.2, textShadow: '0 2px 12px rgba(0,0,0,0.3)',
-                transition: 'opacity 0.4s ease',
-              }}>
-                {activeLokasi.emoji} {activeLokasi.nama}
-              </h2>
-
-              <p style={{
-                fontSize: '0.9rem', color: 'rgba(255,255,255,0.88)',
-                maxWidth: '640px', margin: '0 0 1.5rem 0', lineHeight: 1.6,
-              }}>
-                {activeLokasi.descRingkas}
-              </p>
-
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <button
-                  onClick={() => setModalDetail(activeLokasi)}
-                  style={{
-                    background: 'rgba(255,255,255,0.15)',
-                    backdropFilter: 'blur(8px)',
-                    color: '#fff', padding: '0.7rem 1.4rem',
-                    borderRadius: '10px', fontWeight: 700, fontSize: '0.88rem',
-                    border: '1.5px solid rgba(255,255,255,0.4)', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)')}
-                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)')}
-                >
-                  <FileText size={16} /> Lihat Detail & SOP
-                </button>
-
-                <button
-                  onClick={() => handleOpenForm(activeLokasi)}
-                  style={{
-                    background: `linear-gradient(135deg, ${activeLokasi.accentColor}, #fff3)`,
-                    color: '#fff', padding: '0.7rem 1.4rem',
-                    borderRadius: '10px', fontWeight: 800, fontSize: '0.88rem',
-                    border: 'none', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    boxShadow: `0 4px 14px ${activeLokasi.accentColor}50`,
-                    transition: 'all 0.2s ease',
-                    backgroundColor: activeLokasi.accentColor,
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                  onMouseOut={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-                >
-                  <Calendar size={16} /> Ajukan Kunjungan
-                </button>
-              </div>
-            </div>
-
-            {/* Tab indicator dots */}
-            <div style={{
-              position: 'absolute', bottom: '1.25rem', right: '1.5rem',
-              display: 'flex', gap: '0.5rem', alignItems: 'center',
-            }}>
-              {LOKASI_LIST.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSelectLokasi(idx)}
-                  style={{
-                    width: idx === activeIdx ? '28px' : '8px',
-                    height: '8px',
-                    borderRadius: '9999px',
-                    backgroundColor: idx === activeIdx ? '#fff' : 'rgba(255,255,255,0.45)',
-                    border: 'none', cursor: 'pointer',
-                    transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                    padding: 0,
-                  }}
-                />
-              ))}
-            </div>
+              <Clock size={12} color="#059669" />
+              Senin – Jumat, 08.00 – 15.30 WIB
+            </span>
           </div>
         </div>
 
-        {/* ═══════════════════ QUICK INFO CARDS ═══════════════════ */}
+        {/* Page Title Header */}
+        <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 1.75rem' }}>
+          <span style={{
+            display: 'inline-block',
+            backgroundColor: 'rgba(16,185,129,0.12)', color: '#047857',
+            padding: '0.3rem 0.95rem', borderRadius: '9999px',
+            fontSize: '0.73rem', fontWeight: 800, letterSpacing: '0.06em',
+            textTransform: 'uppercase', marginBottom: '0.5rem',
+          }}>
+            🌱 Balai Besar Penerapan Modernisasi Pertanian DIY
+          </span>
+          <h1 style={{
+            fontSize: 'clamp(1.75rem, 3.2vw, 2.3rem)', fontWeight: 900, color: '#0f172a',
+            margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', lineHeight: 1.2,
+          }}>
+            Kunjungan & Eduwisata Pertanian
+          </h1>
+          <p style={{
+            fontSize: '0.92rem', color: '#64748b', margin: 0, lineHeight: 1.55,
+          }}>
+            Pilih fasilitas untuk melihat profil, lokasi presisi gedung, titik kumpul, dan pengajuan jadwal kunjungan.
+          </p>
+        </div>
+
+        {/* ═══════════════════ 1. HORIZONTAL FACILITY SELECTOR (4 TABS) ═══════════════════ */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1rem', marginBottom: '2.5rem',
-          animation: 'fadeInUp 0.6s 0.1s ease both',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '0.75rem',
+          marginBottom: '1.5rem',
         }}>
           {LOKASI_LIST.map((item, idx) => {
             const isActive = idx === activeIdx;
             return (
-              <div
+              <button
                 key={item.id}
-                onClick={() => handleOpenDetail(item, idx)}
+                onClick={() => handleSelectLokasi(idx)}
                 style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '18px',
-                  padding: '1.4rem',
+                  backgroundColor: isActive ? '#fff' : '#f8fafc',
+                  border: isActive ? `2px solid ${item.accentColor}` : '1.5px solid #e2e8f0',
+                  borderRadius: '16px',
+                  padding: '0.9rem 1.1rem',
                   cursor: 'pointer',
-                  border: isActive ? `2px solid ${item.accentColor}` : '2px solid #f1f5f9',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.85rem',
                   boxShadow: isActive
-                    ? `0 8px 24px ${item.accentColor}25, 0 2px 4px rgba(0,0,0,0.04)`
-                    : '0 2px 8px rgba(0,0,0,0.04)',
-                  transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-                  transform: isActive ? 'translateY(-3px)' : 'translateY(0)',
-                  position: 'relative', overflow: 'hidden',
+                    ? `0 10px 25px -4px ${item.accentColor}25, 0 2px 6px rgba(0,0,0,0.04)`
+                    : '0 1px 3px rgba(0,0,0,0.02)',
+                  transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  transform: isActive ? 'translateY(-2px)' : 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
                 onMouseOver={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                    e.currentTarget.style.boxShadow = `0 8px 24px ${item.accentColor}20`;
+                    e.currentTarget.style.backgroundColor = '#fff';
                     e.currentTarget.style.borderColor = item.accentColor + '80';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
                   }
                 }}
                 onMouseOut={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                    e.currentTarget.style.borderColor = '#f1f5f9';
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                    e.currentTarget.style.transform = 'none';
                   }
                 }}
               >
                 {isActive && (
                   <div style={{
-                    position: 'absolute', top: 0, right: 0,
-                    width: '80px', height: '80px',
-                    background: `radial-gradient(circle at top right, ${item.accentColor}15, transparent)`,
+                    position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px',
+                    backgroundColor: item.accentColor,
                   }} />
                 )}
                 <div style={{
-                  width: '44px', height: '44px', borderRadius: '12px',
-                  backgroundColor: item.accentColor + '18',
+                  width: '42px', height: '42px', borderRadius: '12px',
+                  backgroundColor: isActive ? item.accentColor + '18' : '#e2e8f0',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '0.85rem', fontSize: '1.4rem',
+                  fontSize: '1.3rem', flexShrink: 0,
+                  transition: 'background-color 0.2s ease',
                 }}>
                   {item.emoji}
                 </div>
-                <h3 style={{
-                  fontSize: '0.95rem', fontWeight: 800, color: isActive ? item.accentColor : '#0f172a',
-                  margin: '0 0 0.3rem 0', transition: 'color 0.3s ease',
-                }}>
-                  {item.nama}
-                </h3>
-                <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
-                  {item.kategori}
-                </p>
-                <div style={{
-                  marginTop: '0.85rem', display: 'flex', alignItems: 'center',
-                  gap: '0.35rem', fontSize: '0.75rem', color: item.accentColor, fontWeight: 700,
-                }}>
-                  <span>Lihat Detail</span>
-                  <ChevronRight size={13} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '0.92rem', fontWeight: isActive ? 800 : 700,
+                    color: isActive ? '#0f172a' : '#334155',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {item.nama}
+                  </div>
+                  <div style={{
+                    fontSize: '0.72rem', color: isActive ? item.accentColor : '#64748b',
+                    fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px',
+                  }}>
+                    <MapPin size={11} />
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.areaTag}</span>
+                  </div>
                 </div>
-              </div>
+                {isActive && (
+                  <span style={{
+                    width: '8px', height: '8px', borderRadius: '50%',
+                    backgroundColor: item.accentColor, flexShrink: 0,
+                    boxShadow: `0 0 0 4px ${item.accentColor}30`,
+                  }} />
+                )}
+              </button>
             );
           })}
         </div>
 
-        {/* ═══════════════════ INFO STRIP ═══════════════════ */}
+        {/* ═══════════════════ 2. SPOTLIGHT SHOWCASE CARD (SPLIT BENTO LAYOUT) ═══════════════════ */}
         <div style={{
-          background: 'linear-gradient(135deg, #0d6e38, #1a9e5a)',
-          borderRadius: '18px', padding: '1.5rem 2rem',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem',
-          animation: 'fadeInUp 0.6s 0.2s ease both',
+          backgroundColor: '#fff',
+          borderRadius: '24px',
+          boxShadow: '0 20px 45px -10px rgba(13, 110, 56, 0.08), 0 4px 16px rgba(0,0,0,0.03)',
+          border: '1.5px solid #dcfce7',
+          overflow: 'hidden',
+          animation: 'fadeInScale 0.35s ease both',
         }}>
-          <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap' }}>
-            {[
-              { icon: DollarSign, label: 'Biaya Kunjungan', value: 'GRATIS / Rp. 0' },
-              { icon: Clock, label: 'Jam Layanan', value: 'Senin – Jumat, 08.00 – 15.30' },
-              { icon: MapPin, label: 'Lokasi', value: 'Maguwoharjo, Sleman, DIY' },
-            ].map((info, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                <div style={{
-                  width: '36px', height: '36px', borderRadius: '9px',
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.25fr)',
+            gap: '0',
+          }} className="kunjungan-spotlight-grid">
+
+            {/* Left: Interactive Visual Box */}
+            <div
+              className="kunjungan-visual-col"
+              style={{
+                position: 'relative',
+                minHeight: '440px',
+                overflow: 'hidden',
+                backgroundColor: '#0f172a',
+              }}
+            >
+              <div
+                className={`kunjungan-hero-img ${transitioning ? 'out' : 'in'}`}
+                style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url('${activeLokasi.bgImage}')`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                }}
+              />
+              {/* Gradient Scrim */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(180deg, rgba(15,23,42,0.4) 0%, rgba(15,23,42,0.1) 40%, rgba(15,23,42,0.85) 100%)',
+              }} />
+
+              {/* Floating Top Tag */}
+              <div style={{
+                position: 'absolute', top: '1.25rem', left: '1.25rem', right: '1.25rem',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem',
+              }}>
+                <span style={{
+                  backgroundColor: 'rgba(255,255,255,0.95)',
+                  color: '#065f46',
+                  padding: '0.35rem 0.85rem', borderRadius: '9999px',
+                  fontSize: '0.74rem', fontWeight: 800,
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
                 }}>
-                  <info.icon size={18} color="#fff" />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{info.label}</div>
-                  <div style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{info.value}</div>
+                  <activeLokasi.icon size={13} color="#059669" />
+                  <span>{activeLokasi.kategori}</span>
+                </span>
+
+                <span style={{
+                  backgroundColor: 'rgba(15,23,42,0.65)',
+                  color: '#fff',
+                  padding: '0.35rem 0.75rem', borderRadius: '9999px',
+                  fontSize: '0.72rem', fontWeight: 700,
+                  backdropFilter: 'blur(6px)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}>
+                  {activeLokasi.badge}
+                </span>
+              </div>
+
+              {/* Bottom Visual Bar */}
+              <div style={{
+                position: 'absolute', bottom: '1.25rem', left: '1.25rem', right: '1.25rem',
+                color: '#fff',
+              }}>
+                <div style={{
+                  backgroundColor: 'rgba(15,23,42,0.6)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '14px',
+                  padding: '0.85rem 1rem',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#a7f3d0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Lokasi Akses
+                    </div>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#fff', marginTop: '1px' }}>
+                      {activeLokasi.areaTag}
+                    </div>
+                  </div>
+                  <a
+                    href={activeLokasi.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      backgroundColor: '#fff',
+                      color: '#0d6e38',
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      flexShrink: 0,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    }}
+                  >
+                    <Compass size={13} color="#059669" />
+                    <span>Peta Maps</span>
+                    <ExternalLink size={10} />
+                  </a>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Right: Rich Information & CTAs */}
+            <div style={{
+              padding: '1.85rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '1.15rem',
+            }}>
+              <div>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>{activeLokasi.emoji}</span>
+                  <h2 style={{
+                    fontSize: '1.5rem', fontWeight: 900, color: '#0f172a', margin: 0,
+                    letterSpacing: '-0.02em',
+                  }}>
+                    {activeLokasi.nama}
+                  </h2>
+                </div>
+
+                <p style={{
+                  fontSize: '0.88rem', color: '#475569', lineHeight: 1.6,
+                  margin: '0 0 1.15rem 0',
+                }}>
+                  {activeLokasi.descRingkas}
+                </p>
+
+                {/* Location & Meeting Point Card */}
+                <div style={{
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '16px',
+                  padding: '1rem 1.15rem',
+                  border: '1.5px solid #e2e8f0',
+                  marginBottom: '1.15rem',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                    <div style={{
+                      width: '32px', height: '32px', borderRadius: '10px',
+                      backgroundColor: 'rgba(16,185,129,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, marginTop: '2px',
+                    }}>
+                      <MapPin size={16} color="#059669" />
+                    </div>
+                    <div style={{ flex: 1, fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.88rem' }}>
+                        {activeLokasi.namaGedung}
+                      </div>
+                      <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '2px' }}>
+                        {activeLokasi.alamat}
+                      </div>
+                      <div style={{
+                        marginTop: '0.45rem', paddingTop: '0.45rem', borderTop: '1px dashed #cbd5e1',
+                        color: '#059669', fontSize: '0.76rem', fontWeight: 700,
+                        display: 'flex', alignItems: 'center', gap: '0.35rem',
+                      }}>
+                        <span>🚩 Titik Kumpul:</span>
+                        <span style={{ color: '#0f172a', fontWeight: 600 }}>{activeLokasi.titikKumpul}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3 Key Stats Pills */}
+                <div style={{
+                  display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem',
+                  marginBottom: '1.15rem',
+                }}>
+                  <div style={{ backgroundColor: '#f0fdf4', padding: '0.65rem 0.75rem', borderRadius: '12px', border: '1px solid #dcfce7' }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>Kapasitas</div>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{activeLokasi.kapasitas}</div>
+                  </div>
+                  <div style={{ backgroundColor: '#f0fdf4', padding: '0.65rem 0.75rem', borderRadius: '12px', border: '1px solid #dcfce7' }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>Waktu Layanan</div>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#0f172a', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {activeLokasi.waktu.split('(')[0].trim()}
+                    </div>
+                  </div>
+                  <div style={{ backgroundColor: '#f0fdf4', padding: '0.65rem 0.75rem', borderRadius: '12px', border: '1px solid #dcfce7' }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>Biaya Layanan</div>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#15803d', marginTop: '2px' }}>GRATIS / Rp. 0</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => handleOpenForm(activeLokasi)}
+                  style={{
+                    flex: '1 1 200px',
+                    background: 'linear-gradient(135deg, #0d6e38 0%, #10b981 100%)',
+                    color: '#fff', padding: '0.85rem 1.4rem',
+                    borderRadius: '12px', fontWeight: 800, fontSize: '0.9rem',
+                    border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                    boxShadow: '0 4px 14px rgba(16,185,129,0.35)',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseOut={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+                >
+                  <Calendar size={17} />
+                  <span>Daftar Kunjungan Sekarang</span>
+                </button>
+
+                <button
+                  onClick={() => setModalDetail(activeLokasi)}
+                  style={{
+                    backgroundColor: '#fff',
+                    color: '#334155', padding: '0.85rem 1.25rem',
+                    borderRadius: '12px', fontWeight: 700, fontSize: '0.88rem',
+                    border: '1.5px solid #cbd5e1', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                    e.currentTarget.style.borderColor = '#94a3b8';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff';
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                  }}
+                >
+                  <FileText size={16} />
+                  <span>Lihat SOP & Detail</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <button
-            onClick={() => handleOpenForm(activeLokasi)}
+        </div>
+
+        {/* ═══════════════════ 3. QUICK TRUST & HELP BANNER ═══════════════════ */}
+        <div style={{
+          marginTop: '1.5rem',
+          backgroundColor: '#fff',
+          borderRadius: '18px',
+          padding: '1.15rem 1.5rem',
+          border: '1px solid #e2e8f0',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: '1rem',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '38px', height: '38px', borderRadius: '10px',
+              backgroundColor: '#ecfdf5', color: '#059669',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <CheckCircle size={20} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a' }}>
+                Perlu Koordinasi Jadwal atau Rombongan Khusus?
+              </div>
+              <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
+                Permohonan kunjungan diproses pada hari kerja (Senin–Jumat) dan dikonfirmasi langsung oleh petugas BRMP DIY.
+              </div>
+            </div>
+          </div>
+
+          <a
+            href="https://wa.me/6285878438548?text=Halo%20Admin%20BRMP%20DIY,%20saya%20ingin%20bertanya%20mengenai%20layanan%20kunjungan%20dan%20eduwisata."
+            target="_blank"
+            rel="noreferrer"
             style={{
-              backgroundColor: '#fff', color: '#0d6e38',
-              padding: '0.75rem 1.5rem', borderRadius: '12px',
-              fontWeight: 800, fontSize: '0.9rem', border: 'none',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.15)', transition: 'all 0.2s ease',
+              display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+              backgroundColor: '#ecfdf5', color: '#047857',
+              padding: '0.6rem 1.15rem', borderRadius: '10px',
+              fontSize: '0.82rem', fontWeight: 800,
+              textDecoration: 'none', border: '1px solid #a7f3d0',
+              transition: 'all 0.2s ease',
               whiteSpace: 'nowrap',
             }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#d1fae5')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#ecfdf5')}
           >
-            <Calendar size={17} /> Daftar Kunjungan Sekarang
-          </button>
+            <Phone size={14} />
+            <span>Tanya Admin via WhatsApp</span>
+          </a>
         </div>
       </div>
 
@@ -768,6 +895,91 @@ export default function KunjunganPage() {
                       <span style={{ color: '#334155', lineHeight: 1.55, fontSize: '0.85rem' }}>{alur}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Detail Lokasi & Panduan Akses */}
+              <div style={{
+                marginBottom: '2rem',
+                padding: '1.25rem',
+                borderRadius: '16px',
+                backgroundColor: '#f8fafc',
+                border: '1.5px solid #e2e8f0',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <h4 style={{
+                    fontSize: '0.84rem', fontWeight: 900, color: '#0f172a',
+                    textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0,
+                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  }}>
+                    <MapPin size={17} color={modalDetail.accentColor} />
+                    Detail Lokasi Fasilitas & Panduan Akses
+                  </h4>
+                  <a
+                    href={modalDetail.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+                      backgroundColor: '#fff', color: '#0d6e38',
+                      padding: '0.45rem 0.95rem', borderRadius: '10px',
+                      fontSize: '0.78rem', fontWeight: 800,
+                      textDecoration: 'none', border: '1.5px solid #dcfce7',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#dcfce7')}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+                  >
+                    <Compass size={14} color="#059669" />
+                    <span>Buka Rute di Google Maps</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.85rem' }}>
+                  <div style={{ backgroundColor: '#fff', padding: '0.95rem 1.1rem', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Building2 size={13} color="#0284c7" />
+                      Nama Gedung & Posisi
+                    </div>
+                    <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.88rem' }}>
+                      {modalDetail.namaGedung}
+                    </div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '3px' }}>
+                      {modalDetail.posisi}
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: '#fff', padding: '0.95rem 1.1rem', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#059669', textTransform: 'uppercase', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Navigation size={13} color="#059669" />
+                      Titik Kumpul Rombongan (Meeting Point)
+                    </div>
+                    <div style={{ fontWeight: 800, color: '#059669', fontSize: '0.88rem' }}>
+                      {modalDetail.titikKumpul}
+                    </div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '3px' }}>
+                      Harap tiba di titik kumpul 15 menit sebelum jam kunjungan
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: '#fff', padding: '0.95rem 1.1rem', borderRadius: '12px', border: '1px solid #f1f5f9', gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <MapPin size={13} color="#e11d48" />
+                      Alamat Lengkap Balai
+                    </div>
+                    <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.85rem' }}>
+                      {modalDetail.alamat}
+                    </div>
+                    <div style={{
+                      fontSize: '0.78rem', color: '#334155', marginTop: '0.5rem', lineHeight: 1.55,
+                      backgroundColor: '#f8fafc', padding: '0.65rem 0.85rem', borderRadius: '8px',
+                      borderLeft: `3px solid ${modalDetail.accentColor}`,
+                    }}>
+                      <strong style={{ color: '#0f172a' }}>🧭 Petunjuk Akses dari Gerbang Utama:</strong> {modalDetail.petunjukArah}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -950,6 +1162,32 @@ export default function KunjunganPage() {
                       <option key={l.id} value={l.nama}>{l.nama}</option>
                     ))}
                   </select>
+
+                  {/* Lokasi Info Box di Form */}
+                  <div style={{
+                    marginTop: '0.45rem',
+                    padding: '0.65rem 0.85rem',
+                    borderRadius: '10px',
+                    backgroundColor: '#f1f5f9',
+                    border: '1px solid #e2e8f0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.2rem',
+                    fontSize: '0.74rem',
+                    color: '#334155',
+                    lineHeight: 1.4,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#0f172a', fontWeight: 700 }}>
+                      <MapPin size={12} color={formTarget.accentColor} />
+                      <span>{formTarget.namaGedung} ({formTarget.posisi})</span>
+                    </div>
+                    <div style={{ color: '#64748b', fontSize: '0.7rem' }}>
+                      {formTarget.alamat}
+                    </div>
+                    <div style={{ color: '#059669', fontSize: '0.71rem', fontWeight: 600, marginTop: '2px' }}>
+                      🚩 Titik Kumpul: <strong>{formTarget.titikKumpul}</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1100,8 +1338,31 @@ export default function KunjunganPage() {
                 <strong style={{ color: '#0d6e38', fontFamily: 'monospace', fontSize: '0.95rem' }}>{submitted.code}</strong>
               </div>
               <div><span style={{ color: '#64748b' }}>Lokasi: </span><strong>{submitted.lokasiPilihan}</strong></div>
+              <div><span style={{ color: '#64748b' }}>Gedung: </span><strong style={{ color: '#0284c7' }}>{submitted.namaGedung}</strong></div>
+              <div><span style={{ color: '#64748b' }}>Titik Kumpul: </span><strong style={{ color: '#059669' }}>🚩 {submitted.titikKumpul}</strong></div>
+              <div style={{ fontSize: '0.76rem', color: '#64748b', lineHeight: 1.4, margin: '4px 0' }}>
+                <span>Alamat: </span>{submitted.alamat}
+              </div>
               <div><span style={{ color: '#64748b' }}>Pemohon: </span><strong>{submitted.nama} ({submitted.instansi})</strong></div>
               <div><span style={{ color: '#64748b' }}>Jadwal: </span><strong>{submitted.tanggal} | {submitted.jumlahPeserta} Peserta</strong></div>
+
+              {submitted.mapsUrl && (
+                <div style={{ marginTop: '0.6rem', paddingTop: '0.6rem', borderTop: '1px dashed #cbd5e1' }}>
+                  <a
+                    href={submitted.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                      color: '#0d6e38', fontWeight: 700, fontSize: '0.78rem', textDecoration: 'none',
+                    }}
+                  >
+                    <MapPin size={13} color="#059669" />
+                    <span>Petunjuk Rute Google Maps</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <a
