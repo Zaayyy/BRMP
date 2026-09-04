@@ -1092,7 +1092,8 @@ try {
             }
 
             if ($method === 'POST' || $method === 'PUT') {
-                if ($authUser['role'] !== 'Admin') {
+                $uRole = strtolower(trim($authUser['role'] ?? ''));
+                if ($uRole !== 'admin') {
                     http_response_code(403);
                     echo json_encode(['success' => false, 'message' => 'Akses ditolak. Fitur ini khusus Administrator.']);
                     exit();

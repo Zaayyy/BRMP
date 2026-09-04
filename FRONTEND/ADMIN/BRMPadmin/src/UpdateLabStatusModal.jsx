@@ -63,28 +63,53 @@ const formatSpk = (cus, dateStr, noReg) => {
   }
 };
 
-const getSlaInfo = (dateStr) => {
-  if (!dateStr) return { daysRemaining: 45, label: "Sisa 45 hari", badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+const getSlaInfo = (dateStr, customSlaSettings = null) => {
+  let maxSla = 45;
+  let yellowDays = 14;
+  let redDays = 7;
+
+  const currentSettings = customSlaSettings || (() => {
+    try {
+      const cached = localStorage.getItem("brmp_system_settings");
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  if (currentSettings) {
+    if (currentSettings.sla_hari !== undefined && currentSettings.sla_hari !== "") {
+      maxSla = Math.max(1, parseInt(currentSettings.sla_hari, 10) || 45);
+    }
+    if (currentSettings.sla_kuning_hari !== undefined && currentSettings.sla_kuning_hari !== "") {
+      yellowDays = Math.max(1, parseInt(currentSettings.sla_kuning_hari, 10) || 14);
+    }
+    if (currentSettings.sla_merah_hari !== undefined && currentSettings.sla_merah_hari !== "") {
+      redDays = Math.max(1, parseInt(currentSettings.sla_merah_hari, 10) || 7);
+    }
+  }
+
+  if (!dateStr) return { daysRemaining: maxSla, label: `Sisa ${maxSla} hari`, badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
   try {
     const start = new Date(dateStr);
-    if (isNaN(start.getTime())) return { daysRemaining: 45, label: "Sisa 45 hari", badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+    if (isNaN(start.getTime())) return { daysRemaining: maxSla, label: `Sisa ${maxSla} hari`, badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
     const now = new Date();
     start.setHours(0, 0, 0, 0);
     now.setHours(0, 0, 0, 0);
     const diffTime = now.getTime() - start.getTime();
     const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const daysRemaining = 45 - daysElapsed;
+    const daysRemaining = maxSla - daysElapsed;
     if (daysRemaining <= 0) {
       return { daysRemaining, label: daysRemaining === 0 ? "Batas Hari Ini" : `Lewat ${Math.abs(daysRemaining)} hr`, badgeClass: "bg-rose-100 text-rose-900 border-rose-300 font-black" };
-    } else if (daysRemaining <= 7) {
+    } else if (daysRemaining <= redDays) {
       return { daysRemaining, label: `🚨 Sisa ${daysRemaining} hr (Kritis)`, badgeClass: "bg-rose-100 text-rose-900 border-rose-300 font-extrabold" };
-    } else if (daysRemaining <= 14) {
+    } else if (daysRemaining <= yellowDays) {
       return { daysRemaining, label: `⚠️ Sisa ${daysRemaining} hr`, badgeClass: "bg-amber-100 text-amber-900 border-amber-300 font-bold" };
     } else {
       return { daysRemaining, label: `✓ Sisa ${daysRemaining} hr`, badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold" };
     }
   } catch {
-    return { daysRemaining: 45, label: "Sisa 45 hari", badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+    return { daysRemaining: maxSla, label: `Sisa ${maxSla} hari`, badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300" };
   }
 };
 

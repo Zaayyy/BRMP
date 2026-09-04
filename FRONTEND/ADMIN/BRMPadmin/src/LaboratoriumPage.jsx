@@ -6,7 +6,7 @@ import {
     Activity
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { internalLabService, authService } from "./services/apiService";
+import { internalLabService, internalSettingsService, authService } from "./services/apiService";
 import UpdateLabStatusModal from "./UpdateLabStatusModal";
 
 const tabMeta = {
@@ -107,14 +107,32 @@ export const getTodayDate = () => {
     return `${year}-${month}-${day}`;
 };
 
-// Helper formula SPK: CUS/Bulan-Tahun/Urutan
-const formatSpk = (cus, dateStr, noReg) => {
+// Helper formula SPK: CUS/Bulan-Tahun/Urutan (mendukung template dinamis dari Pengaturan)
+const formatSpk = (cus, dateStr, noReg, customTemplate = null) => {
     try {
         const d = dateStr ? new Date(dateStr) : new Date();
         const month = String(d.getMonth() + 1).padStart(2, "0");
         const year = String(d.getFullYear()).slice(-2);
         const urutan = String(noReg || "1").trim();
-        return `${cus || "CE-3"}/${month}-${year}/${urutan}`;
+        const cleanCus = (cus || "CE-3").trim();
+
+        const template = customTemplate || (() => {
+            try {
+                const cached = localStorage.getItem("brmp_system_settings");
+                return cached ? JSON.parse(cached)?.format_spk : null;
+            } catch {
+                return null;
+            }
+        })() || "CE-{KATEGORI}/{BULAN}-{TAHUN}/{NO}";
+
+        if (template && template.includes("{")) {
+            return template
+                .replace("{KATEGORI}", cleanCus)
+                .replace("{BULAN}", month)
+                .replace("{TAHUN}", year)
+                .replace("{NO}", urutan);
+        }
+        return `${cleanCus}/${month}-${year}/${urutan}`;
     } catch {
         const now = new Date();
         const m = String(now.getMonth() + 1).padStart(2, "0");
@@ -123,18 +141,40 @@ const formatSpk = (cus, dateStr, noReg) => {
     }
 };
 
-// Helper SLA 45 Hari:
-// - Hijau: Sisa > 14 hari
-// - Kuning: 14 hari sebelum 45 (sisa 8 - 14 hari)
-// - Merah: 7 hari sebelum 45 (sisa 1 - 7 hari atau lewat 45 hari)
-export const getSlaInfo = (dateStr) => {
+// Helper SLA Dinamis (membaca konfigurasi sla_hari, sla_kuning_hari, sla_merah_hari)
+export const getSlaInfo = (dateStr, customSlaSettings = null) => {
+    let maxSla = 45;
+    let yellowDays = 14;
+    let redDays = 7;
+
+    const currentSettings = customSlaSettings || (() => {
+        try {
+            const cached = localStorage.getItem("brmp_system_settings");
+            return cached ? JSON.parse(cached) : null;
+        } catch {
+            return null;
+        }
+    })();
+
+    if (currentSettings) {
+        if (currentSettings.sla_hari !== undefined && currentSettings.sla_hari !== "") {
+            maxSla = Math.max(1, parseInt(currentSettings.sla_hari, 10) || 45);
+        }
+        if (currentSettings.sla_kuning_hari !== undefined && currentSettings.sla_kuning_hari !== "") {
+            yellowDays = Math.max(1, parseInt(currentSettings.sla_kuning_hari, 10) || 14);
+        }
+        if (currentSettings.sla_merah_hari !== undefined && currentSettings.sla_merah_hari !== "") {
+            redDays = Math.max(1, parseInt(currentSettings.sla_merah_hari, 10) || 7);
+        }
+    }
+
     if (!dateStr) {
         return {
-            daysRemaining: 45,
+            daysRemaining: maxSla,
             daysElapsed: 0,
             status: "safe",
             color: "emerald",
-            label: "Sisa 45 hari (Aman)",
+            label: `Sisa ${maxSla} hari (Aman)`,
             badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
             dotClass: "bg-emerald-500",
         };
@@ -144,11 +184,11 @@ export const getSlaInfo = (dateStr) => {
         const start = new Date(dateStr);
         if (isNaN(start.getTime())) {
             return {
-                daysRemaining: 45,
+                daysRemaining: maxSla,
                 daysElapsed: 0,
                 status: "safe",
                 color: "emerald",
-                label: "Sisa 45 hari (Aman)",
+                label: `Sisa ${maxSla} hari (Aman)`,
                 badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
                 dotClass: "bg-emerald-500",
             };
@@ -160,7 +200,7 @@ export const getSlaInfo = (dateStr) => {
 
         const diffTime = now.getTime() - start.getTime();
         const daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const daysRemaining = 45 - daysElapsed;
+        const daysRemaining = maxSla - daysElapsed;
 
         if (daysRemaining <= 0) {
             return {
@@ -168,12 +208,11 @@ export const getSlaInfo = (dateStr) => {
                 daysElapsed,
                 status: "overdue",
                 color: "rose",
-                label: daysRemaining === 0 ? "Batas Hari Ini (45 Hari)" : `Lewat ${Math.abs(daysRemaining)} hari`,
+                label: daysRemaining === 0 ? `Batas Hari Ini (${maxSla} Hari)` : `Lewat ${Math.abs(daysRemaining)} hari`,
                 badgeClass: "bg-rose-100 text-rose-900 border border-rose-300 font-black",
                 dotClass: "bg-rose-600 animate-ping",
             };
-        } else if (daysRemaining <= 7) {
-            // Merah: 7 hari sebelum 45 (sisa 1 - 7 hari)
+        } else if (daysRemaining <= redDays) {
             return {
                 daysRemaining,
                 daysElapsed,
@@ -183,8 +222,7 @@ export const getSlaInfo = (dateStr) => {
                 badgeClass: "bg-rose-100 text-rose-900 border border-rose-300 font-extrabold",
                 dotClass: "bg-rose-500 animate-pulse",
             };
-        } else if (daysRemaining <= 14) {
-            // Kuning: 14 hari sebelum 45 (sisa 8 - 14 hari)
+        } else if (daysRemaining <= yellowDays) {
             return {
                 daysRemaining,
                 daysElapsed,
@@ -195,7 +233,6 @@ export const getSlaInfo = (dateStr) => {
                 dotClass: "bg-amber-500",
             };
         } else {
-            // Hijau: Aman (> 14 hari)
             return {
                 daysRemaining,
                 daysElapsed,
@@ -208,11 +245,11 @@ export const getSlaInfo = (dateStr) => {
         }
     } catch {
         return {
-            daysRemaining: 45,
+            daysRemaining: maxSla,
             daysElapsed: 0,
             status: "safe",
             color: "emerald",
-            label: "Sisa 45 hari (Aman)",
+            label: `Sisa ${maxSla} hari (Aman)`,
             badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
             dotClass: "bg-emerald-500",
         };
@@ -363,8 +400,43 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
         }
     };
 
+    // State Pengaturan Sistem & SLA Dinamis
+    const [slaSettings, setSlaSettings] = useState(() => {
+        try {
+            const cached = localStorage.getItem("brmp_system_settings");
+            return cached ? JSON.parse(cached) : { sla_hari: "45", sla_kuning_hari: "14", sla_merah_hari: "7", format_spk: "CE-{KATEGORI}/{BULAN}-{TAHUN}/{NO}" };
+        } catch {
+            return { sla_hari: "45", sla_kuning_hari: "14", sla_merah_hari: "7", format_spk: "CE-{KATEGORI}/{BULAN}-{TAHUN}/{NO}" };
+        }
+    });
+
     useEffect(() => {
         fetchLabData();
+
+        // Ambil pengaturan sistem terbaru dari server & dengarkan event update
+        const fetchSettings = async () => {
+            try {
+                const res = await internalSettingsService.get();
+                if (res && res.success && res.data && Object.keys(res.data).length > 0) {
+                    setSlaSettings(res.data);
+                    localStorage.setItem("brmp_system_settings", JSON.stringify(res.data));
+                }
+            } catch (err) {
+                console.warn("Could not fetch SLA settings:", err);
+            }
+        };
+        fetchSettings();
+
+        const handleSettingsUpdated = (e) => {
+            try {
+                const updated = e?.detail || JSON.parse(localStorage.getItem("brmp_system_settings") || "{}");
+                if (updated && Object.keys(updated).length > 0) {
+                    setSlaSettings(updated);
+                }
+            } catch (err) {}
+        };
+        window.addEventListener("brmp_settings_updated", handleSettingsUpdated);
+        return () => window.removeEventListener("brmp_settings_updated", handleSettingsUpdated);
     }, []);
 
     // Reaktif Auto-Generate Kode Sampel Berurutan secara Real-Time
@@ -1371,16 +1443,16 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                         </div>
                     </div>
 
-                    {/* SLA 45 Hari Monitoring Banner */}
+                    {/* SLA Monitoring Banner Dinamis */}
                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div className="flex items-center gap-3 rounded-2xl bg-emerald-50/80 border border-emerald-200 p-3.5">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 font-black text-sm">
                                 🟢
                             </div>
                             <div>
-                                <span className="text-[11px] font-bold text-emerald-900 block">SLA Aman (&gt; 14 Hari)</span>
+                                <span className="text-[11px] font-bold text-emerald-900 block">SLA Aman (&gt; {slaSettings.sla_kuning_hari || 14} Hari)</span>
                                 <span className="text-lg font-black text-emerald-950">
-                                    {inTestingSamples.filter(r => getSlaInfo(r.tanggal_masuk || r.tanggalMasuk).status === "safe").length} <span className="text-xs font-semibold text-emerald-700">Sampel</span>
+                                    {inTestingSamples.filter(r => getSlaInfo(r.tanggal_masuk || r.tanggalMasuk, slaSettings).status === "safe").length} <span className="text-xs font-semibold text-emerald-700">Sampel</span>
                                 </span>
                             </div>
                         </div>
@@ -1390,9 +1462,9 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                 🟡
                             </div>
                             <div>
-                                <span className="text-[11px] font-bold text-amber-900 block">Peringatan (≤ 14 Hari Sisa)</span>
+                                <span className="text-[11px] font-bold text-amber-900 block">Peringatan (≤ {slaSettings.sla_kuning_hari || 14} Hari Sisa)</span>
                                 <span className="text-lg font-black text-amber-950">
-                                    {inTestingSamples.filter(r => getSlaInfo(r.tanggal_masuk || r.tanggalMasuk).status === "warning").length} <span className="text-xs font-semibold text-amber-700">Sampel</span>
+                                    {inTestingSamples.filter(r => getSlaInfo(r.tanggal_masuk || r.tanggalMasuk, slaSettings).status === "warning").length} <span className="text-xs font-semibold text-amber-700">Sampel</span>
                                 </span>
                             </div>
                         </div>
@@ -1402,9 +1474,9 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                 🔴
                             </div>
                             <div>
-                                <span className="text-[11px] font-bold text-rose-900 block">Kritis / Jatuh Tempo (≤ 7 Hari)</span>
+                                <span className="text-[11px] font-bold text-rose-900 block">Kritis / Jatuh Tempo (≤ {slaSettings.sla_merah_hari || 7} Hari)</span>
                                 <span className="text-lg font-black text-rose-950">
-                                    {inTestingSamples.filter(r => ["critical", "overdue"].includes(getSlaInfo(r.tanggal_masuk || r.tanggalMasuk).status)).length} <span className="text-xs font-semibold text-rose-700">Sampel</span>
+                                    {inTestingSamples.filter(r => ["critical", "overdue"].includes(getSlaInfo(r.tanggal_masuk || r.tanggalMasuk, slaSettings).status)).length} <span className="text-xs font-semibold text-rose-700">Sampel</span>
                                 </span>
                             </div>
                         </div>
@@ -1418,7 +1490,7 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                     <th className="px-3.5 py-3 min-w-[130px]">NOMOR SPK</th>
                                     <th className="px-3 py-3 text-center min-w-[100px]">KODE SAMPEL</th>
                                     <th className="px-3 py-3 text-center w-14">JML</th>
-                                    <th className="px-3.5 py-3 min-w-[160px]">SLA / TENGGAT (45 HARI)</th>
+                                    <th className="px-3.5 py-3 min-w-[160px]">SLA / TENGGAT ({slaSettings.sla_hari || 45} HARI)</th>
                                     <th className="px-3.5 py-3 min-w-[140px]">TAHAPAN ANALISIS</th>
                                     <th className="px-3.5 py-3 min-w-[150px]">PARAMETER UJI</th>
                                     <th className="px-3 py-3 text-center min-w-[80px]">BAYAR</th>
@@ -1436,7 +1508,7 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                 ) : (
                                     inTestingSamples.map((row, idx) => {
                                         const sInfo = getSampleCodeDisplay(row);
-                                        const sla = getSlaInfo(row.tanggal_masuk || row.tanggalMasuk);
+                                        const sla = getSlaInfo(row.tanggal_masuk || row.tanggalMasuk, slaSettings);
 
                                         return (
                                             <tr key={row.id} className="hover:bg-slate-50 transition">
@@ -1551,7 +1623,7 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                     <th className="px-4 py-3 min-w-[130px] border-r border-slate-200">Kode SPK</th>
                                     <th className="px-4 py-3 min-w-[110px] border-r border-slate-200">Kode Sampel</th>
                                     <th className="px-3.5 py-3 w-16 text-center border-r border-slate-200">Jml</th>
-                                    <th className="px-3.5 py-3 min-w-[150px] border-r border-slate-200">SLA Tenggat (45 Hari)</th>
+                                    <th className="px-3.5 py-3 min-w-[150px] border-r border-slate-200">SLA Tenggat ({slaSettings.sla_hari || 45} Hari)</th>
                                     <th className="px-4 py-3 min-w-[180px] border-r border-slate-200">Tahap Proses Uji</th>
                                     <th className="px-4 py-3 min-w-[200px] border-r border-slate-200">Parameter Uji</th>
                                     <th className="px-3.5 py-3 text-center min-w-[90px] border-r border-slate-200">Status</th>
@@ -1568,7 +1640,7 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                                 ) : (
                                     analystBookSamples.map((row, idx) => {
                                         const sInfo = getSampleCodeDisplay(row);
-                                        const sla = getSlaInfo(row.tanggal_masuk || row.tanggalMasuk);
+                                        const sla = getSlaInfo(row.tanggal_masuk || row.tanggalMasuk, slaSettings);
 
                                         return (
                                             <tr key={row.id} className="hover:bg-emerald-50/20 transition font-medium">

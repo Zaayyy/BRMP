@@ -64,12 +64,20 @@ export default function SettingsPage({ onNavigate }) {
     const loadSettings = async () => {
         setIsLoading(true);
         try {
+            const cached = localStorage.getItem("brmp_system_settings");
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    setSettings((prev) => ({ ...prev, ...parsed }));
+                } catch (e) {}
+            }
             const res = await internalSettingsService.get();
-            if (res && res.success && res.data) {
+            if (res && res.success && res.data && Object.keys(res.data).length > 0) {
                 setSettings((prev) => ({
                     ...prev,
                     ...res.data,
                 }));
+                localStorage.setItem("brmp_system_settings", JSON.stringify(res.data));
             }
         } catch (err) {
             console.warn("Gagal memuat pengaturan dari server:", err);
@@ -90,6 +98,9 @@ export default function SettingsPage({ onNavigate }) {
         setIsSaving(true);
         setToastMessage(null);
         try {
+            localStorage.setItem("brmp_system_settings", JSON.stringify(settings));
+            window.dispatchEvent(new CustomEvent("brmp_settings_updated", { detail: settings }));
+
             const res = await internalSettingsService.update(settings);
             setToastMessage({
                 type: "success",
