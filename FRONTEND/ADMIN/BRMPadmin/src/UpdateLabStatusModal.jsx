@@ -370,15 +370,34 @@ export default function UpdateLabStatusModal({ isOpen, onClose, trackingItem, on
 
       if (res && res.success) {
         setSuccessMessage('Data logbook, tahap proses, & parameter uji berhasil diperbarui!');
+        if (typeof window !== 'undefined' && window.showFeedbackPopup) {
+          window.showFeedbackPopup({
+            type: 'success',
+            title: 'Analisis Lab Berhasil Diperbarui! 🧪',
+            message: 'Perubahan parameter uji, logbook analis, dan status tahapan sampel berhasil disimpan.',
+            details: {
+              'Nomor SPK': spkFinal,
+              'Tahapan Proses': payload.tahap_proses,
+              'Status Uji': payload.status_uji,
+            },
+          });
+        }
         setTimeout(() => {
           if (onSuccess) onSuccess();
           onClose();
-        }, 1200);
+        }, 600);
       } else {
         throw new Error(res.message || 'Gagal menyimpan perubahan.');
       }
     } catch (err) {
       setErrorMessage(err.message || 'Terjadi kesalahan sistem saat memperbarui data.');
+      if (typeof window !== 'undefined' && window.showFeedbackPopup) {
+        window.showFeedbackPopup({
+          type: 'error',
+          title: 'Gagal Memperbarui Analisis Lab',
+          message: err.message || 'Terjadi kesalahan sistem saat memperbarui data.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -15,6 +15,7 @@ import {
     Zap,
 } from "lucide-react";
 import { authService, ROLE_DETAILS } from "../services/apiService";
+import FeedbackPopup from "./FeedbackPopup";
 
 const ALL_SIDEBAR_ITEMS = [
     { label: "Dashboard",    icon: LayoutDashboard, key: "dashboard", roles: ["Admin"] },
@@ -277,6 +278,9 @@ export default function AdminShell({ activeView, onNavigate, onLogout, children 
             <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 {children}
             </main>
+
+            {/* Global Modern Feedback Popup Modal */}
+            <FeedbackPopup />
         </div>
     );
 }

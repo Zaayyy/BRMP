@@ -22,6 +22,7 @@ import {
     Database,
 } from "lucide-react";
 import { internalSettingsService, authService } from "./services/apiService";
+import { triggerFeedbackPopup } from "./components/FeedbackPopup";
 
 export default function SettingsPage({ onNavigate }) {
     const user = authService.getUser();
@@ -106,11 +107,27 @@ export default function SettingsPage({ onNavigate }) {
                 type: "success",
                 text: res.message || "Pengaturan aplikasi berhasil disimpan ke server database!",
             });
+            triggerFeedbackPopup({
+                type: "success",
+                title: "Pengaturan Berhasil Disimpan! ⚙️",
+                message: res.message || "Pengaturan aplikasi dan standar SLA laboratorium berhasil diperbarui di database server.",
+                details: {
+                    "Batas Maksimal SLA": `${settings.sla_hari} Hari Kerja`,
+                    "Peringatan Kuning": `${settings.sla_kuning_hari} Hari Sebelum`,
+                    "Peringatan Merah": `${settings.sla_merah_hari} Hari Sebelum`,
+                    "Format SPK": settings.format_spk,
+                },
+            });
             setTimeout(() => setToastMessage(null), 5000);
         } catch (err) {
             setToastMessage({
                 type: "error",
                 text: err.message || "Gagal menyimpan pengaturan ke server.",
+            });
+            triggerFeedbackPopup({
+                type: "error",
+                title: "Gagal Menyimpan Pengaturan",
+                message: err.message || "Gagal menyimpan pengaturan ke server database.",
             });
         } finally {
             setIsSaving(false);
@@ -144,6 +161,11 @@ export default function SettingsPage({ onNavigate }) {
                 type: "success",
                 text: res.message || "Kata sandi berhasil diperbarui!",
             });
+            triggerFeedbackPopup({
+                type: "success",
+                title: "Kata Sandi Berhasil Diubah! 🔒",
+                message: res.message || "Kata sandi akun administrator telah berhasil diperbarui di server.",
+            });
             setPasswordData({
                 current_password: "",
                 new_password: "",
@@ -154,6 +176,11 @@ export default function SettingsPage({ onNavigate }) {
             setToastMessage({
                 type: "error",
                 text: err.message || "Gagal memperbarui password akun.",
+            });
+            triggerFeedbackPopup({
+                type: "error",
+                title: "Gagal Mengubah Kata Sandi",
+                message: err.message || "Gagal memperbarui password akun.",
             });
         } finally {
             setIsSavingPassword(false);

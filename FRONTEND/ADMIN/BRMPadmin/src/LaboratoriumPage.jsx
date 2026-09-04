@@ -8,6 +8,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { internalLabService, internalSettingsService, authService } from "./services/apiService";
 import UpdateLabStatusModal from "./UpdateLabStatusModal";
+import { triggerFeedbackPopup } from "./components/FeedbackPopup";
 
 const tabMeta = {
     "laboratorium-jenis-sampel": {
@@ -564,6 +565,11 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
         setSampleRows(updated);
         localStorage.setItem("brmp_sample_types_v3", JSON.stringify(updated));
         setEditingSampleId(null);
+        triggerFeedbackPopup({
+            type: "success",
+            title: "Jenis Sampel Diperbarui! ✨",
+            message: `Label dan kategori jenis sampel '${editingSampleData.name}' (${editingSampleData.code}) berhasil disimpan.`,
+        });
     };
 
     const deleteSampleType = (no) => {
@@ -571,6 +577,11 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
             const updated = sampleRows.filter((r) => r.no !== no);
             setSampleRows(updated);
             localStorage.setItem("brmp_sample_types_v3", JSON.stringify(updated));
+            triggerFeedbackPopup({
+                type: "info",
+                title: "Kategori Dihapus",
+                message: "Kategori jenis sampel telah berhasil dihapus dari sistem.",
+            });
         }
     };
 
@@ -611,7 +622,17 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
 
             const res = await internalLabService.create(payload);
             if (res && res.success) {
-                setNotification(`Sampel [SPK: ${payload.spk}] berhasil didaftarkan ke register!`);
+                triggerFeedbackPopup({
+                    type: "success",
+                    title: "Pendaftaran Sampel Berhasil! 🎉",
+                    message: "Sampel baru telah resmi dicatat ke dalam buku register laboratorium.",
+                    details: {
+                        "Nomor SPK": payload.spk,
+                        "Kode Sampel": sampleCodeClean,
+                        "Pemohon": payload.nama_pemohon,
+                        "Status Bayar": payload.status_bayar,
+                    },
+                });
                 const nextNo = currentNextNo + 1;
                 setCurrentNextNo(nextNo);
                 setNewEntry({
@@ -630,10 +651,13 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                 setSampleCodeValue("");
                 setIsAddFormOpen(false);
                 fetchLabData();
-                setTimeout(() => setNotification(null), 4000);
             }
         } catch (err) {
-            alert(err.message || "Gagal mendaftarkan sampel laboratorium.");
+            triggerFeedbackPopup({
+                type: "error",
+                title: "Gagal Mendaftarkan Sampel",
+                message: err.message || "Terjadi kendala saat mendaftarkan sampel ke server.",
+            });
         } finally {
             setActionLoading(false);
         }
@@ -656,10 +680,22 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                     tahap_proses: "2. Preparasi & Verifikasi Sampel"
                 } : item))
             );
-            setNotification(`Pembayaran SPK ${spk || `#${id}`} LUNAS! Berkas otomatis dipindahkan ke menu 'Proses Pengujian'.`);
-            setTimeout(() => setNotification(null), 4000);
+            triggerFeedbackPopup({
+                type: "success",
+                title: "Pembayaran Lunas! 💳",
+                message: `Pembayaran berkas SPK ${spk || `#${id}`} telah diverifikasi lunas dan otomatis dipindahkan ke menu 'Proses Pengujian'.`,
+                details: {
+                    "Nomor SPK": spk || `#${id}`,
+                    "Tahap Baru": "2. Preparasi & Verifikasi Sampel",
+                    "Status": "Lunas",
+                },
+            });
         } catch (err) {
-            alert(err.message || "Gagal memperbarui status pembayaran.");
+            triggerFeedbackPopup({
+                type: "error",
+                title: "Gagal Mengubah Status Pembayaran",
+                message: err.message || "Gagal memperbarui status ke server.",
+            });
         } finally {
             setActionLoading(false);
         }
@@ -683,10 +719,22 @@ export default function LaboratoriumPage({ activeTab, onNavigate }) {
                     tanggal_selesai: today 
                 } : item))
             );
-            setNotification(`Pengujian SPK ${spk || `#${id}`} SELESAI! Berkas otomatis dipindahkan ke menu 'Laporan Selesai' untuk upload sertifikat.`);
-            setTimeout(() => setNotification(null), 4000);
+            triggerFeedbackPopup({
+                type: "success",
+                title: "Pengujian Selesai Dilakukan! 🧪",
+                message: `Pengujian teknis SPK ${spk || `#${id}`} selesai. Berkas otomatis dipindahkan ke menu 'Laporan Selesai' untuk penerbitan sertifikat LHU.`,
+                details: {
+                    "Nomor SPK": spk || `#${id}`,
+                    "Tahap Baru": "6. Penerbitan & Pengesahan LHU",
+                    "Status": "Selesai",
+                },
+            });
         } catch (err) {
-            alert(err.message || "Gagal memperbarui status pengujian.");
+            triggerFeedbackPopup({
+                type: "error",
+                title: "Gagal Mengubah Status Pengujian",
+                message: err.message || "Gagal memperbarui status ke server.",
+            });
         } finally {
             setActionLoading(false);
         }
